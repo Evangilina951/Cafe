@@ -90,56 +90,58 @@ function clearOrder() {
 
 // ================== ОТПРАВКА ДАННЫХ ================== //
 async function pay() {
-  if (!currentUser) {
-    alert('Пожалуйста, войдите в систему');
-    return;
-  }
-
-  if (order.length === 0) {
-    alert('Добавьте напитки в заказ');
-    return;
-  }
-
-  if (!confirm(`Подтвердить заказ на ${document.getElementById('total').textContent} руб.?`)) {
-    return;
-  }
-
   try {
     const scriptUrl = "https://script.google.com/macros/s/AKfycbxglM-7_EmARAX7Q-3o-88-HstwO9mM8iwq5NUO8vDZH6DWfalK3-Y0gR-gg6c6P_r0/exec";
+    const callbackName = "jsonpCallback_" + Date.now();
     
-    // Создаем callback функцию для JSONP
-    const callbackName = 'jsonpCallback_' + Date.now();
-    window[callbackName] = function(response) {
-      delete window[callbackName];
-      document.body.removeChild(script);
+    return new Promise((resolve, reject) => {
+      // Создаем callback-функцию
+      window[callbackName] = function(response) {
+        delete window[callbackName];
+        document.body.removeChild(script);
+        
+        if (response.status === "success") {
+          resolve(response);
+        } else {
+          reject(new Error(response.message));
+        }
+      };
       
-      if (response.status === 'success') {
-        alert('Заказ успешно сохранен!');
-        order = [];
-        updateOrderList();
-      } else {
-        throw new Error(response.message || 'Ошибка сервера');
-      }
-    };
-
-    // Формируем параметры
-    const params = new URLSearchParams();
-    params.append('name', order.map(item => item.name).join(', '));
-    params.append('price', order.reduce((sum, item) => sum + item.price, 0));
-    params.append('email', currentUser.email);
-    params.append('date', new Date().toISOString());
-    params.append('callback', callbackName);
-
-    // Создаем script элемент
-    const script = document.createElement('script');
-    script.src = `${scriptUrl}?${params.toString()}`;
-    document.body.appendChild(script);
-
+      // Формируем URL
+      const params = new URLSearchParams({
+        name: order.map(i => i.name).join(", "),
+        price: order.reduce((sum, i) => sum + i.price, 0),
+        email: currentUser.email,
+        date: new Date().toISOString(),
+        callback: callbackName
+      });
+      
+      // Создаем script-тег
+      const script = document.createElement("script");
+      script.src = `${scriptUrl}?${params}`;
+      script.onerror = () => {
+        reject(new Error("Ошибка загрузки скрипта"));
+      };
+      
+      document.body.appendChild(script);
+    });
+    
   } catch (error) {
-    console.error('Ошибка:', error);
-    alert(`Ошибка сохранения: ${error.message}`);
+    console.error("Ошибка:", error);
+    throw error;
   }
 }
+
+// Использование:
+pay()
+  .then(() => {
+    alert("Заказ сохранен!");
+    order = [];
+    updateOrderList();
+  })
+  .catch(err => {
+    alert("Ошибка: " + err.message);
+  });
 
 // Стили для кнопки удаления
 const style = document.createElement('style');
