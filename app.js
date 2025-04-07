@@ -89,59 +89,49 @@ function clearOrder() {
 }
 
 // ================== ОТПРАВКА ДАННЫХ ================== //
-async function pay() {
-  try {
-    const scriptUrl = "https://script.google.com/macros/s/AKfycbxglM-7_EmARAX7Q-3o-88-HstwO9mM8iwq5NUO8vDZH6DWfalK3-Y0gR-gg6c6P_r0/exec";
-    const callbackName = "jsonpCallback_" + Date.now();
-    
-    return new Promise((resolve, reject) => {
-      // Создаем callback-функцию
-      window[callbackName] = function(response) {
-        delete window[callbackName];
-        document.body.removeChild(script);
-        
-        if (response.status === "success") {
-          resolve(response);
-        } else {
-          reject(new Error(response.message));
-        }
-      };
-      
-      // Формируем URL
-      const params = new URLSearchParams({
-        name: order.map(i => i.name).join(", "),
-        price: order.reduce((sum, i) => sum + i.price, 0),
-        email: currentUser.email,
-        date: new Date().toISOString(),
-        callback: callbackName
-      });
-      
-      // Создаем script-тег
-      const script = document.createElement("script");
-      script.src = `${scriptUrl}?${params}`;
-      script.onerror = () => {
-        reject(new Error("Ошибка загрузки скрипта"));
-      };
-      
-      document.body.appendChild(script);
-    });
-    
-  } catch (error) {
-    console.error("Ошибка:", error);
-    throw error;
-  }
-}
 
-// Использование:
-pay()
-  .then(() => {
+async function pay() {
+  if (!currentUser) {
+    alert("Пожалуйста, войдите в систему");
+    return;
+  }
+
+  if (order.length === 0) {
+    alert("Добавьте напитки в заказ");
+    return;
+  }
+
+  try {
+    // Используем прокси для CORS
+    const proxyUrl = "https://corsproxy.io/?";
+    const scriptUrl = "https://script.google.com/macros/s/AKfycbxglM-7_EmARAX7Q-3o-88-HstwO9mM8iwq5NUO8vDZH6DWfalK3-Y0gR-gg6c6P_r0/exec"; // Ваш URL скрипта
+    
+    const response = await fetch(proxyUrl + encodeURIComponent(scriptUrl), {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        name: order.map(item => item.name).join(", "),
+        price: order.reduce((sum, item) => sum + item.price, 0),
+        email: currentUser.email, // Firebase уже проверил авторизацию
+        date: new Date().toISOString()
+      })
+    });
+
+    const result = await response.json();
+    
+    if (result.status !== "success") {
+      throw new Error(result.message);
+    }
+
     alert("Заказ сохранен!");
     order = [];
     updateOrderList();
-  })
-  .catch(err => {
-    alert("Ошибка: " + err.message);
-  });
+
+  } catch (error) {
+    console.error("Ошибка:", error);
+    alert("Ошибка: " + error.message);
+  }
+}
 
 // Стили для кнопки удаления
 const style = document.createElement('style');
