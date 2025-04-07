@@ -129,7 +129,7 @@ async function pay() {
 
 try {
         // URL вашего Google Apps Script
-        const scriptUrl = "https://script.google.com/macros/s/AKfycbxk40vLFzdMtAlJNowi5A02Ea4drKtlCWkzsbwmsnrxjHcm7bS2GuPuIYvg3ENk-ylaPg/exec";
+        const scriptUrl = "https://script.google.com/macros/s/AKfycbxglM-7_EmARAX7Q-3o-88-HstwO9mM8iwq5NUO8vDZH6DWfalK3-Y0gR-gg6c6P_r0/exec";
         
         // Отправляем каждый товар с email пользователя
         for (const item of order) {
