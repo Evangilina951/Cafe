@@ -31,7 +31,7 @@ function pay() {
 
   if (confirm("Подтвердите оплату")) {
     order.forEach(item => {
-      fetch("ВАШ_URL_СКРИПТА", {
+      fetch("https://script.google.com/macros/s/AKfycbxk40vLFzdMtAlJNowi5A02Ea4drKtlCWkzsbwmsnrxjHcm7bS2GuPuIYvg3ENk-ylaPg/exec", {
         method: "POST",
         body: JSON.stringify({ name: item.name, price: item.price })
       });
