@@ -1,4 +1,4 @@
-// Конфигурация Firebase (замените на свои данные)
+// Конфигурация Firebase
 const firebaseConfig = {
   apiKey: "AIzaSyDB8Vtxg3SjVyHRJ3ZOXT8osnHYrO_uw4A",
   authDomain: "cafe-90de8.firebaseapp.com",
@@ -17,139 +17,136 @@ const auth = firebase.auth();
 let order = [];
 let currentUser = null;
 
-// Проверка состояния авторизации при загрузке
+// ================== АВТОРИЗАЦИЯ ================== //
 auth.onAuthStateChanged(user => {
-    currentUser = user;
-    if (user) {
-        // Пользователь авторизован
-        document.getElementById('auth-form').classList.add('hidden');
-        document.getElementById('order-interface').classList.remove('hidden');
-        document.getElementById('user-email').textContent = user.email;
-    } else {
-        // Пользователь не авторизован
-        document.getElementById('auth-form').classList.remove('hidden');
-        document.getElementById('order-interface').classList.add('hidden');
-    }
+  currentUser = user;
+  if (user) {
+    document.getElementById('auth-form').classList.add('hidden');
+    document.getElementById('order-interface').classList.remove('hidden');
+    document.getElementById('user-email').textContent = user.email;
+  } else {
+    document.getElementById('auth-form').classList.remove('hidden');
+    document.getElementById('order-interface').classList.add('hidden');
+  }
 });
 
-// Функция входа
 function login() {
-    const email = document.getElementById('email').value;
-    const password = document.getElementById('password').value;
-    const errorMessage = document.getElementById('error-message');
-    
-    errorMessage.textContent = '';
-    
-    if (!email || !password) {
-        errorMessage.textContent = 'Введите email и пароль';
-        return;
-    }
-
-    auth.signInWithEmailAndPassword(email, password)
-        .catch(error => {
-            console.error('Ошибка входа:', error);
-            errorMessage.textContent = 'Ошибка входа: ' + error.message;
-        });
+  const email = document.getElementById('email').value;
+  const password = document.getElementById('password').value;
+  const errorMessage = document.getElementById('error-message');
+  
+  errorMessage.textContent = '';
+  
+  auth.signInWithEmailAndPassword(email, password)
+    .catch(error => {
+      errorMessage.textContent = error.message;
+    });
 }
 
-// Функция выхода
 function logout() {
-    auth.signOut()
-        .then(() => {
-            order = [];
-            updateOrderList();
-        })
-        .catch(error => {
-            console.error('Ошибка выхода:', error);
-        });
+  auth.signOut();
 }
 
-// Добавление напитка в заказ
+// ================== ФУНКЦИОНАЛ ЗАКАЗА ================== //
 function addDrink(name, price) {
-    if (!currentUser) {
-        alert('Пожалуйста, войдите в систему');
-        return;
-    }
-    
-    order.push({ name, price });
-    updateOrderList();
+  if (!currentUser) {
+    alert("Сначала войдите в систему!");
+    return;
+  }
+  
+  order.push({ name, price });
+  updateOrderList();
 }
 
-// Обновление списка заказов
 function updateOrderList() {
-    const list = document.getElementById('order-list');
-    list.innerHTML = '';
+  const list = document.getElementById("order-list");
+  list.innerHTML = "";
 
-    order.forEach((item, index) => {
-        const li = document.createElement('li');
-        li.innerHTML = `
-            ${item.name} - ${item.price} руб.
-            <button onclick="removeItem(${index})" style="float: right; padding: 2px 5px; background: #f44336;">×</button>
-        `;
-        list.appendChild(li);
+  order.forEach((item, index) => {
+    const li = document.createElement("li");
+    li.innerHTML = `
+      ${item.name} - ${item.price} руб.
+      <button onclick="removeItem(${index})" class="remove-btn">×</button>
+    `;
+    list.appendChild(li);
+  });
+
+  const total = order.reduce((sum, item) => sum + item.price, 0);
+  document.getElementById("total").textContent = total;
+}
+
+function removeItem(index) {
+  order.splice(index, 1);
+  updateOrderList();
+}
+
+function clearOrder() {
+  if (order.length === 0) return;
+  if (confirm("Вы уверены, что хотите очистить заказ?")) {
+    order = [];
+    updateOrderList();
+  }
+}
+
+// ================== ОТПРАВКА ДАННЫХ ================== //
+async function pay() {
+  if (!currentUser) {
+    alert("Пожалуйста, войдите в систему");
+    return;
+  }
+
+  if (order.length === 0) {
+    alert("Добавьте напитки в заказ");
+    return;
+  }
+
+  if (!confirm(`Подтвердить заказ на ${document.getElementById('total').textContent} руб.?`)) {
+    return;
+  }
+
+  try {
+    const scriptUrl = "https://script.google.com/macros/s/AKfycbxglM-7_EmARAX7Q-3o-88-HstwO9mM8iwq5NUO8vDZH6DWfalK3-Y0gR-gg6c6P_r0/exec";
+    
+    // Используем GET с параметрами для обхода CORS
+    const params = new URLSearchParams();
+    params.append('name', order.map(item => item.name).join(', '));
+    params.append('price', order.reduce((sum, item) => sum + item.price, 0));
+    params.append('email', currentUser.email);
+    params.append('date', new Date().toISOString());
+    
+    const response = await fetch(`${scriptUrl}?${params.toString()}`, {
+      method: 'GET',
+      headers: {
+        'Content-Type': 'application/json'
+      }
     });
 
-    // Обновляем итоговую сумму
-    const total = order.reduce((sum, item) => sum + item.price, 0);
-    document.getElementById('total').textContent = total;
-}
-
-// Удаление позиции из заказа
-function removeItem(index) {
-    order.splice(index, 1);
-    updateOrderList();
-}
-
-// Очистка всего заказа
-function clearOrder() {
-    if (order.length === 0) return;
+    if (!response.ok) throw new Error('Ошибка сервера');
     
-    if (confirm('Вы уверены, что хотите очистить заказ?')) {
-        order = [];
-        updateOrderList();
-    }
+    alert('Заказ успешно сохранен!');
+    order = [];
+    updateOrderList();
+    
+  } catch (error) {
+    console.error('Ошибка:', error);
+    alert(`Ошибка сохранения: ${error.message}\n\nПроверьте консоль (F12) для деталей`);
+  }
 }
 
-// Отправка заказа
-async function pay() {
-    if (!currentUser) {
-        alert('Пожалуйста, войдите в систему');
-        return;
-    }
-
-    if (order.length === 0) {
-        alert('Добавьте напитки в заказ');
-        return;
-    }
-
-    if (!confirm(`Подтвердить заказ на ${document.getElementById('total').textContent} руб.?`)) {
-        return;
-    }
-
-
-try {
-        // URL вашего Google Apps Script
-        const scriptUrl = "https://script.google.com/macros/s/AKfycbxglM-7_EmARAX7Q-3o-88-HstwO9mM8iwq5NUO8vDZH6DWfalK3-Y0gR-gg6c6P_r0/exec";
-        
-        // Отправляем каждый товар с email пользователя
-        for (const item of order) {
-            await fetch(scriptUrl, {
-                method: "POST",
-                headers: { "Content-Type": "application/json" },
-                body: JSON.stringify({
-                    name: item.name,
-                    price: item.price,
-                    email: currentUser.email,
-                    date: new Date().toISOString()
-                })
-            });
-        }
-        
-        alert('Заказ успешно сохранен!');
-        order = [];
-        updateOrderList();
-    } catch (error) {
-        console.error('Ошибка при сохранении заказа:', error);
-        alert('Произошла ошибка при сохранении заказа');
-    }
-}
+// Стили для кнопки удаления
+const style = document.createElement('style');
+style.textContent = `
+  .remove-btn {
+    float: right;
+    padding: 2px 5px;
+    background: #f44336;
+    color: white;
+    border: none;
+    border-radius: 3px;
+    cursor: pointer;
+  }
+  .remove-btn:hover {
+    background: #d32f2f;
+  }
+`;
+document.head.appendChild(style);
