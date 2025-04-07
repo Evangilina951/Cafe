@@ -91,7 +91,7 @@
     // ================== ОТПРАВКА ДАННЫХ (без прокси) ================== //
     async function pay() {
   try {
-    const URL = "https://script.google.com/macros/s/AKfycbxglM-7_EmARAX7Q-3o-88-HstwO9mM8iwq5NUO8vDZH6DWfalK3-Y0gR-gg6c6P_r0/exec";
+    const URL = "https://script.google.com/macros/s/AKfycbzi6FReoh2AVKINhx6BRh792exjZ0RBD5TyE5YfrOO_TTEEbVurjvVdrditzXcL3tSgVA/exec";
     
     // Используем FormData вместо JSON для обхода CORS
     const formData = new FormData();
