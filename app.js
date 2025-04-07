@@ -89,47 +89,35 @@
     }
 
     // ================== ОТПРАВКА ДАННЫХ (без прокси) ================== //
-    async function pay() {
-      if (!currentUser) {
-        alert("Пожалуйста, войдите в систему");
-        return;
-      }
-
-      if (order.length === 0) {
-        alert("Добавьте напитки в заказ");
-        return;
-      }
-
+     async function pay() {
+      if (!currentUser || order.length === 0) return;
+      
       try {
         const URL = "https://script.google.com/macros/s/AKfycbxI4A__-HxfMHvEfUDJ1loQP9QRQJ9YR2AcKsiV01wwfO7c-Lri215L8ukYyY5K6IP_MA/exec";
+        const formData = new FormData();
+        formData.append('name', order.map(item => item.name).join(", "));
+        formData.append('price', order.reduce((sum, item) => sum + item.price, 0));
+        formData.append('email', currentUser.email);
+        formData.append('date', new Date().toISOString());
+
+        // Используем старый добрый XHR для обхода CORS
+        const xhr = new XMLHttpRequest();
+        xhr.open('POST', URL, true);
+        xhr.setRequestHeader('Content-Type', 'application/x-www-form-urlencoded');
         
-        // 1. Сначала OPTIONS-запрос
-        await fetch(URL, {
-          method: "OPTIONS",
-          headers: {
-            "Access-Control-Request-Method": "POST",
-            "Access-Control-Request-Headers": "Content-Type"
+        xhr.onload = function() {
+          if (xhr.status === 200 || xhr.status === 0) {
+            alert("Заказ сохранен!");
+            order = [];
+            updateOrderList();
+          } else {
+            alert("Ошибка при отправке");
           }
-        });
+        };
         
-        // 2. Основной POST-запрос
-        const response = await fetch(URL, {
-          method: "POST",
-          mode: "no-cors",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({
-            name: order.map(item => item.name).join(", "),
-            price: order.reduce((sum, item) => sum + item.price, 0),
-            email: currentUser.email,
-            date: new Date().toISOString()
-          })
-        });
-        
-        alert("Заказ сохранен!");
-        order = [];
-        updateOrderList();
+        xhr.send(new URLSearchParams(formData));
       } catch (error) {
-        console.error("Ошибка:", error);
-        alert("Ошибка при отправке заказа");
+        console.error(error);
+        alert("Ошибка: " + error.message);
       }
     }
