@@ -101,7 +101,7 @@
       }
 
       try {
-        const URL = "https://script.google.com/macros/s/AKfycbxglM-7_EmARAX7Q-3o-88-HstwO9mM8iwq5NUO8vDZH6DWfalK3-Y0gR-gg6c6P_r0/exec";
+        const URL = "https://script.google.com/macros/s/AKfycbxI4A__-HxfMHvEfUDJ1loQP9QRQJ9YR2AcKsiV01wwfO7c-Lri215L8ukYyY5K6IP_MA/exec";
         
         // 1. Сначала OPTIONS-запрос
         await fetch(URL, {
