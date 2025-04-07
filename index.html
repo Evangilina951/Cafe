@@ -1,25 +1,42 @@
 <!DOCTYPE html>
 <html>
 <head>
-  <title>Название кафе"</title>
+  <title>Тестовое кафе"</title>
+  <!-- Подключаем Firebase для авторизации пользователей -->
+  <script src="https://www.gstatic.com/firebasejs/9.6.0/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/9.6.0/firebase-auth-compat.js"></script>
   <style>
     body { font-family: Arial; margin: 20px; }
     button { padding: 10px; margin: 5px; }
     #cart { border: 1px solid #ccc; padding: 10px; }
+    #auth-form, #admin-panel { width: 300px; margin: 50px auto; }
+    .hidden { display: none; }
   </style>
 </head>
 <body>
-  <h1>Выберите напиток:</h1>
+  <!-- Форма входа -->
+  <div id="auth-form">
+    <h2>Вход для сотрудников</h2>
+    <input type="email" id="email" placeholder="Email">
+    <input type="password" id="password" placeholder="Пароль">
+    <button onclick="login()">Войти</button>
+    <p id="error-message" style="color: red;"></p>
+  </div>
+
+  <!-- Контент для авторизованных -->
+  <div id="admin-panel" class="hidden">
+    <h2>Добро пожаловать, <span id="user-email"></span>!</h2>
+    <button onclick="logout()">Выйти</button>
+   <h1>Выберите напиток:</h1>
   <button onclick="addDrink('Кофе', 100)">Кофе (100 руб.)</button>
   <button onclick="addDrink('Чай', 50)">Чай (50 руб.)</button>
-
+  </div>
   <div id="cart">
     <h2>Заказ:</h2>
     <ul id="order-list"></ul>
     <p>Итого: <span id="total">0</span> руб.</p>
     <button onclick="pay()">Оплатить</button>
   </div>
-
   <script src="app.js"></script>
 </body>
 </html>
