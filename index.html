@@ -1,40 +1,98 @@
 <!DOCTYPE html>
-<html>
+<html lang="ru">
 <head>
-  <title>Тестовое кафе"</title>
-  <!-- Подключаем Firebase для авторизации пользователей -->
-  <script src="https://www.gstatic.com/firebasejs/9.6.0/firebase-app-compat.js"></script>
-  <script src="https://www.gstatic.com/firebasejs/9.6.0/firebase-auth-compat.js"></script>
-  <style>
-    body { font-family: Arial; margin: 20px; }
-    button { padding: 10px; margin: 5px; }
-    #cart { border: 1px solid #ccc; padding: 10px; }
-    #auth-form, #admin-panel { width: 300px; margin: 50px auto; }
-    .hidden { display: none; }
-  </style>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Тестовое Кафе</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+        .hidden {
+            display: none;
+        }
+        #auth-form, #order-interface {
+            background: #f5f5f5;
+            padding: 20px;
+            border-radius: 8px;
+            margin-bottom: 20px;
+        }
+        input, button {
+            padding: 10px;
+            margin: 5px 0;
+            width: 100%;
+            box-sizing: border-box;
+        }
+        button {
+            background-color: #4285f4;
+            color: white;
+            border: none;
+            cursor: pointer;
+        }
+        button:hover {
+            background-color: #3367d6;
+        }
+        #order-list {
+            list-style: none;
+            padding: 0;
+        }
+        #order-list li {
+            padding: 8px;
+            border-bottom: 1px solid #ddd;
+        }
+        #error-message {
+            color: red;
+        }
+        .user-info {
+            font-weight: bold;
+            margin-bottom: 10px;
+        }
+    </style>
 </head>
 <body>
-  <!-- Форма входа -->
-  <div id="auth-form">
-    <h2>Вход для сотрудников</h2>
-    <input type="email" id="email" placeholder="Email">
-    <input type="password" id="password" placeholder="Пароль">
-    <button onclick="login()">Войти</button>
-    <p id="error-message" style="color: red;"></p>
-  </div>
+    <!-- Форма авторизации -->
+    <div id="auth-form">
+        <h2>Вход для сотрудников</h2>
+        <input type="email" id="email" placeholder="Ваш email">
+        <input type="password" id="password" placeholder="Пароль">
+        <button onclick="login()">Войти</button>
+        <p id="error-message"></p>
+    </div>
 
-  <!-- Контент для авторизованных -->
-  <div id="admin-panel" class="hidden">
-    <h2>Добро пожаловать, <span id="user-email"></span>!</h2>
-    <button onclick="logout()">Выйти</button>
-   <h1>Выберите напиток:</h1>
-  <button onclick="addDrink('Кофе', 100)">Кофе (100 руб.)</button>
-  <button onclick="addDrink('Чай', 50)">Чай (50 руб.)</button>
-    <h2>Заказ:</h2>
-    <ul id="order-list"></ul>
-    <p>Итого: <span id="total">0</span> руб.</p>
-    <button onclick="pay()">Оплатить</button>
-  </div>
-  <script src="app.js"></script>
+    <!-- Интерфейс заказов -->
+    <div id="order-interface" class="hidden">
+        <div class="user-info">
+            Вы вошли как: <span id="user-email"></span>
+            <button onclick="logout()" style="width: auto;">Выйти</button>
+        </div>
+        
+        <h2>Меню напитков</h2>
+        <div class="menu-buttons">
+            <button onclick="addDrink('Кофе', 100)">Кофе - 100 руб.</button>
+            <button onclick="addDrink('Чай', 50)">Чай - 50 руб.</button>
+            <button onclick="addDrink('Капучино', 150)">Капучино - 150 руб.</button>
+            <button onclick="addDrink('Латте', 200)">Латте - 200 руб.</button>
+        </div>
+        
+        <h3>Текущий заказ</h3>
+        <ul id="order-list"></ul>
+        
+        <div class="order-total">
+            <strong>Итого к оплате: <span id="total">0</span> руб.</strong>
+        </div>
+        
+        <button onclick="pay()">Подтвердить заказ</button>
+        <button onclick="clearOrder()" style="background-color: #f44336;">Очистить заказ</button>
+    </div>
+
+    <!-- Подключаем Firebase -->
+    <script src="https://www.gstatic.com/firebasejs/9.6.0/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.6.0/firebase-auth-compat.js"></script>
+    
+    <!-- Подключаем скрипт -->
+    <script src="app.js"></script>
 </body>
 </html>
