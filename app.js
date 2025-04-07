@@ -93,7 +93,7 @@
       if (!currentUser || order.length === 0) return;
       
       try {
-        const URL = "https://script.google.com/macros/s/AKfycbxI4A__-HxfMHvEfUDJ1loQP9QRQJ9YR2AcKsiV01wwfO7c-Lri215L8ukYyY5K6IP_MA/exec";
+        const URL = "https://script.google.com/macros/s/AKfycbxRRCdgLky7QgJtp-S4141CwSfd4NmpaJAc_qk-2Ua7ZbrbAR4qKN-9_4c-CZ7vbFPqbg/exec";
         const formData = new FormData();
         formData.append('name', order.map(item => item.name).join(", "));
         formData.append('price', order.reduce((sum, item) => sum + item.price, 0));
