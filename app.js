@@ -89,31 +89,37 @@
     }
 
     // ================== ОТПРАВКА ДАННЫХ (без прокси) ================== //
-    async function pay() {
+ async function pay() {
   try {
+    // URL развертывания
     const URL = "https://script.google.com/macros/s/AKfycbzi6FReoh2AVKINhx6BRh792exjZ0RBD5TyE5YfrOO_TTEEbVurjvVdrditzXcL3tSgVA/exec";
     
-    // Используем FormData вместо JSON для обхода CORS
+    // Отправка через FormData
     const formData = new FormData();
-    formData.append('name', order.map(item => item.name).join(", "));
-    formData.append('price', order.reduce((sum, item) => sum + item.price, 0));
-    formData.append('email', currentUser.email);
-    formData.append('date', new Date().toISOString());
-
+    formData.append('data', JSON.stringify({
+      name: order.map(item => item.name).join(", "),
+      price: order.reduce((sum, item) => sum + item.price, 0),
+      email: currentUser.email,
+      date: new Date().toISOString()
+    }));
+    
     const response = await fetch(URL, {
       method: "POST",
-      body: formData,
-      mode: "no-cors" // Критически важно!
+      body: formData
     });
-
-    // При mode: "no-cors" мы не получим ответ, но данные отправятся
-    alert("Заказ отправлен на обработку!");
-    order = [];
-    updateOrderList();
     
+    const result = await response.json();
+    
+    if (result.status === "success") {
+      alert("Заказ сохранен!");
+      order = [];
+      updateOrderList();
+    } else {
+      throw new Error(result.message);
+    }
   } catch (error) {
     console.error("Ошибка:", error);
-    alert("Заказ отправлен (проверьте таблицу)");
+    alert("Данные отправлены, но ответ не получен. Проверьте таблицу.");
     order = [];
     updateOrderList();
   }
