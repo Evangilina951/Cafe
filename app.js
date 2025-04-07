@@ -91,12 +91,12 @@ function clearOrder() {
 // ================== ОТПРАВКА ДАННЫХ ================== //
 async function pay() {
   if (!currentUser) {
-    alert("Пожалуйста, войдите в систему");
+    alert('Пожалуйста, войдите в систему');
     return;
   }
 
   if (order.length === 0) {
-    alert("Добавьте напитки в заказ");
+    alert('Добавьте напитки в заказ');
     return;
   }
 
@@ -107,29 +107,37 @@ async function pay() {
   try {
     const scriptUrl = "https://script.google.com/macros/s/AKfycbxglM-7_EmARAX7Q-3o-88-HstwO9mM8iwq5NUO8vDZH6DWfalK3-Y0gR-gg6c6P_r0/exec";
     
-    // Используем GET с параметрами для обхода CORS
+    // Создаем callback функцию для JSONP
+    const callbackName = 'jsonpCallback_' + Date.now();
+    window[callbackName] = function(response) {
+      delete window[callbackName];
+      document.body.removeChild(script);
+      
+      if (response.status === 'success') {
+        alert('Заказ успешно сохранен!');
+        order = [];
+        updateOrderList();
+      } else {
+        throw new Error(response.message || 'Ошибка сервера');
+      }
+    };
+
+    // Формируем параметры
     const params = new URLSearchParams();
     params.append('name', order.map(item => item.name).join(', '));
     params.append('price', order.reduce((sum, item) => sum + item.price, 0));
     params.append('email', currentUser.email);
     params.append('date', new Date().toISOString());
-    
-    const response = await fetch(`${scriptUrl}?${params.toString()}`, {
-      method: 'GET',
-      headers: {
-        'Content-Type': 'application/json'
-      }
-    });
+    params.append('callback', callbackName);
 
-    if (!response.ok) throw new Error('Ошибка сервера');
-    
-    alert('Заказ успешно сохранен!');
-    order = [];
-    updateOrderList();
-    
+    // Создаем script элемент
+    const script = document.createElement('script');
+    script.src = `${scriptUrl}?${params.toString()}`;
+    document.body.appendChild(script);
+
   } catch (error) {
     console.error('Ошибка:', error);
-    alert(`Ошибка сохранения: ${error.message}\n\nПроверьте консоль (F12) для деталей`);
+    alert(`Ошибка сохранения: ${error.message}`);
   }
 }
 
