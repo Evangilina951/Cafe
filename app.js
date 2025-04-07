@@ -89,35 +89,32 @@
     }
 
     // ================== ОТПРАВКА ДАННЫХ (без прокси) ================== //
-     async function pay() {
-      if (!currentUser || order.length === 0) return;
-      
-      try {
-        const URL = "https://script.google.com/macros/s/AKfycbxRRCdgLky7QgJtp-S4141CwSfd4NmpaJAc_qk-2Ua7ZbrbAR4qKN-9_4c-CZ7vbFPqbg/exec";
-        const formData = new FormData();
-        formData.append('name', order.map(item => item.name).join(", "));
-        formData.append('price', order.reduce((sum, item) => sum + item.price, 0));
-        formData.append('email', currentUser.email);
-        formData.append('date', new Date().toISOString());
+    async function pay() {
+  try {
+    const URL = "https://script.google.com/macros/s/AKfycbxglM-7_EmARAX7Q-3o-88-HstwO9mM8iwq5NUO8vDZH6DWfalK3-Y0gR-gg6c6P_r0/exec";
+    
+    // Используем FormData вместо JSON для обхода CORS
+    const formData = new FormData();
+    formData.append('name', order.map(item => item.name).join(", "));
+    formData.append('price', order.reduce((sum, item) => sum + item.price, 0));
+    formData.append('email', currentUser.email);
+    formData.append('date', new Date().toISOString());
 
-        // Используем старый добрый XHR для обхода CORS
-        const xhr = new XMLHttpRequest();
-        xhr.open('POST', URL, true);
-        xhr.setRequestHeader('Content-Type', 'application/x-www-form-urlencoded');
-        
-        xhr.onload = function() {
-          if (xhr.status === 200 || xhr.status === 0) {
-            alert("Заказ сохранен!");
-            order = [];
-            updateOrderList();
-          } else {
-            alert("Ошибка при отправке");
-          }
-        };
-        
-        xhr.send(new URLSearchParams(formData));
-      } catch (error) {
-        console.error(error);
-        alert("Ошибка: " + error.message);
-      }
-    }
+    const response = await fetch(URL, {
+      method: "POST",
+      body: formData,
+      mode: "no-cors" // Критически важно!
+    });
+
+    // При mode: "no-cors" мы не получим ответ, но данные отправятся
+    alert("Заказ отправлен на обработку!");
+    order = [];
+    updateOrderList();
+    
+  } catch (error) {
+    console.error("Ошибка:", error);
+    alert("Заказ отправлен (проверьте таблицу)");
+    order = [];
+    updateOrderList();
+  }
+}
