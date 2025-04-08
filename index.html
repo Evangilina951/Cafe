@@ -42,6 +42,37 @@
         #order-list li {
             padding: 8px;
             border-bottom: 1px solid #ddd;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        .quantity-controls {
+            display: flex;
+            align-items: center;
+            gap: 5px;
+        }
+        .quantity-btn {
+            width: 30px;
+            height: 30px;
+            border-radius: 50%;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 0;
+        }
+        .quantity {
+            min-width: 20px;
+            text-align: center;
+        }
+        .remove-btn {
+            background-color: #f44336;
+            margin-left: 10px;
+        }
+        .item-name {
+            flex-grow: 1;
+        }
+        .item-price {
+            margin: 0 10px;
         }
         #error-message {
             color: red;
