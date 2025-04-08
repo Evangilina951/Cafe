@@ -98,27 +98,33 @@ function pay() {
     return;
   }
 
-  const callbackName = 'jsonpCallback_' + Date.now();
-  window[callbackName] = function(response) {
-    delete window[callbackName];
-    if (response.status === "success") {
-      alert("Заказ сохранен!");
-      order = [];
-      updateOrderList();
-    } else {
-      alert("Ошибка: " + (response.message || "Неизвестная ошибка"));
-    }
-  };
+  // Для каждого элемента в заказе создаем отдельный запрос
+  order.forEach((item, index) => {
+    const callbackName = `jsonpCallback_${Date.now()}_${index}`;
+    window[callbackName] = function(response) {
+      delete window[callbackName];
+      if (response.status !== "success") {
+        console.error("Ошибка сохранения позиции:", item.name, response.message);
+      }
+      
+      // После сохранения последней позиции показываем уведомление
+      if (index === order.length - 1) {
+        alert("Заказ сохранен!");
+        order = [];
+        updateOrderList();
+      }
+    };
 
-  const params = new URLSearchParams({
-    name: order.map(i => i.name).join(", "),
-    price: order.reduce((sum, i) => sum + i.price, 0),
-    email: currentUser.email,
-    date: new Date().toISOString(),
-    callback: callbackName
+    const params = new URLSearchParams({
+      name: item.name,
+      price: item.price,
+      email: currentUser.email,
+      date: new Date().toISOString(),
+      callback: callbackName
+    });
+
+    const script = document.createElement('script');
+    script.src = `https://script.google.com/macros/s/AKfycbyVSEyq7_3pbSqlAcYR0SO1pgbUno63xTzK6vjYJmllmiGpfANxhSfvKpO-2fYaJq5F8Q/exec?${params}`;
+    document.body.appendChild(script);
   });
-
-  const script = document.createElement('script');
-  script.src = `https://script.google.com/macros/s/AKfycbyVSEyq7_3pbSqlAcYR0SO1pgbUno63xTzK6vjYJmllmiGpfANxhSfvKpO-2fYaJq5F8Q/exec?${params}`;
-  document.body.appendChild(script);
 }
