@@ -1,65 +1,79 @@
-// Конфигурация Firebase 
+// Конфигурация Firebase
 const firebaseConfig = {
-  apiKey: "AIzaSyDB8Vtxg3SjVyHRJ3ZOXT8osnHYrO_uw4A",
-  authDomain: "cafe-90de8.firebaseapp.com",
-  projectId: "cafe-90de8",
-  storageBucket: "cafe-90de8.firebasestorage.app",
-  messagingSenderId: "1086414728245",
-  appId: "1:1086414728245:web:fbbec8b3adf4eba659957c",
-  measurementId: "G-2FVD2KRF16"
+    apiKey: "AIzaSyDB8Vtxg3SjVyHRJ3ZOXT8osnHYrO_uw4A",
+    authDomain: "cafe-90de8.firebaseapp.com",
+    projectId: "cafe-90de8",
+    storageBucket: "cafe-90de8.firebasestorage.app",
+    messagingSenderId: "1086414728245",
+    appId: "1:1086414728245:web:fbbec8b3adf4eba659957c",
+    measurementId: "G-2FVD2KRF16"
 };
 
 // Инициализация Firebase
-firebase.initializeApp(firebaseConfig);
+const app = firebase.initializeApp(firebaseConfig);
 const auth = firebase.auth();
 
 let order = [];
 let currentUser = null;
 
 // Обработчик состояния авторизации
-        auth.onAuthStateChanged(user => {
-            console.log("Auth state changed:", user);
-            
-            const authForm = document.getElementById('auth-form');
-            const orderInterface = document.getElementById('order-interface');
-            
-            if (user) {
-                console.log("User logged in");
-                currentUser = user;
-                authForm.classList.add('hidden');
-                orderInterface.style.display = 'block'; // Принудительное отображение
-                document.getElementById('user-email').textContent = user.email;
-                
-                // Дополнительная проверка видимости
-                setTimeout(() => {
-                    if (orderInterface.offsetParent === null) {
-                        console.error("Interface still not visible!");
-                        orderInterface.style.display = 'block';
-                        orderInterface.style.opacity = '1';
-                        orderInterface.style.visibility = 'visible';
-                    }
-                }, 100);
-            } else {
-                console.log("User logged out");
-                currentUser = null;
-                authForm.classList.remove('hidden');
-                orderInterface.classList.add('hidden');
-                order = [];
-                updateOrderList();
-            }
-        });
+auth.onAuthStateChanged(user => {
+    console.log("Auth state changed:", user);
+    
+    const authForm = document.getElementById('auth-form');
+    const orderInterface = document.getElementById('order-interface');
+    
+    if (user) {
+        console.log("User logged in. Showing interface...");
+        currentUser = user;
+        
+        // Гарантированное скрытие формы
+        authForm.style.display = 'none';
+        authForm.classList.add('hidden');
+        
+        // Гарантированное отображение интерфейса
+        orderInterface.style.display = 'flex';
+        orderInterface.classList.remove('hidden');
+        
+        document.getElementById('user-email').textContent = user.email;
+        
+        // Принудительный рефлоу для активации изменений
+        setTimeout(() => {
+            orderInterface.style.visibility = 'visible';
+            orderInterface.style.opacity = '1';
+        }, 10);
+    } else {
+        console.log("User logged out. Showing auth form...");
+        currentUser = null;
+        
+        // Гарантированное отображение формы
+        authForm.style.display = 'block';
+        authForm.classList.remove('hidden');
+        
+        // Гарантированное скрытие интерфейса
+        orderInterface.style.display = 'none';
+        orderInterface.classList.add('hidden');
+        
+        order = [];
+        updateOrderList();
+    }
+});
 
 function login() {
-  const email = document.getElementById('email').value;
-  const password = document.getElementById('password').value;
-  const errorMessage = document.getElementById('error-message');
-  
-  errorMessage.textContent = '';
-  
-  auth.signInWithEmailAndPassword(email, password)
-    .catch(error => {
-      errorMessage.textContent = error.message;
-    });
+    const email = document.getElementById('email').value;
+    const password = document.getElementById('password').value;
+    const errorMessage = document.getElementById('error-message');
+    
+    errorMessage.textContent = '';
+    
+    auth.signInWithEmailAndPassword(email, password)
+        .then(() => {
+            console.log("Login successful");
+        })
+        .catch(error => {
+            console.error("Login error:", error);
+            errorMessage.textContent = error.message;
+        });
 }
 
 function logout() {
