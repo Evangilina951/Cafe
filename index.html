@@ -12,18 +12,18 @@
             margin: 0;
             padding: 0;
             min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            transition: all 0.3s;
         }
 
         .hidden {
-            display: none;
+            display: none !important;
         }
 
-        /* Центрированная форма авторизации */
+        /* Форма авторизации */
         #auth-form {
-            position: absolute;
-            top: 50%;
-            left: 50%;
-            transform: translate(-50%, -50%);
             width: 350px;
             padding: 30px;
             background-color: rgba(255, 255, 255, 0.9);
@@ -61,25 +61,25 @@
             transition: background-color 0.3s;
         }
 
-        #auth-form button:hover {
-            background-color: #5a2b19;
-        }
-
         #error-message {
             color: #e0131a;
             margin-top: 10px;
             text-align: center;
         }
 
-        /* Основной интерфейс после входа */
+        /* Основной интерфейс */
         #order-interface {
             display: none;
+            width: 100%;
             height: 100vh;
+            position: fixed;
+            top: 0;
+            left: 0;
         }
 
         /* Левая часть - меню */
         .menu-section {
-            position: fixed;
+            position: absolute;
             left: 0;
             top: 0;
             width: 60%;
@@ -94,6 +94,7 @@
             color: #6d341f;
             margin-bottom: 30px;
             font-weight: bold;
+            font-size: 18px;
         }
 
         .logout-btn {
@@ -105,11 +106,6 @@
             cursor: pointer;
             margin-left: 10px;
             transition: all 0.3s;
-        }
-
-        .logout-btn:hover {
-            background-color: #6d341f;
-            color: #ffefdc;
         }
 
         .menu-buttons {
@@ -129,13 +125,9 @@
             transition: transform 0.2s;
         }
 
-        .menu-btn:hover {
-            transform: translateY(-3px);
-        }
-
         /* Правая часть - заказ */
         .order-section {
-            position: fixed;
+            position: absolute;
             right: 0;
             top: 0;
             width: 40%;
@@ -161,10 +153,6 @@
             margin-bottom: 10px;
             background-color: rgba(255, 255, 255, 0.7);
             border-radius: 8px;
-        }
-
-        .item-name {
-            font-weight: bold;
         }
 
         .item-controls {
@@ -205,11 +193,6 @@
             padding: 0;
         }
 
-        .quantity {
-            min-width: 20px;
-            text-align: center;
-        }
-
         .order-total {
             margin-top: 20px;
             padding-top: 15px;
@@ -244,14 +227,6 @@
             background-color: #a7c556;
             color: white;
         }
-
-        .clear-btn:hover {
-            background-color: #ffe0e0;
-        }
-
-        .pay-btn:hover {
-            background-color: #8fb346;
-        }
     </style>
 </head>
 <body>
@@ -279,8 +254,6 @@
                 <button class="menu-btn" onclick="addDrink('Чай', 50)">Чай - 50 ₽</button>
                 <button class="menu-btn" onclick="addDrink('Капучино', 150)">Капучино - 150 ₽</button>
                 <button class="menu-btn" onclick="addDrink('Латте', 200)">Латте - 200 ₽</button>
-                <button class="menu-btn" onclick="addDrink('Американо', 120)">Американо - 120 ₽</button>
-                <button class="menu-btn" onclick="addDrink('Эспрессо', 130)">Эспрессо - 130 ₽</button>
             </div>
         </div>
 
@@ -299,7 +272,7 @@
             </div>
         </div>
     </div>
-
+    
     <!-- Подключаем Firebase -->
     <script src="https://www.gstatic.com/firebasejs/9.6.0/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/9.6.0/firebase-auth-compat.js"></script>
