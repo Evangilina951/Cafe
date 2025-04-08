@@ -1,4 +1,4 @@
-// Конфигурация Firebase (оставляем без изменений)
+// Конфигурация Firebase 
 const firebaseConfig = {
   apiKey: "AIzaSyDB8Vtxg3SjVyHRJ3ZOXT8osnHYrO_uw4A",
   authDomain: "cafe-90de8.firebaseapp.com",
@@ -16,18 +16,38 @@ const auth = firebase.auth();
 let order = [];
 let currentUser = null;
 
-// Авторизация (оставляем без изменений)
-auth.onAuthStateChanged(user => {
-  currentUser = user;
-  if (user) {
-    document.getElementById('auth-form').classList.add('hidden');
-    document.getElementById('order-interface').classList.remove('hidden');
-    document.getElementById('user-email').textContent = user.email;
-  } else {
-    document.getElementById('auth-form').classList.remove('hidden');
-    document.getElementById('order-interface').classList.add('hidden');
-  }
-});
+// Обработчик состояния авторизации
+        auth.onAuthStateChanged(user => {
+            console.log("Auth state changed:", user);
+            
+            const authForm = document.getElementById('auth-form');
+            const orderInterface = document.getElementById('order-interface');
+            
+            if (user) {
+                console.log("User logged in");
+                currentUser = user;
+                authForm.classList.add('hidden');
+                orderInterface.style.display = 'block'; // Принудительное отображение
+                document.getElementById('user-email').textContent = user.email;
+                
+                // Дополнительная проверка видимости
+                setTimeout(() => {
+                    if (orderInterface.offsetParent === null) {
+                        console.error("Interface still not visible!");
+                        orderInterface.style.display = 'block';
+                        orderInterface.style.opacity = '1';
+                        orderInterface.style.visibility = 'visible';
+                    }
+                }, 100);
+            } else {
+                console.log("User logged out");
+                currentUser = null;
+                authForm.classList.remove('hidden');
+                orderInterface.classList.add('hidden');
+                order = [];
+                updateOrderList();
+            }
+        });
 
 function login() {
   const email = document.getElementById('email').value;
