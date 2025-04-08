@@ -1,4 +1,4 @@
-// Конфигурация Firebase
+// Конфигурация Firebase (оставляем без изменений)
 const firebaseConfig = {
   apiKey: "AIzaSyDB8Vtxg3SjVyHRJ3ZOXT8osnHYrO_uw4A",
   authDomain: "cafe-90de8.firebaseapp.com",
@@ -16,7 +16,7 @@ const auth = firebase.auth();
 let order = [];
 let currentUser = null;
 
-// Авторизация
+// Авторизация (оставляем без изменений)
 auth.onAuthStateChanged(user => {
   currentUser = user;
   if (user) {
@@ -46,13 +46,28 @@ function logout() {
   auth.signOut();
 }
 
-// Функционал заказа
+// Новый функционал заказа с группировкой позиций
 function addDrink(name, price) {
   if (!currentUser) {
     alert("Сначала войдите в систему!");
     return;
   }
-  order.push({ name, price });
+  
+  // Ищем позицию в заказе
+  const existingItemIndex = order.findIndex(item => item.name === name);
+  
+  if (existingItemIndex >= 0) {
+    // Если позиция уже есть - увеличиваем количество
+    order[existingItemIndex].quantity += 1;
+  } else {
+    // Если позиции нет - добавляем новую
+    order.push({ 
+      name, 
+      price,
+      quantity: 1
+    });
+  }
+  
   updateOrderList();
 }
 
@@ -62,15 +77,33 @@ function updateOrderList() {
 
   order.forEach((item, index) => {
     const li = document.createElement("li");
+    li.className = "order-item";
     li.innerHTML = `
-      ${item.name} - ${item.price} руб.
-      <button onclick="removeItem(${index})" class="remove-btn">×</button>
+      <span class="item-name">${item.name}</span>
+      <span class="item-price">${item.price} руб.</span>
+      <div class="quantity-controls">
+        <button onclick="changeQuantity(${index}, -1)" class="quantity-btn minus">-</button>
+        <span class="quantity">${item.quantity}</span>
+        <button onclick="changeQuantity(${index}, 1)" class="quantity-btn plus">+</button>
+        <button onclick="removeItem(${index})" class="remove-btn">×</button>
+      </div>
     `;
     list.appendChild(li);
   });
 
   document.getElementById("total").textContent = 
-    order.reduce((sum, item) => sum + item.price, 0);
+    order.reduce((sum, item) => sum + (item.price * item.quantity), 0);
+}
+
+function changeQuantity(index, delta) {
+  const newQuantity = order[index].quantity + delta;
+  
+  if (newQuantity <= 0) {
+    removeItem(index);
+  } else {
+    order[index].quantity = newQuantity;
+    updateOrderList();
+  }
 }
 
 function removeItem(index) {
@@ -86,7 +119,7 @@ function clearOrder() {
   }
 }
 
-// JSONP-отправка данных
+// Модифицированная функция оплаты с учетом количества
 function pay() {
   if (!currentUser) {
     alert("Войдите в систему");
@@ -98,33 +131,43 @@ function pay() {
     return;
   }
 
-  // Для каждого элемента в заказе создаем отдельный запрос
+  let processedItems = 0;
+  
   order.forEach((item, index) => {
-    const callbackName = `jsonpCallback_${Date.now()}_${index}`;
-    window[callbackName] = function(response) {
-      delete window[callbackName];
-      if (response.status !== "success") {
-        console.error("Ошибка сохранения позиции:", item.name, response.message);
-      }
-      
-      // После сохранения последней позиции показываем уведомление
-      if (index === order.length - 1) {
-        alert("Заказ сохранен!");
-        order = [];
-        updateOrderList();
-      }
-    };
+    // Для каждого экземпляра позиции (с учетом количества)
+    for (let i = 0; i < item.quantity; i++) {
+      const callbackName = `jsonpCallback_${Date.now()}_${index}_${i}`;
+      window[callbackName] = function(response) {
+        delete window[callbackName];
+        if (response.status !== "success") {
+          console.error("Ошибка сохранения позиции:", item.name, response.message);
+        }
+        
+        processedItems++;
+        // После сохранения всех позиций показываем уведомление
+        if (processedItems === getTotalItems()) {
+          alert("Заказ сохранен!");
+          order = [];
+          updateOrderList();
+        }
+      };
 
-    const params = new URLSearchParams({
-      name: item.name,
-      price: item.price,
-      email: currentUser.email,
-      date: new Date().toISOString(),
-      callback: callbackName
-    });
+      const params = new URLSearchParams({
+        name: item.name,
+        price: item.price,
+        email: currentUser.email,
+        date: new Date().toISOString(),
+        callback: callbackName
+      });
 
-    const script = document.createElement('script');
-    script.src = `https://script.google.com/macros/s/AKfycbyVSEyq7_3pbSqlAcYR0SO1pgbUno63xTzK6vjYJmllmiGpfANxhSfvKpO-2fYaJq5F8Q/exec?${params}`;
-    document.body.appendChild(script);
+      const script = document.createElement('script');
+      script.src = `https://script.google.com/macros/s/AKfycbyVSEyq7_3pbSqlAcYR0SO1pgbUno63xTzK6vjYJmllmiGpfANxhSfvKpO-2fYaJq5F8Q/exec?${params}`;
+      document.body.appendChild(script);
+    }
   });
+}
+
+// Вспомогательная функция для подсчета общего количества позиций
+function getTotalItems() {
+  return order.reduce((sum, item) => sum + item.quantity, 0);
 }
