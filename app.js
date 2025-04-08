@@ -88,28 +88,39 @@
       }
     }
 
-    // ================== ОТПРАВКА ДАННЫХ (без прокси) ================== //
-async function submitOrder() {
-  const formUrl = "https://docs.google.com/forms/d/e/1FAIpQLSeE7WrUaKKUHaCTE1YT4-_Jce_3sJlhLG15EX82dmb98JXYxQ/viewform?usp=dialog";
+    // ================== ОТПРАВКА ДАННЫХ ================== //
+async function pay() {
+  if (!currentUser) {
+    alert("Пожалуйста, войдите в систему");
+    return;
+  }
+
+  if (order.length === 0) {
+    alert("Добавьте напитки в заказ");
+    return;
+  }
+
+  const formUrl = "https://docs.google.com/forms/d/e/1FAIpQLSeE7WrUaKKUHaCTE1YT4-_Jce_3sJlhLG15EX82dmb98JXYxQ/formResponse";
   
   const formData = new URLSearchParams();
-  formData.append("entry.6805698089", order.map(item => item.name).join(", ")); // entry.ID поля "Имя"
-  formData.append("entry.1025264131", order.reduce((sum, item) => sum + item.price, 0)); // entry.ID поля "Цена"
-  formData.append("entry.2138552739", currentUser.email); // Если включен сбор email
-  
+  formData.append("entry.6805698089", order.map(item => item.name).join(", "));
+  formData.append("entry.1025264131", order.reduce((sum, item) => sum + item.price, 0));
+  formData.append("entry.2138552739", currentUser.email);
+
   try {
     await fetch(formUrl, {
       method: "POST",
       body: formData,
-      mode: "no-cors" // Важно!
+      mode: "no-cors"
     });
     
     alert("Заказ отправлен!");
     order = [];
     updateOrderList();
-    
   } catch (error) {
     console.error("Ошибка:", error);
     alert("Заказ отправлен (проверьте таблицу)");
+    order = [];
+    updateOrderList();
   }
 }
