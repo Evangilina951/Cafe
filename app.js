@@ -89,38 +89,27 @@
     }
 
     // ================== ОТПРАВКА ДАННЫХ (без прокси) ================== //
- async function pay() {
+async function submitOrder() {
+  const formUrl = "https://docs.google.com/forms/d/e/1FAIpQLSeE7WrUaKKUHaCTE1YT4-_Jce_3sJlhLG15EX82dmb98JXYxQ/viewform?usp=dialog";
+  
+  const formData = new URLSearchParams();
+  formData.append("entry.6805698089", order.map(item => item.name).join(", ")); // entry.ID поля "Имя"
+  formData.append("entry.1025264131", order.reduce((sum, item) => sum + item.price, 0)); // entry.ID поля "Цена"
+  formData.append("entry.2138552739", currentUser.email); // Если включен сбор email
+  
   try {
-    // URL развертывания
-    const URL = "https://script.google.com/macros/s/AKfycbzi6FReoh2AVKINhx6BRh792exjZ0RBD5TyE5YfrOO_TTEEbVurjvVdrditzXcL3tSgVA/exec";
-    
-    // Отправка через FormData
-    const formData = new FormData();
-    formData.append('data', JSON.stringify({
-      name: order.map(item => item.name).join(", "),
-      price: order.reduce((sum, item) => sum + item.price, 0),
-      email: currentUser.email,
-      date: new Date().toISOString()
-    }));
-    
-    const response = await fetch(URL, {
+    await fetch(formUrl, {
       method: "POST",
-      body: formData
+      body: formData,
+      mode: "no-cors" // Важно!
     });
     
-    const result = await response.json();
-    
-    if (result.status === "success") {
-      alert("Заказ сохранен!");
-      order = [];
-      updateOrderList();
-    } else {
-      throw new Error(result.message);
-    }
-  } catch (error) {
-    console.error("Ошибка:", error);
-    alert("Данные отправлены, но ответ не получен. Проверьте таблицу.");
+    alert("Заказ отправлен!");
     order = [];
     updateOrderList();
+    
+  } catch (error) {
+    console.error("Ошибка:", error);
+    alert("Заказ отправлен (проверьте таблицу)");
   }
 }
