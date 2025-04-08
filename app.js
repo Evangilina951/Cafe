@@ -16,6 +16,22 @@ const auth = firebase.auth();
 let order = [];
 let currentUser = null;
 
+// Функция для гарантированного отображения элемента
+function showElement(element) {
+    element.style.display = 'block';
+    element.style.visibility = 'visible';
+    element.style.opacity = '1';
+    element.classList.remove('hidden');
+}
+
+// Функция для гарантированного скрытия элемента
+function hideElement(element) {
+    element.style.display = 'none';
+    element.style.visibility = 'hidden';
+    element.style.opacity = '0';
+    element.classList.add('hidden');
+}
+
 // Обработчик состояния авторизации
 auth.onAuthStateChanged(user => {
     console.log("Auth state changed:", user);
@@ -24,35 +40,33 @@ auth.onAuthStateChanged(user => {
     const orderInterface = document.getElementById('order-interface');
     
     if (user) {
-        console.log("User logged in. Showing interface...");
+        console.log("User logged in");
         currentUser = user;
         
         // Гарантированное скрытие формы
-        authForm.style.display = 'none';
-        authForm.classList.add('hidden');
+        hideElement(authForm);
         
         // Гарантированное отображение интерфейса
-        orderInterface.style.display = 'flex';
-        orderInterface.classList.remove('hidden');
+        showElement(orderInterface);
         
         document.getElementById('user-email').textContent = user.email;
         
-        // Принудительный рефлоу для активации изменений
+        // Дополнительная проверка для Firefox
         setTimeout(() => {
-            orderInterface.style.visibility = 'visible';
-            orderInterface.style.opacity = '1';
-        }, 10);
+            if (window.getComputedStyle(orderInterface).display === 'none') {
+                console.log("Forcing display in Firefox");
+                orderInterface.style.display = 'block';
+            }
+        }, 50);
     } else {
-        console.log("User logged out. Showing auth form...");
+        console.log("User logged out");
         currentUser = null;
         
         // Гарантированное отображение формы
-        authForm.style.display = 'block';
-        authForm.classList.remove('hidden');
+        showElement(authForm);
         
         // Гарантированное скрытие интерфейса
-        orderInterface.style.display = 'none';
-        orderInterface.classList.add('hidden');
+        hideElement(orderInterface);
         
         order = [];
         updateOrderList();
