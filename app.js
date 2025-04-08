@@ -120,27 +120,28 @@ function addDrink(name, price) {
 }
 
 function updateOrderList() {
-  const list = document.getElementById("order-list");
-  list.innerHTML = "";
+    const list = document.getElementById("order-list");
+    list.innerHTML = "";
 
-  order.forEach((item, index) => {
-    const li = document.createElement("li");
-    li.className = "order-item";
-    li.innerHTML = `
-      <span class="item-name">${item.name}</span>
-      <span class="item-price">${item.price} руб.</span>
-      <div class="quantity-controls">
-        <button onclick="changeQuantity(${index}, -1)" class="quantity-btn minus">-</button>
-        <span class="quantity">${item.quantity}</span>
-        <button onclick="changeQuantity(${index}, 1)" class="quantity-btn plus">+</button>
-        <button onclick="removeItem(${index})" class="remove-btn">×</button>
-      </div>
-    `;
-    list.appendChild(li);
-  });
+    order.forEach((item, index) => {
+        const li = document.createElement("li");
+        li.innerHTML = `
+            <span class="item-name">${item.name}</span>
+            <span class="item-price">${item.price} ₽</span>
+            <div class="item-controls">
+                <div class="quantity-controls">
+                    <button class="quantity-btn minus-btn" onclick="changeQuantity(${index}, -1)">-</button>
+                    <span class="quantity">${item.quantity}</span>
+                    <button class="quantity-btn plus-btn" onclick="changeQuantity(${index}, 1)">+</button>
+                </div>
+                <button class="remove-btn" onclick="removeItem(${index})">×</button>
+            </div>
+        `;
+        list.appendChild(li);
+    });
 
-  document.getElementById("total").textContent = 
-    order.reduce((sum, item) => sum + (item.price * item.quantity), 0);
+    const total = order.reduce((sum, item) => sum + (item.price * item.quantity), 0);
+    document.getElementById("total").textContent = total;
 }
 
 function changeQuantity(index, delta) {
