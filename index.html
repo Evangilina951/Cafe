@@ -46,7 +46,7 @@
             top: 0;
             width: 60%;
             height: 100%;
-            padding: 20px;
+            padding: 30px;
             overflow-y: auto;
             background-color: #ffefdc;
         }
@@ -57,7 +57,7 @@
             top: 0;
             width: 40%;
             height: 100%;
-            padding: 20px;
+            padding: 30px;
             background-color: rgba(109, 52, 31, 0.05);
             border-left: 1px solid #6d341f;
             overflow-y: auto;
@@ -67,7 +67,167 @@
             display: none !important;
         }
 
-        /* Остальные стили остаются без изменений */
+        .user-info {
+            color: #6d341f;
+            margin-bottom: 30px;
+            font-weight: bold;
+            font-size: 20px;
+        }
+
+        .logout-btn {
+            padding: 8px 16px;
+            background-color: transparent;
+            color: #6d341f;
+            border: 1px solid #6d341f;
+            border-radius: 8px;
+            cursor: pointer;
+            margin-left: 15px;
+            font-size: 16px;
+            transition: all 0.3s;
+        }
+
+        .logout-btn:hover {
+            background-color: #6d341f;
+            color: #ffefdc;
+        }
+
+        .menu-buttons {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 20px;
+        }
+
+        .menu-btn {
+            padding: 20px;
+            background-color: #6d341f;
+            color: #ffefdc;
+            border: none;
+            border-radius: 15px;
+            font-size: 18px;
+            font-weight: bold;
+            cursor: pointer;
+            transition: transform 0.2s;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+        }
+
+        .menu-btn:hover {
+            transform: translateY(-3px);
+        }
+
+        #order-list {
+            list-style: none;
+            padding: 0;
+            margin: 25px 0;
+        }
+
+        #order-list li {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 15px;
+            margin-bottom: 15px;
+            background-color: rgba(255, 255, 255, 0.7);
+            border-radius: 12px;
+            font-size: 16px;
+        }
+
+        .item-controls {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .quantity-btn {
+            width: 36px;
+            height: 36px;
+            border-radius: 50%;
+            border: none;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            font-weight: bold;
+            cursor: pointer;
+            font-size: 20px;
+            transition: all 0.2s;
+        }
+
+        .plus-btn {
+            background-color: #a7c556;
+            color: white;
+        }
+
+        .minus-btn {
+            background-color: #ff914d;
+            color: white;
+        }
+
+        .remove-btn {
+            background: none;
+            border: none;
+            color: #e0131a;
+            font-size: 24px;
+            cursor: pointer;
+            width: 36px;
+            height: 36px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 0;
+            transition: all 0.2s;
+        }
+
+        .remove-btn:hover {
+            transform: scale(1.1);
+        }
+
+        .order-total {
+            margin-top: 25px;
+            padding-top: 20px;
+            border-top: 2px solid #6d341f;
+            font-size: 22px;
+            font-weight: bold;
+            text-align: right;
+        }
+
+        .action-buttons {
+            display: flex;
+            justify-content: space-between;
+            margin-top: 25px;
+            gap: 20px;
+        }
+
+        .action-btn {
+            padding: 15px 30px;
+            border: none;
+            border-radius: 10px;
+            font-weight: bold;
+            cursor: pointer;
+            font-size: 18px;
+            transition: all 0.3s;
+            flex: 1;
+            text-align: center;
+        }
+
+        .clear-btn {
+            background-color: transparent;
+            color: #e0131a;
+            border: 2px solid #e0131a;
+        }
+
+        .clear-btn:hover {
+            background-color: rgba(224, 19, 26, 0.1);
+        }
+
+        .pay-btn {
+            background-color: #a7c556;
+            color: white;
+            border: 2px solid #a7c556;
+        }
+
+        .pay-btn:hover {
+            background-color: #8fb346;
+            border-color: #8fb346;
+        }
     </style>
 </head>
 <body>
