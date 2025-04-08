@@ -3,229 +3,83 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Кофейня</title>
+    <title>Тестовое Кафе</title>
     <style>
         body {
-            font-family: 'Arial', sans-serif;
-            background-color: #ffefdc;
-            color: #6d341f;
-            margin: 0;
-            padding: 0;
-            min-height: 100vh;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            transition: all 0.3s;
+            font-family: Arial, sans-serif;
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 20px;
         }
-
         .hidden {
-            display: none !important;
-        }
-
-        /* Форма авторизации */
-        #auth-form {
-            width: 350px;
-            padding: 30px;
-            background-color: rgba(255, 255, 255, 0.9);
-            border-radius: 15px;
-            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
-            text-align: center;
-        }
-
-        #auth-form h2 {
-            color: #6d341f;
-            margin-bottom: 25px;
-        }
-
-        #auth-form input {
-            width: 100%;
-            padding: 12px;
-            margin: 8px 0;
-            border: 1px solid #6d341f;
-            border-radius: 8px;
-            background-color: #ffefdc;
-            color: #6d341f;
-            box-sizing: border-box;
-        }
-
-        #auth-form button {
-            width: 100%;
-            padding: 12px;
-            margin-top: 15px;
-            background-color: #6d341f;
-            color: #ffefdc;
-            border: none;
-            border-radius: 8px;
-            font-weight: bold;
-            cursor: pointer;
-            transition: background-color 0.3s;
-        }
-
-        #error-message {
-            color: #e0131a;
-            margin-top: 10px;
-            text-align: center;
-        }
-
-        /* Основной интерфейс */
-        #order-interface {
             display: none;
+        }
+        #auth-form, #order-interface {
+            background: #f5f5f5;
+            padding: 20px;
+            border-radius: 8px;
+            margin-bottom: 20px;
+        }
+        input, button {
+            padding: 10px;
+            margin: 5px 0;
             width: 100%;
-            height: 100vh;
-            position: fixed;
-            top: 0;
-            left: 0;
-        }
-
-        /* Левая часть - меню */
-        .menu-section {
-            position: absolute;
-            left: 0;
-            top: 0;
-            width: 60%;
-            height: 100%;
-            padding: 20px;
             box-sizing: border-box;
-            overflow-y: auto;
-            background-color: #ffefdc;
         }
-
-        .user-info {
-            color: #6d341f;
-            margin-bottom: 30px;
-            font-weight: bold;
-            font-size: 18px;
-        }
-
-        .logout-btn {
-            padding: 6px 12px;
-            background-color: transparent;
-            color: #6d341f;
-            border: 1px solid #6d341f;
-            border-radius: 6px;
-            cursor: pointer;
-            margin-left: 10px;
-            transition: all 0.3s;
-        }
-
-        .menu-buttons {
-            display: grid;
-            grid-template-columns: repeat(2, 1fr);
-            gap: 15px;
-        }
-
-        .menu-btn {
-            padding: 15px;
-            background-color: #6d341f;
-            color: #ffefdc;
+        button {
+            background-color: #4285f4;
+            color: white;
             border: none;
-            border-radius: 12px;
-            font-size: 16px;
             cursor: pointer;
-            transition: transform 0.2s;
         }
-
-        /* Правая часть - заказ */
-        .order-section {
-            position: absolute;
-            right: 0;
-            top: 0;
-            width: 40%;
-            height: 100%;
-            padding: 20px;
-            box-sizing: border-box;
-            background-color: rgba(109, 52, 31, 0.05);
-            border-left: 1px solid #6d341f;
-            overflow-y: auto;
+        button:hover {
+            background-color: #3367d6;
         }
-
         #order-list {
             list-style: none;
             padding: 0;
-            margin: 20px 0;
         }
-
         #order-list li {
+            padding: 8px;
+            border-bottom: 1px solid #ddd;
             display: flex;
             justify-content: space-between;
             align-items: center;
-            padding: 12px;
-            margin-bottom: 10px;
-            background-color: rgba(255, 255, 255, 0.7);
-            border-radius: 8px;
         }
-
-        .item-controls {
+        .quantity-controls {
             display: flex;
             align-items: center;
+            gap: 5px;
         }
-
         .quantity-btn {
-            width: 28px;
-            height: 28px;
+            width: 30px;
+            height: 30px;
             border-radius: 50%;
-            border: none;
             display: flex;
             justify-content: center;
             align-items: center;
-            font-weight: bold;
-            cursor: pointer;
-            margin: 0 5px;
-        }
-
-        .plus-btn {
-            background-color: #a7c556;
-            color: white;
-        }
-
-        .minus-btn {
-            background-color: #ff914d;
-            color: white;
-        }
-
-        .remove-btn {
-            background: none;
-            border: none;
-            color: #e0131a;
-            font-size: 20px;
-            cursor: pointer;
-            margin-left: 10px;
             padding: 0;
         }
-
-        .order-total {
-            margin-top: 20px;
-            padding-top: 15px;
-            border-top: 1px solid #6d341f;
-            font-size: 18px;
+        .quantity {
+            min-width: 20px;
+            text-align: center;
+        }
+        .remove-btn {
+            background-color: #f44336;
+            margin-left: 10px;
+        }
+        .item-name {
+            flex-grow: 1;
+        }
+        .item-price {
+            margin: 0 10px;
+        }
+        #error-message {
+            color: red;
+        }
+        .user-info {
             font-weight: bold;
-            text-align: right;
-        }
-
-        .action-buttons {
-            display: flex;
-            justify-content: space-between;
-            margin-top: 20px;
-        }
-
-        .action-btn {
-            padding: 12px 25px;
-            border: none;
-            border-radius: 8px;
-            font-weight: bold;
-            cursor: pointer;
-            transition: all 0.3s;
-        }
-
-        .clear-btn {
-            background-color: transparent;
-            color: #e0131a;
-            border: 1px solid #e0131a;
-        }
-
-        .pay-btn {
-            background-color: #a7c556;
-            color: white;
+            margin-bottom: 10px;
         }
     </style>
 </head>
@@ -239,40 +93,32 @@
         <p id="error-message"></p>
     </div>
 
-    <!-- Основной интерфейс -->
+    <!-- Интерфейс заказов -->
     <div id="order-interface" class="hidden">
-        <!-- Левая часть - меню -->
-        <div class="menu-section">
-            <div class="user-info">
-                Вы вошли как: <span id="user-email"></span>
-                <button class="logout-btn" onclick="logout()">Выйти</button>
-            </div>
-            
-            <h2>Меню напитков</h2>
-            <div class="menu-buttons">
-                <button class="menu-btn" onclick="addDrink('Кофе', 100)">Кофе - 100 ₽</button>
-                <button class="menu-btn" onclick="addDrink('Чай', 50)">Чай - 50 ₽</button>
-                <button class="menu-btn" onclick="addDrink('Капучино', 150)">Капучино - 150 ₽</button>
-                <button class="menu-btn" onclick="addDrink('Латте', 200)">Латте - 200 ₽</button>
-            </div>
+        <div class="user-info">
+            Вы вошли как: <span id="user-email"></span>
+            <button onclick="logout()" style="width: auto;">Выйти</button>
         </div>
-
-        <!-- Правая часть - заказ -->
-        <div class="order-section">
-            <h2>Текущий заказ</h2>
-            <ul id="order-list"></ul>
-            
-            <div class="order-total">
-                Итого к оплате: <span id="total">0</span> ₽
-            </div>
-            
-            <div class="action-buttons">
-                <button class="action-btn clear-btn" onclick="clearOrder()">Очистить</button>
-                <button class="action-btn pay-btn" onclick="pay()">Оплатить</button>
-            </div>
+        
+        <h2>Меню напитков</h2>
+        <div class="menu-buttons">
+            <button onclick="addDrink('Кофе', 100)">Кофе - 100 руб.</button>
+            <button onclick="addDrink('Чай', 50)">Чай - 50 руб.</button>
+            <button onclick="addDrink('Капучино', 150)">Капучино - 150 руб.</button>
+            <button onclick="addDrink('Латте', 200)">Латте - 200 руб.</button>
         </div>
+        
+        <h3>Текущий заказ</h3>
+        <ul id="order-list"></ul>
+        
+        <div class="order-total">
+            <strong>Итого к оплате: <span id="total">0</span> руб.</strong>
+        </div>
+        
+        <button onclick="pay()">Подтвердить заказ</button>
+        <button onclick="clearOrder()" style="background-color: #f44336;">Очистить заказ</button>
     </div>
-    
+
     <!-- Подключаем Firebase -->
     <script src="https://www.gstatic.com/firebasejs/9.6.0/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/9.6.0/firebase-auth-compat.js"></script>
