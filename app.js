@@ -55,7 +55,7 @@ auth.onAuthStateChanged(user => {
         setTimeout(() => {
             if (window.getComputedStyle(orderInterface).display === 'none') {
                 console.log("Forcing display in Firefox");
-                orderInterface.style.display = 'block';
+                orderInterface.style.display = 'flex';
             }
         }, 50);
     } else {
@@ -129,11 +129,9 @@ function updateOrderList() {
             <span class="item-name">${item.name}</span>
             <span class="item-price">${item.price} ₽</span>
             <div class="item-controls">
-                <div class="quantity-controls">
-                    <button class="quantity-btn minus-btn" onclick="changeQuantity(${index}, -1)">-</button>
-                    <span class="quantity">${item.quantity}</span>
-                    <button class="quantity-btn plus-btn" onclick="changeQuantity(${index}, 1)">+</button>
-                </div>
+                <button class="quantity-btn minus-btn" onclick="changeQuantity(${index}, -1)">-</button>
+                <span class="quantity">${item.quantity}</span>
+                <button class="quantity-btn plus-btn" onclick="changeQuantity(${index}, 1)">+</button>
                 <button class="remove-btn" onclick="removeItem(${index})">×</button>
             </div>
         `;
@@ -143,6 +141,7 @@ function updateOrderList() {
     const total = order.reduce((sum, item) => sum + (item.price * item.quantity), 0);
     document.getElementById("total").textContent = total;
 }
+
 
 function changeQuantity(index, delta) {
   const newQuantity = order[index].quantity + delta;
