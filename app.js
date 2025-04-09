@@ -91,14 +91,23 @@ function loadMenuFromFirebase() {
                 loadMenuData();
             }
         } else {
-            // Если база пуста, показываем стандартные кнопки
-            const menuButtons = document.querySelector('.menu-buttons');
-            menuButtons.innerHTML = `
-                <button class="menu-btn" onclick="addDrink('Кофе', 100)">Кофе - 100 ₽</button>
-                <button class="menu-btn" onclick="addDrink('Чай', 50)">Чай - 50 ₽</button>
-                <button class="menu-btn" onclick="addDrink('Капучино', 150)">Капучино - 150 ₽</button>
-                <button class="menu-btn" onclick="addDrink('Латте', 200)">Латте - 200 ₽</button>
-            `;
+            // Инициализация базы данных при первом запуске
+            const initialData = {
+                categories: ["Кофе", "Чай", "Десерты"],
+                items: {
+                    item1: { id: 1, name: "Кофе", price: 100, category: "Кофе" },
+                    item2: { id: 2, name: "Чай", price: 50, category: "Чай" },
+                    item3: { id: 3, name: "Капучино", price: 150, category: "Кофе" },
+                    item4: { id: 4, name: "Латте", price: 200, category: "Кофе" }
+                }
+            };
+            
+            db.ref('menu').set(initialData)
+                .then(() => {
+                    menuCategories = initialData.categories;
+                    menuItems = Object.values(initialData.items);
+                    updateMainMenu();
+                });
         }
     });
 }
@@ -107,15 +116,13 @@ function updateMainMenu() {
     const menuButtons = document.querySelector('.menu-buttons');
     menuButtons.innerHTML = '';
     
-    if (menuItems.length > 0) {
-        menuItems.forEach(item => {
-            const btn = document.createElement('button');
-            btn.className = 'menu-btn';
-            btn.innerHTML = `${item.name} - ${item.price} ₽`;
-            btn.onclick = () => addDrink(item.name, item.price);
-            menuButtons.appendChild(btn);
-        });
-    }
+    menuItems.forEach(item => {
+        const btn = document.createElement('button');
+        btn.className = 'menu-btn';
+        btn.innerHTML = `${item.name} - ${item.price} ₽`;
+        btn.onclick = () => addDrink(item.name, item.price);
+        menuButtons.appendChild(btn);
+    });
 }
 
 // Админ-панель
@@ -130,56 +137,76 @@ function hideAdminPanel() {
     document.getElementById('order-interface').classList.remove('hidden');
 }
 
-function loadMenuData() {
-    const categoriesList = document.getElementById('categories-list');
-    const itemsList = document.getElementById('menu-items-list');
-    const categorySelect = document.getElementById('new-item-category');
-    
-    categoriesList.innerHTML = '<h3>Категории</h3>';
-    itemsList.innerHTML = '<h3>Напитки</h3>';
-    categorySelect.innerHTML = '';
-    
-    menuCategories.forEach(category => {
-        // Добавляем категории в список
-        const card = document.createElement('div');
-        card.className = 'category-card';
-        card.innerHTML = `
-            <span>${category}</span>
-            <button onclick="deleteCategory('${category}')">×</button>
-        `;
-        categoriesList.appendChild(card);
-        
-        // Добавляем категории в select
-        const option = document.createElement('option');
-        option.value = category;
-        option.textContent = category;
-        categorySelect.appendChild(option);
-    });
-    
-    menuItems.forEach(item => {
-        const card = document.createElement('div');
-        card.className = 'menu-item-card';
-        card.innerHTML = `
-            <div>
-                <strong>${item.name}</strong>
-                <div>${item.price} ₽ • ${item.category}</div>
-            </div>
-            <button onclick="deleteMenuItem(${item.id})">×</button>
-        `;
-        itemsList.appendChild(card);
-    });
+function showAddCategoryForm() {
+    document.getElementById('add-category-form').classList.remove('hidden');
 }
 
 function showAddItemForm() {
     document.getElementById('add-item-form').classList.remove('hidden');
 }
 
+function loadMenuData() {
+    const categoriesList = document.getElementById('categories-list');
+    const itemsList = document.getElementById('menu-items-list');
+    const categorySelect = document.getElementById('new-item-category');
+    
+    // Очищаем и заполняем категории
+    categoriesList.innerHTML = '<h3>Категории</h3>';
+    categorySelect.innerHTML = '';
+    
+    menuCategories.forEach(category => {
+        // Добавляем в список категорий
+        const categoryCard = document.createElement('div');
+        categoryCard.className = 'category-card';
+        categoryCard.innerHTML = `
+            <span>${category}</span>
+            <button onclick="deleteCategory('${category}')">×</button>
+        `;
+        categoriesList.appendChild(categoryCard);
+        
+        // Добавляем в выпадающий список
+        const option = document.createElement('option');
+        option.value = category;
+        option.textContent = category;
+        categorySelect.appendChild(option);
+    });
+    
+    // Очищаем и заполняем список напитков
+    itemsList.innerHTML = '<h3>Напитки</h3>';
+    menuItems.forEach(item => {
+        const itemCard = document.createElement('div');
+        itemCard.className = 'menu-item-card';
+        itemCard.innerHTML = `
+            <div>
+                <strong>${item.name}</strong>
+                <div>${item.price} ₽ • ${item.category}</div>
+            </div>
+            <button onclick="deleteMenuItem(${item.id})">×</button>
+        `;
+        itemsList.appendChild(itemCard);
+    });
+}
+
+function addCategory() {
+    const name = document.getElementById('new-category-name').value.trim();
+    if (!name) return alert('Введите название категории');
+    
+    if (!menuCategories.includes(name)) {
+        menuCategories.push(name);
+        db.ref('menu/categories').set(menuCategories)
+            .then(() => {
+                document.getElementById('new-category-name').value = '';
+                document.getElementById('add-category-form').classList.add('hidden');
+            });
+    }
+}
+
 function addMenuItem() {
-    const name = document.getElementById('new-item-name').value;
+    const name = document.getElementById('new-item-name').value.trim();
     const price = parseInt(document.getElementById('new-item-price').value);
     const category = document.getElementById('new-item-category').value;
     
-    if (!name || !price) return alert('Заполните все поля!');
+    if (!name || isNaN(price)) return alert('Заполните все поля корректно!');
     
     const newItem = {
         id: Date.now(),
@@ -190,23 +217,30 @@ function addMenuItem() {
     
     menuItems.push(newItem);
     saveMenuItemsToFirebase();
+    
+    // Очищаем форму
+    document.getElementById('new-item-name').value = '';
+    document.getElementById('new-item-price').value = '';
     document.getElementById('add-item-form').classList.add('hidden');
+}
+
+function deleteCategory(category) {
+    if (!confirm(`Удалить категорию "${category}"? Все напитки этой категории также будут удалены.`)) return;
+    
+    // Удаляем напитки этой категории
+    menuItems = menuItems.filter(item => item.category !== category);
+    saveMenuItemsToFirebase();
+    
+    // Удаляем саму категорию
+    menuCategories = menuCategories.filter(c => c !== category);
+    db.ref('menu/categories').set(menuCategories);
 }
 
 function deleteMenuItem(id) {
     if (!confirm('Удалить этот напиток?')) return;
+    
     menuItems = menuItems.filter(item => item.id !== id);
     saveMenuItemsToFirebase();
-}
-
-function deleteCategory(category) {
-    if (!confirm(`Удалить категорию "${category}"?`)) return;
-    menuCategories = menuCategories.filter(cat => cat !== category);
-    saveCategoriesToFirebase();
-}
-
-function saveCategoriesToFirebase() {
-    db.ref('menu/categories').set(menuCategories);
 }
 
 function saveMenuItemsToFirebase() {
