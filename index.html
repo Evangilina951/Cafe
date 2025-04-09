@@ -342,9 +342,13 @@
             </div>
             
             <h2>Меню напитков</h2>
-            <div class="menu-buttons" id="menu-buttons">
-                <!-- Кнопки меню будут генерироваться динамически -->
-            </div>
+                <div class="menu-buttons">
+                            <!-- Стандартные кнопки меню (будут заменены при загрузке из Firebase) -->
+                    <button class="menu-btn" onclick="addDrink('Кофе', 100)">Кофе - 100 ₽</button>
+                    <button class="menu-btn" onclick="addDrink('Чай', 50)">Чай - 50 ₽</button>
+                    <button class="menu-btn" onclick="addDrink('Капучино', 150)">Капучино - 150 ₽</button>
+                    <button class="menu-btn" onclick="addDrink('Латте', 200)">Латте - 200 ₽</button>
+                </div>
         </div>
 
         <!-- Правая часть - заказ -->
