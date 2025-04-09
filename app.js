@@ -123,11 +123,16 @@ function initEventListeners() {
     }
     
     if (elements.addCategoryBtn) {
-        elements.addCategoryBtn.addEventListener('click', showAddCategoryForm);
+        elements.addCategoryBtn.addEventListener('click', () => {
+            showElement(elements.addCategoryForm);
+        });
     }
     
     if (elements.addItemBtn) {
-        elements.addItemBtn.addEventListener('click', showAddItemForm);
+        elements.addItemBtn.addEventListener('click', () => {
+            showElement(elements.addItemForm);
+            resetAddItemForm();
+        });
     }
     
     if (elements.confirmAddCategory) {
@@ -229,15 +234,20 @@ function hideAdminPanel() {
     window.location.hash = '';
 }
 
-function showAddCategoryForm() {
-    const form = document.getElementById('add-category-form');
-    if (form) form.classList.remove('hidden');
-}
-
-function showAddItemForm() {
-    const form = document.getElementById('add-item-form');
-    if (form) form.classList.remove('hidden');
-    resetAddItemForm();
+function resetAddItemForm() {
+    document.getElementById('new-item-name').value = '';
+    document.getElementById('new-item-price').value = '';
+    
+    const ingredientsList = document.getElementById('ingredients-list');
+    ingredientsList.innerHTML = `
+        <div class="ingredient-item">
+            <input type="text" class="ingredient-name" placeholder="Название ингредиента">
+            <input type="text" class="ingredient-quantity" placeholder="Количество">
+            <button class="remove-ingredient-btn">×</button>
+        </div>
+    `;
+    
+    initIngredientsHandlers();
 }
 
 function addMenuItem() {
@@ -272,6 +282,7 @@ function addMenuItem() {
     
     updateMenuInFirebase()
         .then(() => {
+            hideElement(elements.addItemForm);
             resetAddItemForm();
             loadMenuData();
         })
@@ -292,23 +303,6 @@ function updateMenuInFirebase() {
         categories: menuCategories,
         items: itemsObj
     });
-}
-
-function resetAddItemForm() {
-    document.getElementById('new-item-name').value = '';
-    document.getElementById('new-item-price').value = '';
-    
-    const ingredientsList = document.getElementById('ingredients-list');
-    ingredientsList.innerHTML = `
-        <div class="ingredient-item">
-            <input type="text" class="ingredient-name" placeholder="Название ингредиента">
-            <input type="text" class="ingredient-quantity" placeholder="Количество">
-            <button class="remove-ingredient-btn">×</button>
-        </div>
-    `;
-    
-    document.getElementById('add-item-form').classList.add('hidden');
-    initIngredientsHandlers();
 }
 
 function initIngredientsHandlers() {
@@ -542,8 +536,7 @@ function addCategory() {
         db.ref('menu/categories').set(menuCategories)
             .then(() => {
                 nameInput.value = '';
-                const form = document.getElementById('add-category-form');
-                if (form) form.classList.add('hidden');
+                hideElement(elements.addCategoryForm);
                 loadMenuData();
             })
             .catch(error => {
@@ -587,6 +580,7 @@ function deleteMenuItem(id) {
         });
 }
 
+// Функции заказа
 function addDrink(name, price) {
     if (!currentUser) {
         alert("Сначала войдите в систему!");
