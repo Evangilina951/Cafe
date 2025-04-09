@@ -49,7 +49,9 @@ const elements = {
     confirmAddCategory: document.getElementById('add-category-btn'),
     confirmAddItem: document.getElementById('add-menu-item-btn'),
     categoriesList: document.getElementById('categories-list'),
-    menuItemsList: document.getElementById('menu-items-list')
+    menuItemsList: document.getElementById('menu-items-list'),
+    ingredientsList: document.getElementById('ingredients-list'),
+    addIngredientBtn: document.getElementById('add-ingredient-btn')
 };
 
 // Функции для работы с DOM
@@ -88,6 +90,11 @@ auth.onAuthStateChanged(user => {
         }
         
         loadMenuFromFirebase();
+        
+        // Для админа сразу загружаем данные админ-панели
+        if (user.email === 'admin@dismail.com') {
+            loadMenuData();
+        }
     } else {
         currentUser = null;
         showElement(elements.authForm);
@@ -161,10 +168,10 @@ function loadMenuFromFirebase() {
             const initialData = {
                 categories: ["Кофе", "Чай", "Десерты"],
                 items: {
-                    item1: { id: 1, name: "Кофе", price: 100, category: "Кофе" },
-                    item2: { id: 2, name: "Чай", price: 50, category: "Чай" },
-                    item3: { id: 3, name: "Капучино", price: 150, category: "Кофе" },
-                    item4: { id: 4, name: "Латте", price: 200, category: "Кофе" }
+                    item1: { id: 1, name: "Кофе", price: 100, category: "Кофе", ingredients: ["Арабика", "Вода"] },
+                    item2: { id: 2, name: "Чай", price: 50, category: "Чай", ingredients: ["Чайные листья", "Вода"] },
+                    item3: { id: 3, name: "Капучино", price: 150, category: "Кофе", ingredients: ["Эспрессо", "Молоко", "Пена"] },
+                    item4: { id: 4, name: "Латте", price: 200, category: "Кофе", ingredients: ["Эспрессо", "Молоко"] }
                 }
             };
             
@@ -233,49 +240,260 @@ function showAddCategoryForm() {
 function showAddItemForm() {
     const form = document.getElementById('add-item-form');
     if (form) form.classList.remove('hidden');
+    resetAddItemForm();
 }
 
+// Доработанная функция добавления напитка
+function addMenuItem() {
+    const name = document.getElementById('new-item-name').value.trim();
+    const price = parseInt(document.getElementById('new-item-price').value);
+    const category = document.getElementById('new-item-category').value;
+    
+    // Собираем ингредиенты
+    const ingredients = [];
+    const ingredientInputs = document.querySelectorAll('.ingredient-input');
+    ingredientInputs.forEach(input => {
+        if (input.value.trim()) {
+            ingredients.push(input.value.trim());
+        }
+    });
+
+    if (!name || isNaN(price) || !category) {
+        alert('Заполните все обязательные поля!');
+        return;
+    }
+
+    const newItem = {
+        id: Date.now(),
+        name,
+        price,
+        category,
+        ingredients
+    };
+    
+    menuItems.push(newItem);
+    saveMenuItemsToFirebase();
+    resetAddItemForm();
+}
+
+// Функция сброса формы добавления напитка
+function resetAddItemForm() {
+    document.getElementById('new-item-name').value = '';
+    document.getElementById('new-item-price').value = '';
+    
+    const ingredientsList = document.getElementById('ingredients-list');
+    ingredientsList.innerHTML = `
+        <div class="ingredient-item">
+            <input type="text" class="ingredient-input" placeholder="Ингредиент 1">
+            <button class="remove-ingredient-btn">×</button>
+        </div>
+    `;
+    
+    document.getElementById('add-item-form').classList.add('hidden');
+    initIngredientsHandlers();
+}
+
+// Инициализация обработчиков для ингредиентов
+function initIngredientsHandlers() {
+    // Добавление нового ингредиента
+    document.getElementById('add-ingredient-btn').addEventListener('click', () => {
+        const ingredientsList = document.getElementById('ingredients-list');
+        const count = ingredientsList.children.length + 1;
+        const newIngredient = document.createElement('div');
+        newIngredient.className = 'ingredient-item';
+        newIngredient.innerHTML = `
+            <input type="text" class="ingredient-input" placeholder="Ингредиент ${count}">
+            <button class="remove-ingredient-btn">×</button>
+        `;
+        ingredientsList.appendChild(newIngredient);
+        
+        // Назначаем обработчик для новой кнопки удаления
+        newIngredient.querySelector('.remove-ingredient-btn').addEventListener('click', function() {
+            if (ingredientsList.children.length > 1) {
+                ingredientsList.removeChild(newIngredient);
+            }
+        });
+    });
+    
+    // Удаление ингредиентов
+    document.querySelectorAll('.remove-ingredient-btn').forEach(btn => {
+        btn.addEventListener('click', function() {
+            if (document.querySelectorAll('.ingredient-item').length > 1) {
+                this.parentElement.remove();
+            }
+        });
+    });
+}
+
+// Доработанная функция загрузки данных меню в админ-панель
 function loadMenuData() {
     const categoriesList = document.getElementById('categories-list');
     const itemsList = document.getElementById('menu-items-list');
     const categorySelect = document.getElementById('new-item-category');
     
-    if (!categoriesList || !itemsList || !categorySelect) return;
-    
-    // Очищаем и заполняем категории
     categoriesList.innerHTML = '<h3>Категории</h3>';
+    itemsList.innerHTML = '<h3>Напитки</h3>';
     categorySelect.innerHTML = '';
     
+    // Заполняем категории
     menuCategories.forEach(category => {
-        // Добавляем в список категорий
+        // Список категорий
         const categoryCard = document.createElement('div');
         categoryCard.className = 'category-card';
         categoryCard.innerHTML = `
             <span>${category}</span>
-            <button onclick="deleteCategory('${category}')">×</button>
+            <button class="delete-category-btn">×</button>
         `;
         categoriesList.appendChild(categoryCard);
         
-        // Добавляем в выпадающий список
+        // Выпадающий список
         const option = document.createElement('option');
         option.value = category;
         option.textContent = category;
         categorySelect.appendChild(option);
     });
     
-    // Очищаем и заполняем список напитков
-    itemsList.innerHTML = '<h3>Напитки</h3>';
+    // Заполняем напитки с возможностью редактирования
     menuItems.forEach(item => {
         const itemCard = document.createElement('div');
         itemCard.className = 'menu-item-card';
+        itemCard.dataset.id = item.id;
+        
+        let ingredientsHtml = '';
+        if (item.ingredients && item.ingredients.length > 0) {
+            ingredientsHtml = `
+                <div class="item-ingredients">
+                    <strong>Состав:</strong>
+                    <ul>
+                        ${item.ingredients.map(ing => `<li>${ing}</li>`).join('')}
+                    </ul>
+                </div>
+            `;
+        }
+        
         itemCard.innerHTML = `
-            <div>
-                <strong>${item.name}</strong>
-                <div>${item.price} ₽ • ${item.category}</div>
+            <div class="item-main-info">
+                <div>
+                    <strong>${item.name}</strong>
+                    <div>${item.price} ₽ • ${item.category}</div>
+                    ${ingredientsHtml}
+                </div>
+                <div class="item-actions">
+                    <button class="edit-item-btn">✏️</button>
+                    <button class="delete-item-btn">×</button>
+                </div>
             </div>
-            <button onclick="deleteMenuItem(${item.id})">×</button>
+            <div class="edit-form hidden" data-id="${item.id}">
+                <input type="text" value="${item.name}" class="edit-name">
+                <input type="number" value="${item.price}" class="edit-price">
+                <select class="edit-category">
+                    ${menuCategories.map(cat => 
+                        `<option value="${cat}" ${cat === item.category ? 'selected' : ''}>${cat}</option>`
+                    ).join('')}
+                </select>
+                <div class="edit-ingredients">
+                    <h4>Состав:</h4>
+                    <div class="edit-ingredients-list">
+                        ${item.ingredients ? item.ingredients.map((ing, idx) => `
+                            <div class="ingredient-item">
+                                <input type="text" value="${ing}" class="ingredient-input" placeholder="Ингредиент ${idx+1}">
+                                <button class="remove-ingredient-btn">×</button>
+                            </div>
+                        `).join('') : ''}
+                    </div>
+                    <button class="add-edit-ingredient-btn">+ Добавить ингредиент</button>
+                </div>
+                <button class="save-edit-btn">Сохранить</button>
+                <button class="cancel-edit-btn">Отмена</button>
+            </div>
         `;
+        
         itemsList.appendChild(itemCard);
+    });
+    
+    // Инициализация обработчиков для админ-панели
+    initAdminPanelHandlers();
+}
+
+// Инициализация обработчиков админ-панели
+function initAdminPanelHandlers() {
+    // Обработчики для кнопок удаления
+    document.querySelectorAll('.delete-category-btn').forEach(btn => {
+        btn.addEventListener('click', function() {
+            const category = this.parentElement.querySelector('span').textContent;
+            deleteCategory(category);
+        });
+    });
+    
+    document.querySelectorAll('.delete-item-btn').forEach(btn => {
+        btn.addEventListener('click', function() {
+            const itemId = parseInt(this.closest('.menu-item-card').dataset.id);
+            deleteMenuItem(itemId);
+        });
+    });
+    
+    // Обработчики для кнопок редактирования
+    document.querySelectorAll('.edit-item-btn').forEach(btn => {
+        btn.addEventListener('click', function() {
+            const itemCard = this.closest('.menu-item-card');
+            itemCard.querySelector('.item-main-info').classList.add('hidden');
+            itemCard.querySelector('.edit-form').classList.remove('hidden');
+        });
+    });
+    
+    document.querySelectorAll('.cancel-edit-btn').forEach(btn => {
+        btn.addEventListener('click', function() {
+            const itemCard = this.closest('.menu-item-card');
+            itemCard.querySelector('.item-main-info').classList.remove('hidden');
+            itemCard.querySelector('.edit-form').classList.add('hidden');
+        });
+    });
+    
+    // Обработчики для сохранения изменений
+    document.querySelectorAll('.save-edit-btn').forEach(btn => {
+        btn.addEventListener('click', function() {
+            const itemCard = this.closest('.menu-item-card');
+            const itemId = parseInt(itemCard.dataset.id);
+            const editForm = itemCard.querySelector('.edit-form');
+            
+            const updatedItem = {
+                id: itemId,
+                name: editForm.querySelector('.edit-name').value.trim(),
+                price: parseInt(editForm.querySelector('.edit-price').value),
+                category: editForm.querySelector('.edit-category').value,
+                ingredients: Array.from(editForm.querySelectorAll('.edit-ingredients-list .ingredient-input'))
+                    .map(input => input.value.trim())
+                    .filter(ing => ing)
+            };
+            
+            // Находим и обновляем элемент
+            const index = menuItems.findIndex(item => item.id === itemId);
+            if (index !== -1) {
+                menuItems[index] = updatedItem;
+                saveMenuItemsToFirebase();
+            }
+        });
+    });
+    
+    // Обработчики для ингредиентов в форме редактирования
+    document.querySelectorAll('.add-edit-ingredient-btn').forEach(btn => {
+        btn.addEventListener('click', function() {
+            const ingredientsList = this.previousElementSibling;
+            const count = ingredientsList.children.length + 1;
+            const newIngredient = document.createElement('div');
+            newIngredient.className = 'ingredient-item';
+            newIngredient.innerHTML = `
+                <input type="text" class="ingredient-input" placeholder="Ингредиент ${count}">
+                <button class="remove-ingredient-btn">×</button>
+            `;
+            ingredientsList.appendChild(newIngredient);
+            
+            newIngredient.querySelector('.remove-ingredient-btn').addEventListener('click', function() {
+                if (ingredientsList.children.length > 1) {
+                    ingredientsList.removeChild(newIngredient.parentElement);
+                }
+            });
+        });
     });
 }
 
@@ -299,39 +517,6 @@ function addCategory() {
             })
             .catch(error => console.error("Ошибка сохранения категории:", error));
     }
-}
-
-function addMenuItem() {
-    const nameInput = document.getElementById('new-item-name');
-    const priceInput = document.getElementById('new-item-price');
-    const categorySelect = document.getElementById('new-item-category');
-    
-    if (!nameInput || !priceInput || !categorySelect) return;
-    
-    const name = nameInput.value.trim();
-    const price = parseInt(priceInput.value);
-    const category = categorySelect.value;
-    
-    if (!name || isNaN(price)) {
-        alert('Заполните все поля корректно!');
-        return;
-    }
-    
-    const newItem = {
-        id: Date.now(),
-        name,
-        price,
-        category
-    };
-    
-    menuItems.push(newItem);
-    saveMenuItemsToFirebase();
-    
-    // Очищаем форму
-    nameInput.value = '';
-    priceInput.value = '';
-    const form = document.getElementById('add-item-form');
-    if (form) form.classList.add('hidden');
 }
 
 function deleteCategory(category) {
@@ -504,4 +689,5 @@ function pay() {
 // Инициализация при загрузке страницы
 document.addEventListener('DOMContentLoaded', () => {
     initEventListeners();
+    initIngredientsHandlers();
 });
