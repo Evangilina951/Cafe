@@ -85,17 +85,10 @@ auth.onAuthStateChanged(user => {
         // Проверка прав администратора
         if (user.email === 'admin@dismail.com') {
             if (elements.adminBtn) elements.adminBtn.style.display = 'block';
-            // Загружаем данные меню сразу для админа
-            loadMenuFromFirebase().then(() => {
-                if (window.location.hash === '#admin') {
-                    showAdminPanel();
-                }
-            });
+            loadMenuFromFirebase();
         } else if (elements.adminBtn) {
             elements.adminBtn.style.display = 'none';
         }
-        
-        loadMenuFromFirebase();
     } else {
         currentUser = null;
         showElement(elements.authForm);
@@ -165,6 +158,9 @@ function loadMenuFromFirebase() {
                 loadMenuData();
             }
         } else {
+            // Если меню пустое, показываем сообщение об ошибке
+            updateMainMenu();
+            
             // Инициализация базы данных при первом запуске
             const initialData = {
                 categories: ["Кофе", "Чай", "Десерты"],
@@ -176,13 +172,21 @@ function loadMenuFromFirebase() {
                 }
             };
             
+            // Сохраняем начальные данные
             db.ref('menu').set(initialData)
                 .then(() => {
                     menuCategories = initialData.categories;
                     menuItems = Object.values(initialData.items);
                     updateMainMenu();
+                })
+                .catch(error => {
+                    console.error("Ошибка инициализации меню:", error);
+                    updateMainMenu();
                 });
         }
+    }, (error) => {
+        console.error("Ошибка загрузки меню:", error);
+        updateMainMenu();
     });
 }
 
@@ -201,13 +205,8 @@ function updateMainMenu() {
             menuButtons.appendChild(btn);
         });
     } else {
-        // Стандартные кнопки, если меню пустое
-        menuButtons.innerHTML = `
-            <button class="menu-btn" onclick="addDrink('Кофе', 100)">Кофе - 100 ₽</button>
-            <button class="menu-btn" onclick="addDrink('Чай', 50)">Чай - 50 ₽</button>
-            <button class="menu-btn" onclick="addDrink('Капучино', 150)">Капучино - 150 ₽</button>
-            <button class="menu-btn" onclick="addDrink('Латте', 200)">Латте - 200 ₽</button>
-        `;
+        // Показываем сообщение об ошибке вместо стандартных кнопок
+        menuButtons.innerHTML = '<div class="menu-error">Ошибка: Меню не загружено</div>';
     }
 }
 
@@ -236,7 +235,7 @@ function showAddItemForm() {
     resetAddItemForm();
 }
 
-// Обновленная функция добавления напитка
+// Функция добавления напитка
 function addMenuItem() {
     const name = document.getElementById('new-item-name').value.trim();
     const price = parseInt(document.getElementById('new-item-price').value);
@@ -266,13 +265,28 @@ function addMenuItem() {
         ingredients
     };
     
+    // Добавляем новый напиток в массив
     menuItems.push(newItem);
-    saveMenuItemsToFirebase();
-    resetAddItemForm();
-    loadMenuData(); // Обновляем список напитков сразу после добавления
+    
+    // Создаем объект для Firebase
+    const itemsObj = {};
+    menuItems.forEach(item => {
+        itemsObj['item' + item.id] = item;
+    });
+    
+    // Сохраняем в Firebase
+    db.ref('menu/items').set(itemsObj)
+        .then(() => {
+            resetAddItemForm();
+            loadMenuData(); // Обновляем список напитков
+        })
+        .catch(error => {
+            console.error("Ошибка сохранения напитка:", error);
+            alert("Не удалось сохранить напиток");
+        });
 }
 
-// Обновленная функция сброса формы добавления напитка
+// Функция сброса формы добавления напитка
 function resetAddItemForm() {
     document.getElementById('new-item-name').value = '';
     document.getElementById('new-item-price').value = '';
@@ -290,27 +304,29 @@ function resetAddItemForm() {
     initIngredientsHandlers();
 }
 
-// Обновленная функция инициализации обработчиков ингредиентов
+// Инициализация обработчиков для ингредиентов
 function initIngredientsHandlers() {
     // Добавление нового ингредиента
-    document.getElementById('add-ingredient-btn').addEventListener('click', () => {
-        const ingredientsList = document.getElementById('ingredients-list');
-        const newIngredient = document.createElement('div');
-        newIngredient.className = 'ingredient-item';
-        newIngredient.innerHTML = `
-            <input type="text" class="ingredient-name" placeholder="Название ингредиента">
-            <input type="text" class="ingredient-quantity" placeholder="Количество">
-            <button class="remove-ingredient-btn">×</button>
-        `;
-        ingredientsList.appendChild(newIngredient);
-        
-        // Назначаем обработчик для новой кнопки удаления
-        newIngredient.querySelector('.remove-ingredient-btn').addEventListener('click', function() {
-            if (ingredientsList.children.length > 1) {
-                ingredientsList.removeChild(newIngredient);
-            }
+    if (elements.addIngredientBtn) {
+        elements.addIngredientBtn.addEventListener('click', () => {
+            const ingredientsList = document.getElementById('ingredients-list');
+            const newIngredient = document.createElement('div');
+            newIngredient.className = 'ingredient-item';
+            newIngredient.innerHTML = `
+                <input type="text" class="ingredient-name" placeholder="Название ингредиента">
+                <input type="text" class="ingredient-quantity" placeholder="Количество">
+                <button class="remove-ingredient-btn">×</button>
+            `;
+            ingredientsList.appendChild(newIngredient);
+            
+            // Назначаем обработчик для новой кнопки удаления
+            newIngredient.querySelector('.remove-ingredient-btn').addEventListener('click', function() {
+                if (ingredientsList.children.length > 1) {
+                    ingredientsList.removeChild(newIngredient);
+                }
+            });
         });
-    });
+    }
     
     // Удаление ингредиентов
     document.querySelectorAll('.remove-ingredient-btn').forEach(btn => {
@@ -322,13 +338,15 @@ function initIngredientsHandlers() {
     });
 }
 
-// Обновленная функция загрузки данных меню
+// Функция загрузки данных меню в админ-панель
 function loadMenuData() {
     if (!elements.adminPanel || elements.adminPanel.classList.contains('hidden')) return;
     
     const categoriesList = document.getElementById('categories-list');
     const itemsList = document.getElementById('menu-items-list');
     const categorySelect = document.getElementById('new-item-category');
+    
+    if (!categoriesList || !itemsList || !categorySelect) return;
     
     categoriesList.innerHTML = '<h3>Категории</h3>';
     itemsList.innerHTML = '<h3>Напитки</h3>';
@@ -479,11 +497,25 @@ function initAdminPanelHandlers() {
             const index = menuItems.findIndex(item => item.id === itemId);
             if (index !== -1) {
                 menuItems[index] = updatedItem;
-                saveMenuItemsToFirebase();
                 
-                // Закрываем форму редактирования
-                itemCard.querySelector('.item-main-info').classList.remove('hidden');
-                itemCard.querySelector('.edit-form').classList.add('hidden');
+                // Создаем объект для Firebase
+                const itemsObj = {};
+                menuItems.forEach(item => {
+                    itemsObj['item' + item.id] = item;
+                });
+                
+                // Сохраняем в Firebase
+                db.ref('menu/items').set(itemsObj)
+                    .then(() => {
+                        // Закрываем форму редактирования
+                        itemCard.querySelector('.item-main-info').classList.remove('hidden');
+                        itemCard.querySelector('.edit-form').classList.add('hidden');
+                        loadMenuData(); // Обновляем список
+                    })
+                    .catch(error => {
+                        console.error("Ошибка сохранения изменений:", error);
+                        alert("Не удалось сохранить изменения");
+                    });
             }
         });
     });
@@ -529,7 +561,10 @@ function addCategory() {
                 if (form) form.classList.add('hidden');
                 loadMenuData(); // Обновляем список категорий
             })
-            .catch(error => console.error("Ошибка сохранения категории:", error));
+            .catch(error => {
+                console.error("Ошибка сохранения категории:", error);
+                alert("Не удалось сохранить категорию");
+            });
     }
 }
 
@@ -540,36 +575,47 @@ function deleteCategory(category) {
     
     // Удаляем напитки этой категории
     menuItems = menuItems.filter(item => item.category !== category);
-    saveMenuItemsToFirebase();
     
-    // Удаляем саму категорию
-    menuCategories = menuCategories.filter(c => c !== category);
-    db.ref('menu/categories').set(menuCategories)
-        .catch(error => console.error("Ошибка удаления категории:", error));
+    // Создаем объект для Firebase
+    const itemsObj = {};
+    menuItems.forEach(item => {
+        itemsObj['item' + item.id] = item;
+    });
+    
+    // Сохраняем изменения
+    db.ref('menu').update({
+        categories: menuCategories,
+        items: itemsObj
+    })
+    .then(() => {
+        loadMenuData(); // Обновляем данные
+    })
+    .catch(error => {
+        console.error("Ошибка удаления категории:", error);
+        alert("Не удалось удалить категорию");
+    });
 }
 
 function deleteMenuItem(id) {
     if (!confirm('Удалить этот напиток?')) return;
     
     menuItems = menuItems.filter(item => item.id !== id);
-    saveMenuItemsToFirebase();
-}
-
-function saveMenuItemsToFirebase() {
+    
+    // Создаем объект для Firebase
     const itemsObj = {};
     menuItems.forEach(item => {
         itemsObj['item' + item.id] = item;
     });
     
+    // Сохраняем в Firebase
     db.ref('menu/items').set(itemsObj)
         .then(() => {
-            // После сохранения обновляем отображение меню
-            updateMainMenu();
-            if (!elements.adminPanel.classList.contains('hidden')) {
-                loadMenuData();
-            }
+            loadMenuData(); // Обновляем список
         })
-        .catch(error => console.error("Ошибка сохранения меню:", error));
+        .catch(error => {
+            console.error("Ошибка удаления напитка:", error);
+            alert("Не удалось удалить напиток");
+        });
 }
 
 // Функции заказа
