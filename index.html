@@ -220,6 +220,67 @@
 .logout-btn:hover {
     background-color: #ffcdd2;
 }
+
+/* Админ-панель */
+#admin-panel {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100vh;
+    padding: 30px;
+    background-color: #fff;
+    z-index: 200;
+    overflow-y: auto;
+}
+
+.admin-header {
+    display: flex;
+    justify-content: space-between;
+    margin-bottom: 30px;
+}
+
+.admin-actions {
+    display: flex;
+    gap: 15px;
+    margin-bottom: 20px;
+}
+
+.add-category-btn, .add-item-btn {
+    background-color: #6d341f;
+    color: #ffefdc;
+    border: none;
+    padding: 12px 20px;
+    border-radius: 8px;
+    cursor: pointer;
+}
+
+#add-item-form {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    max-width: 400px;
+    margin-bottom: 30px;
+    padding: 20px;
+    background-color: #f5f5f5;
+    border-radius: 10px;
+}
+
+.menu-management {
+    display: grid;
+    grid-template-columns: 250px 1fr;
+    gap: 30px;
+}
+
+.category-card, .menu-item-card {
+    background-color: #fff;
+    border: 1px solid #ddd;
+    border-radius: 8px;
+    padding: 15px;
+    margin-bottom: 10px;
+    display: flex;
+    justify-content: space-between;
+}
     </style>
 </head>
 <body>
@@ -234,6 +295,32 @@
 
     <!-- Основной интерфейс -->
     <div id="order-interface">
+            <!-- Реализация админки меню -->
+        <div id="admin-panel" class="hidden">
+    <div class="admin-header">
+        <h2>Панель управления меню</h2>
+        <button class="back-btn" onclick="hideAdminPanel()">← Назад к заказу</button>
+    </div>
+    
+    <div class="admin-actions">
+        <button class="add-category-btn" onclick="showAddCategoryForm()">+ Добавить категорию</button>
+        <button class="add-item-btn" onclick="showAddItemForm()">+ Добавить напиток</button>
+    </div>
+
+    <!-- Форма добавления напитка (изначально скрыта) -->
+    <div id="add-item-form" class="hidden">
+        <input type="text" id="new-item-name" placeholder="Название">
+        <input type="number" id="new-item-price" placeholder="Цена">
+        <select id="new-item-category"></select>
+        <button onclick="addMenuItem()">Сохранить</button>
+    </div>
+
+    <!-- Список категорий и напитков -->
+    <div class="menu-management">
+        <div id="categories-list"></div>
+        <div id="menu-items-list"></div>
+    </div>
+</div>
         <!-- Левая часть - меню -->
         <div class="menu-section">
             <div class="user-info">
