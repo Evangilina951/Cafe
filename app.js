@@ -439,7 +439,6 @@ function loadMenuData() {
     
     initAdminPanelHandlers();
 }
-
 function initAdminPanelHandlers() {
     document.querySelectorAll('.delete-category-btn').forEach(btn => {
         btn.addEventListener('click', function() {
@@ -460,6 +459,9 @@ function initAdminPanelHandlers() {
             const itemCard = this.closest('.menu-item-card');
             itemCard.querySelector('.item-main-info').classList.add('hidden');
             itemCard.querySelector('.edit-form').classList.remove('hidden');
+            
+            // Инициализируем обработчики для кнопок удаления в форме редактирования
+            initEditFormIngredientHandlers(itemCard.querySelector('.edit-form'));
         });
     });
     
@@ -513,6 +515,7 @@ function initAdminPanelHandlers() {
         });
     });
     
+    // Обработчики для кнопок добавления ингредиентов в формах редактирования
     document.querySelectorAll('.add-edit-ingredient-btn').forEach(btn => {
         btn.addEventListener('click', function() {
             const ingredientsList = this.previousElementSibling;
@@ -525,11 +528,52 @@ function initAdminPanelHandlers() {
             `;
             ingredientsList.appendChild(newIngredient);
             
+            // Добавляем обработчик для новой кнопки удаления
             newIngredient.querySelector('.remove-ingredient-btn').addEventListener('click', function() {
-                ingredientsList.removeChild(newIngredient);
+                this.closest('.ingredient-item').remove();
             });
         });
     });
+    
+    // Обработчики для существующих кнопок удаления в формах редактирования
+    document.querySelectorAll('.edit-form .remove-ingredient-btn').forEach(btn => {
+        btn.addEventListener('click', function() {
+            this.closest('.ingredient-item').remove();
+        });
+    });
+}
+
+// Новая функция для инициализации обработчиков ингредиентов в форме редактирования
+function initEditFormIngredientHandlers(editForm) {
+    if (!editForm) return;
+    
+    // Обработчики для существующих кнопок удаления
+    editForm.querySelectorAll('.remove-ingredient-btn').forEach(btn => {
+        btn.addEventListener('click', function() {
+            this.closest('.ingredient-item').remove();
+        });
+    });
+    
+    // Обработчик для кнопки добавления ингредиента
+    const addBtn = editForm.querySelector('.add-edit-ingredient-btn');
+    if (addBtn) {
+        addBtn.addEventListener('click', function() {
+            const ingredientsList = this.previousElementSibling;
+            const newIngredient = document.createElement('div');
+            newIngredient.className = 'ingredient-item';
+            newIngredient.innerHTML = `
+                <input type="text" class="ingredient-name" placeholder="Название">
+                <input type="text" class="ingredient-quantity" placeholder="Количество">
+                <button class="remove-ingredient-btn">×</button>
+            `;
+            ingredientsList.appendChild(newIngredient);
+            
+            // Добавляем обработчик для новой кнопки удаления
+            newIngredient.querySelector('.remove-ingredient-btn').addEventListener('click', function() {
+                this.closest('.ingredient-item').remove();
+            });
+        });
+    }
 }
 
 function addCategory() {
