@@ -256,7 +256,7 @@ function addMenuItem() {
     const category = document.getElementById('new-item-category').value;
     
     const ingredients = [];
-    const ingredientItems = document.querySelectorAll('.ingredient-item');
+    const ingredientItems = document.querySelectorAll('#ingredients-list .ingredient-item');
     ingredientItems.forEach(item => {
         const name = item.querySelector('.ingredient-name').value.trim();
         const quantity = item.querySelector('.ingredient-quantity').value.trim();
@@ -330,8 +330,8 @@ function initIngredientsHandlers() {
     document.querySelectorAll('.remove-ingredient-btn').forEach(btn => {
         btn.addEventListener('click', function() {
             const ingredientItem = this.closest('.ingredient-item');
-            if (ingredientItem) {
-                ingredientItem.remove();
+            if (ingredientItem && ingredientItem.parentNode) {
+                ingredientItem.parentNode.removeChild(ingredientItem);
             }
         });
     });
@@ -733,6 +733,14 @@ function pay() {
 document.addEventListener('DOMContentLoaded', () => {
     initEventListeners();
     initIngredientsHandlers();
+    
+    // Обновляем CSS для формы добавления напитка
+    const addItemForm = document.getElementById('add-item-form');
+    if (addItemForm) {
+        addItemForm.style.display = 'flex';
+        addItemForm.style.flexDirection = 'column';
+        addItemForm.style.gap = '10px';
+    }
     
     if (window.location.hash === '#admin') {
         const user = auth.currentUser;
