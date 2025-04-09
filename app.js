@@ -20,6 +20,38 @@ let currentUser = null;
 let menuCategories = [];
 let menuItems = [];
 
+// DOM элементы
+const elements = {
+    authForm: document.getElementById('auth-form'),
+    orderInterface: document.getElementById('order-interface'),
+    adminPanel: document.getElementById('admin-panel'),
+    userEmail: document.getElementById('user-email'),
+    menuButtons: document.getElementById('menu-buttons'),
+    orderList: document.getElementById('order-list'),
+    totalElement: document.getElementById('total'),
+    emailInput: document.getElementById('email'),
+    passwordInput: document.getElementById('password'),
+    errorMessage: document.getElementById('error-message'),
+    loginBtn: document.getElementById('login-btn'),
+    logoutBtn: document.querySelector('.logout-btn'),
+    adminBtn: document.querySelector('.admin-btn'),
+    backBtn: document.querySelector('.back-btn'),
+    clearBtn: document.querySelector('.clear-btn'),
+    payBtn: document.querySelector('.pay-btn'),
+    addCategoryBtn: document.querySelector('.add-category-btn'),
+    addItemBtn: document.querySelector('.add-item-btn'),
+    addCategoryForm: document.getElementById('add-category-form'),
+    addItemForm: document.getElementById('add-item-form'),
+    newCategoryName: document.getElementById('new-category-name'),
+    newItemName: document.getElementById('new-item-name'),
+    newItemPrice: document.getElementById('new-item-price'),
+    newItemCategory: document.getElementById('new-item-category'),
+    confirmAddCategory: document.getElementById('add-category-btn'),
+    confirmAddItem: document.getElementById('add-menu-item-btn'),
+    categoriesList: document.getElementById('categories-list'),
+    menuItemsList: document.getElementById('menu-items-list')
+};
+
 // Функции для работы с DOM
 function showElement(element) {
     if (!element) return;
@@ -39,39 +71,76 @@ function hideElement(element) {
 
 // Обработчик состояния авторизации
 auth.onAuthStateChanged(user => {
-    const authForm = document.getElementById('auth-form');
-    const orderInterface = document.getElementById('order-interface');
-    const adminBtn = document.querySelector('.admin-btn');
-    
     if (user) {
         currentUser = user;
+        hideElement(elements.authForm);
+        showElement(elements.orderInterface);
         
-        hideElement(authForm);
-        showElement(orderInterface);
-        
-        const userEmailElement = document.getElementById('user-email');
-        if (userEmailElement) {
-            userEmailElement.textContent = user.email;
+        if (elements.userEmail) {
+            elements.userEmail.textContent = user.email;
         }
         
         // Проверка прав администратора
-        if (user.email === 'admin@dismail.com' && adminBtn) {
-            adminBtn.style.display = 'block';
-            adminBtn.onclick = showAdminPanel;
-        } else if (adminBtn) {
-            adminBtn.style.display = 'none';
+        if (user.email === 'admin@dismail.com' && elements.adminBtn) {
+            elements.adminBtn.style.display = 'block';
+        } else if (elements.adminBtn) {
+            elements.adminBtn.style.display = 'none';
         }
         
         loadMenuFromFirebase();
     } else {
         currentUser = null;
-        showElement(authForm);
-        hideElement(orderInterface);
-        if (adminBtn) adminBtn.style.display = 'none';
+        showElement(elements.authForm);
+        hideElement(elements.orderInterface);
+        hideElement(elements.adminPanel);
+        if (elements.adminBtn) elements.adminBtn.style.display = 'none';
         order = [];
         updateOrderList();
     }
 });
+
+// Инициализация обработчиков событий
+function initEventListeners() {
+    if (elements.loginBtn) {
+        elements.loginBtn.addEventListener('click', login);
+    }
+    
+    if (elements.logoutBtn) {
+        elements.logoutBtn.addEventListener('click', logout);
+    }
+    
+    if (elements.adminBtn) {
+        elements.adminBtn.addEventListener('click', showAdminPanel);
+    }
+    
+    if (elements.backBtn) {
+        elements.backBtn.addEventListener('click', hideAdminPanel);
+    }
+    
+    if (elements.clearBtn) {
+        elements.clearBtn.addEventListener('click', clearOrder);
+    }
+    
+    if (elements.payBtn) {
+        elements.payBtn.addEventListener('click', pay);
+    }
+    
+    if (elements.addCategoryBtn) {
+        elements.addCategoryBtn.addEventListener('click', showAddCategoryForm);
+    }
+    
+    if (elements.addItemBtn) {
+        elements.addItemBtn.addEventListener('click', showAddItemForm);
+    }
+    
+    if (elements.confirmAddCategory) {
+        elements.confirmAddCategory.addEventListener('click', addCategory);
+    }
+    
+    if (elements.confirmAddItem) {
+        elements.confirmAddItem.addEventListener('click', addMenuItem);
+    }
+}
 
 // Работа с меню
 function loadMenuFromFirebase() {
@@ -84,8 +153,7 @@ function loadMenuFromFirebase() {
             menuItems = data.items ? Object.values(data.items) : [];
             updateMainMenu();
             
-            const adminPanel = document.getElementById('admin-panel');
-            if (adminPanel && !adminPanel.classList.contains('hidden')) {
+            if (elements.adminPanel && !elements.adminPanel.classList.contains('hidden')) {
                 loadMenuData();
             }
         } else {
@@ -435,19 +503,5 @@ function pay() {
 
 // Инициализация при загрузке страницы
 document.addEventListener('DOMContentLoaded', () => {
-    // Назначаем обработчики для кнопок входа/выхода
-    const loginBtn = document.querySelector('#auth-form button');
-    if (loginBtn) loginBtn.onclick = login;
-    
-    const logoutBtn = document.querySelector('.logout-btn');
-    if (logoutBtn) logoutBtn.onclick = logout;
-    
-    // Проверяем состояние авторизации
-    auth.onAuthStateChanged(user => {
-        if (user) {
-            console.log("User is logged in:", user.email);
-        } else {
-            console.log("User is logged out");
-        }
-    });
+    initEventListeners();
 });
