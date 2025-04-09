@@ -247,6 +247,13 @@ function resetAddItemForm() {
         </div>
     `;
     
+    // Удаляем старые обработчики перед добавлением новых
+    if (elements.addIngredientBtn) {
+        const newBtn = elements.addIngredientBtn.cloneNode(true);
+        elements.addIngredientBtn.parentNode.replaceChild(newBtn, elements.addIngredientBtn);
+        elements.addIngredientBtn = newBtn;
+    }
+    
     initIngredientsHandlers();
 }
 
@@ -308,7 +315,7 @@ function updateMenuInFirebase() {
 function initIngredientsHandlers() {
     // Обработчик для кнопки добавления ингредиента
     if (elements.addIngredientBtn) {
-        elements.addIngredientBtn.addEventListener('click', () => {
+        elements.addIngredientBtn.addEventListener('click', function addIngredientHandler() {
             const ingredientsList = document.getElementById('ingredients-list');
             const newIngredient = document.createElement('div');
             newIngredient.className = 'ingredient-item';
@@ -439,6 +446,7 @@ function loadMenuData() {
     
     initAdminPanelHandlers();
 }
+
 function initAdminPanelHandlers() {
     document.querySelectorAll('.delete-category-btn').forEach(btn => {
         btn.addEventListener('click', function() {
@@ -460,8 +468,8 @@ function initAdminPanelHandlers() {
             itemCard.querySelector('.item-main-info').classList.add('hidden');
             itemCard.querySelector('.edit-form').classList.remove('hidden');
             
-            // Инициализируем обработчики для кнопок удаления в форме редактирования
-            initEditFormIngredientHandlers(itemCard.querySelector('.edit-form'));
+            // Инициализируем обработчики для формы редактирования
+            initEditFormHandlers(itemCard.querySelector('.edit-form'));
         });
     });
     
@@ -514,38 +522,17 @@ function initAdminPanelHandlers() {
             }
         });
     });
-    
-    // Обработчики для кнопок добавления ингредиентов в формах редактирования
-    document.querySelectorAll('.add-edit-ingredient-btn').forEach(btn => {
-        btn.addEventListener('click', function() {
-            const ingredientsList = this.previousElementSibling;
-            const newIngredient = document.createElement('div');
-            newIngredient.className = 'ingredient-item';
-            newIngredient.innerHTML = `
-                <input type="text" class="ingredient-name" placeholder="Название">
-                <input type="text" class="ingredient-quantity" placeholder="Количество">
-                <button class="remove-ingredient-btn">×</button>
-            `;
-            ingredientsList.appendChild(newIngredient);
-            
-            // Добавляем обработчик для новой кнопки удаления
-            newIngredient.querySelector('.remove-ingredient-btn').addEventListener('click', function() {
-                this.closest('.ingredient-item').remove();
-            });
-        });
-    });
-    
-    // Обработчики для существующих кнопок удаления в формах редактирования
-    document.querySelectorAll('.edit-form .remove-ingredient-btn').forEach(btn => {
-        btn.addEventListener('click', function() {
-            this.closest('.ingredient-item').remove();
-        });
-    });
 }
 
-// Новая функция для инициализации обработчиков ингредиентов в форме редактирования
-function initEditFormIngredientHandlers(editForm) {
+function initEditFormHandlers(editForm) {
     if (!editForm) return;
+    
+    // Удаляем старый обработчик перед добавлением нового
+    const addBtn = editForm.querySelector('.add-edit-ingredient-btn');
+    if (addBtn) {
+        const newBtn = addBtn.cloneNode(true);
+        addBtn.parentNode.replaceChild(newBtn, addBtn);
+    }
     
     // Обработчики для существующих кнопок удаления
     editForm.querySelectorAll('.remove-ingredient-btn').forEach(btn => {
@@ -555,9 +542,9 @@ function initEditFormIngredientHandlers(editForm) {
     });
     
     // Обработчик для кнопки добавления ингредиента
-    const addBtn = editForm.querySelector('.add-edit-ingredient-btn');
-    if (addBtn) {
-        addBtn.addEventListener('click', function() {
+    const newAddBtn = editForm.querySelector('.add-edit-ingredient-btn');
+    if (newAddBtn) {
+        newAddBtn.addEventListener('click', function() {
             const ingredientsList = this.previousElementSibling;
             const newIngredient = document.createElement('div');
             newIngredient.className = 'ingredient-item';
@@ -568,7 +555,7 @@ function initEditFormIngredientHandlers(editForm) {
             `;
             ingredientsList.appendChild(newIngredient);
             
-            // Добавляем обработчик для новой кнопки удаления
+            // Обработчик для новой кнопки удаления
             newIngredient.querySelector('.remove-ingredient-btn').addEventListener('click', function() {
                 this.closest('.ingredient-item').remove();
             });
