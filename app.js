@@ -320,8 +320,7 @@ function initIngredientsHandlers() {
             ingredientsList.appendChild(newIngredient);
             
             // Обработчик для кнопки удаления ингредиента
-            const removeBtn = newIngredient.querySelector('.remove-ingredient-btn');
-            removeBtn.addEventListener('click', function() {
+            newIngredient.querySelector('.remove-ingredient-btn').addEventListener('click', function() {
                 ingredientsList.removeChild(newIngredient);
             });
         });
@@ -441,9 +440,294 @@ function loadMenuData() {
     initAdminPanelHandlers();
 }
 
-// Остальные функции (initAdminPanelHandlers, addCategory, deleteCategory, deleteMenuItem, 
-// addDrink, updateOrderList, changeQuantity, removeItem, clearOrder, login, logout, pay) 
-// остаются без изменений...
+function initAdminPanelHandlers() {
+    document.querySelectorAll('.delete-category-btn').forEach(btn => {
+        btn.addEventListener('click', function() {
+            const category = this.parentElement.querySelector('span').textContent;
+            deleteCategory(category);
+        });
+    });
+    
+    document.querySelectorAll('.delete-item-btn').forEach(btn => {
+        btn.addEventListener('click', function() {
+            const itemId = parseInt(this.closest('.menu-item-card').dataset.id);
+            deleteMenuItem(itemId);
+        });
+    });
+    
+    document.querySelectorAll('.edit-item-btn').forEach(btn => {
+        btn.addEventListener('click', function() {
+            const itemCard = this.closest('.menu-item-card');
+            itemCard.querySelector('.item-main-info').classList.add('hidden');
+            itemCard.querySelector('.edit-form').classList.remove('hidden');
+        });
+    });
+    
+    document.querySelectorAll('.cancel-edit-btn').forEach(btn => {
+        btn.addEventListener('click', function() {
+            const itemCard = this.closest('.menu-item-card');
+            itemCard.querySelector('.item-main-info').classList.remove('hidden');
+            itemCard.querySelector('.edit-form').classList.add('hidden');
+        });
+    });
+    
+    document.querySelectorAll('.save-edit-btn').forEach(btn => {
+        btn.addEventListener('click', function() {
+            const itemCard = this.closest('.menu-item-card');
+            const itemId = parseInt(itemCard.dataset.id);
+            const editForm = itemCard.querySelector('.edit-form');
+            
+            const ingredients = [];
+            const ingredientItems = editForm.querySelectorAll('.ingredient-item');
+            ingredientItems.forEach(item => {
+                const name = item.querySelector('.ingredient-name').value.trim();
+                const quantity = item.querySelector('.ingredient-quantity').value.trim();
+                if (name && quantity) {
+                    ingredients.push(`${name} ${quantity}`);
+                }
+            });
+
+            const updatedItem = {
+                id: itemId,
+                name: editForm.querySelector('.edit-name').value.trim(),
+                price: parseInt(editForm.querySelector('.edit-price').value),
+                category: editForm.querySelector('.edit-category').value,
+                ingredients
+            };
+            
+            const index = menuItems.findIndex(item => item.id === itemId);
+            if (index !== -1) {
+                menuItems[index] = updatedItem;
+                
+                updateMenuInFirebase()
+                    .then(() => {
+                        itemCard.querySelector('.item-main-info').classList.remove('hidden');
+                        itemCard.querySelector('.edit-form').classList.add('hidden');
+                        loadMenuData();
+                    })
+                    .catch(error => {
+                        console.error("Ошибка сохранения изменений:", error);
+                        alert("Не удалось сохранить изменения");
+                    });
+            }
+        });
+    });
+    
+    document.querySelectorAll('.add-edit-ingredient-btn').forEach(btn => {
+        btn.addEventListener('click', function() {
+            const ingredientsList = this.previousElementSibling;
+            const newIngredient = document.createElement('div');
+            newIngredient.className = 'ingredient-item';
+            newIngredient.innerHTML = `
+                <input type="text" class="ingredient-name" placeholder="Название">
+                <input type="text" class="ingredient-quantity" placeholder="Количество">
+                <button class="remove-ingredient-btn">×</button>
+            `;
+            ingredientsList.appendChild(newIngredient);
+            
+            newIngredient.querySelector('.remove-ingredient-btn').addEventListener('click', function() {
+                ingredientsList.removeChild(newIngredient);
+            });
+        });
+    });
+}
+
+function addCategory() {
+    const nameInput = document.getElementById('new-category-name');
+    if (!nameInput) return;
+    
+    const name = nameInput.value.trim();
+    if (!name) {
+        alert('Введите название категории');
+        return;
+    }
+    
+    if (!menuCategories.includes(name)) {
+        menuCategories.push(name);
+        db.ref('menu/categories').set(menuCategories)
+            .then(() => {
+                nameInput.value = '';
+                hideElement(elements.addCategoryForm);
+                loadMenuData();
+            })
+            .catch(error => {
+                console.error("Ошибка сохранения категории:", error);
+                alert("Не удалось сохранить категорию");
+            });
+    }
+}
+
+function deleteCategory(category) {
+    if (!confirm(`Удалить категорию "${category}"? Все напитки этой категории также будут удалены.`)) {
+        return;
+    }
+    
+    const itemsToKeep = menuItems.filter(item => item.category !== category);
+    menuItems = itemsToKeep;
+    menuCategories = menuCategories.filter(c => c !== category);
+    
+    updateMenuInFirebase()
+        .then(() => {
+            loadMenuData();
+        })
+        .catch(error => {
+            console.error("Ошибка удаления категории:", error);
+            alert("Не удалось удалить категорию");
+        });
+}
+
+function deleteMenuItem(id) {
+    if (!confirm('Удалить этот напиток?')) return;
+    
+    menuItems = menuItems.filter(item => item.id !== id);
+    
+    updateMenuInFirebase()
+        .then(() => {
+            loadMenuData();
+        })
+        .catch(error => {
+            console.error("Ошибка удаления напитка:", error);
+            alert("Не удалось удалить напиток");
+        });
+}
+
+function addDrink(name, price) {
+    if (!currentUser) {
+        alert("Сначала войдите в систему!");
+        return;
+    }
+    
+    const existingItem = order.find(item => item.name === name);
+    if (existingItem) {
+        existingItem.quantity += 1;
+    } else {
+        order.push({ name, price, quantity: 1 });
+    }
+    updateOrderList();
+}
+
+function updateOrderList() {
+    const list = document.getElementById("order-list");
+    if (!list) return;
+    
+    list.innerHTML = "";
+
+    order.forEach((item, index) => {
+        const li = document.createElement("li");
+        li.innerHTML = `
+            <span class="item-name">${item.name}</span>
+            <span class="item-price">${item.price} ₽</span>
+            <div class="item-controls">
+                <button class="quantity-btn minus-btn" onclick="changeQuantity(${index}, -1)">-</button>
+                <span class="quantity">${item.quantity}</span>
+                <button class="quantity-btn plus-btn" onclick="changeQuantity(${index}, 1)">+</button>
+                <button class="remove-btn" onclick="removeItem(${index})">×</button>
+            </div>
+        `;
+        list.appendChild(li);
+    });
+
+    const totalElement = document.getElementById("total");
+    if (totalElement) {
+        const total = order.reduce((sum, item) => sum + (item.price * item.quantity), 0);
+        totalElement.textContent = total;
+    }
+}
+
+function changeQuantity(index, delta) {
+    const newQuantity = order[index].quantity + delta;
+    if (newQuantity <= 0) {
+        removeItem(index);
+    } else {
+        order[index].quantity = newQuantity;
+        updateOrderList();
+    }
+}
+
+function removeItem(index) {
+    order.splice(index, 1);
+    updateOrderList();
+}
+
+function clearOrder() {
+    if (order.length === 0) return;
+    if (confirm("Очистить заказ?")) {
+        order = [];
+        updateOrderList();
+    }
+}
+
+function login() {
+    const email = document.getElementById('email');
+    const password = document.getElementById('password');
+    const errorMessage = document.getElementById('error-message');
+    
+    if (!email || !password || !errorMessage) return;
+    
+    errorMessage.textContent = '';
+    
+    auth.signInWithEmailAndPassword(email.value, password.value)
+        .then(() => {
+            console.log("Login successful");
+        })
+        .catch(error => {
+            console.error("Login error:", error);
+            errorMessage.textContent = error.message;
+        });
+}
+
+function logout() {
+    auth.signOut()
+        .then(() => {
+            console.log("User logged out");
+        })
+        .catch(error => console.error("Logout error:", error));
+}
+
+function pay() {
+    if (!currentUser) {
+        alert("Войдите в систему");
+        return;
+    }
+
+    if (order.length === 0) {
+        alert("Добавьте напитки");
+        return;
+    }
+
+    let processedItems = 0;
+    const totalItems = order.reduce((sum, item) => sum + item.quantity, 0);
+    
+    order.forEach((item, index) => {
+        for (let i = 0; i < item.quantity; i++) {
+            const callbackName = `jsonpCallback_${Date.now()}_${index}_${i}`;
+            window[callbackName] = function(response) {
+                delete window[callbackName];
+                if (response.status !== "success") {
+                    console.error("Ошибка сохранения:", item.name, response.message);
+                }
+                
+                if (++processedItems === totalItems) {
+                    alert("Заказ сохранен!");
+                    order = [];
+                    updateOrderList();
+                }
+            };
+
+            const params = new URLSearchParams({
+                name: item.name,
+                price: item.price,
+                email: currentUser.email,
+                date: new Date().toISOString(),
+                callback: callbackName
+            });
+
+            const script = document.createElement('script');
+            script.src = `https://script.google.com/macros/s/AKfycbyVSEyq7_3pbSqlAcYR0SO1pgbUno63xTzK6vjYJmllmiGpfANxhSfvKpO-2fYaJq5F8Q/exec?${params}`;
+            document.body.appendChild(script);
+        }
+    });
+}
 
 // Инициализация при загрузке страницы
 document.addEventListener('DOMContentLoaded', () => {
