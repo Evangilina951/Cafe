@@ -14,6 +14,11 @@ const app = firebase.initializeApp(firebaseConfig);
 const auth = firebase.auth();
 const db = firebase.database();
 
+// Проверка работы базы данных
+db.ref('menu/categories').on('value', (snapshot) => {
+  console.log("Категории меню:", snapshot.val());
+});
+
 let order = [];
 let currentUser = null;
 let menuCategories = ['Кофе', 'Чай', 'Десерты'];
