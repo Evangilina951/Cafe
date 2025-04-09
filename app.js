@@ -2,6 +2,7 @@
 const firebaseConfig = {
     apiKey: "AIzaSyDB8Vtxg3SjVyHRJ3ZOXT8osnHYrO_uw4A",
     authDomain: "cafe-90de8.firebaseapp.com",
+    databaseURL: "https://cafe-90de8-default-rtdb.europe-west1.firebasedatabase.app",
     projectId: "cafe-90de8",
     storageBucket: "cafe-90de8.firebasestorage.app",
     messagingSenderId: "1086414728245",
@@ -14,17 +15,12 @@ const app = firebase.initializeApp(firebaseConfig);
 const auth = firebase.auth();
 const db = firebase.database();
 
-// Проверка работы базы данных
-db.ref('menu/categories').on('value', (snapshot) => {
-  console.log("Категории меню:", snapshot.val());
-});
-
 let order = [];
 let currentUser = null;
-let menuCategories = ['Кофе', 'Чай', 'Десерты'];
+let menuCategories = [];
 let menuItems = [];
 
-// Функция для гарантированного отображения элемента
+// Функции для работы с DOM
 function showElement(element) {
     element.style.display = 'block';
     element.style.visibility = 'visible';
@@ -32,7 +28,6 @@ function showElement(element) {
     element.classList.remove('hidden');
 }
 
-// Функция для гарантированного скрытия элемента
 function hideElement(element) {
     element.style.display = 'none';
     element.style.visibility = 'hidden';
@@ -52,47 +47,37 @@ auth.onAuthStateChanged(user => {
         console.log("User logged in");
         currentUser = user;
         
-        // Гарантированное скрытие формы
         hideElement(authForm);
-        
-        // Гарантированное отображение интерфейса
         showElement(orderInterface);
-        
         document.getElementById('user-email').textContent = user.email;
         
         // Проверка прав администратора
         if (user.email === 'admin@dismail.com') {
             adminBtn.style.display = 'block';
-            loadMenuFromFirebase();
         } else {
             adminBtn.style.display = 'none';
         }
         
-        // Дополнительная проверка для Firefox
+        loadMenuFromFirebase();
+        
         setTimeout(() => {
             if (window.getComputedStyle(orderInterface).display === 'none') {
-                console.log("Forcing display in Firefox");
                 orderInterface.style.display = 'flex';
             }
         }, 50);
     } else {
         console.log("User logged out");
         currentUser = null;
-        
-        // Гарантированное отображение формы
         showElement(authForm);
-        
-        // Гарантированное скрытие интерфейса
         hideElement(orderInterface);
-        
         order = [];
         updateOrderList();
     }
 });
 
-// Функции для работы с меню в Firebase
+// Работа с меню
 function loadMenuFromFirebase() {
-    const menuRef = firebase.database().ref('menu');
+    const menuRef = db.ref('menu');
     
     menuRef.on('value', (snapshot) => {
         const data = snapshot.val();
@@ -101,29 +86,39 @@ function loadMenuFromFirebase() {
             menuItems = data.items ? Object.values(data.items) : [];
             updateMainMenu();
             
-            if (document.getElementById('admin-panel') && !document.getElementById('admin-panel').classList.contains('hidden')) {
+            if (document.getElementById('admin-panel') && 
+                !document.getElementById('admin-panel').classList.contains('hidden')) {
                 loadMenuData();
             }
+        } else {
+            // Если база пуста, показываем стандартные кнопки
+            const menuButtons = document.querySelector('.menu-buttons');
+            menuButtons.innerHTML = `
+                <button class="menu-btn" onclick="addDrink('Кофе', 100)">Кофе - 100 ₽</button>
+                <button class="menu-btn" onclick="addDrink('Чай', 50)">Чай - 50 ₽</button>
+                <button class="menu-btn" onclick="addDrink('Капучино', 150)">Капучино - 150 ₽</button>
+                <button class="menu-btn" onclick="addDrink('Латте', 200)">Латте - 200 ₽</button>
+            `;
         }
     });
 }
 
-function saveCategoriesToFirebase() {
-    firebase.database().ref('menu/categories').set(menuCategories);
+function updateMainMenu() {
+    const menuButtons = document.querySelector('.menu-buttons');
+    menuButtons.innerHTML = '';
+    
+    if (menuItems.length > 0) {
+        menuItems.forEach(item => {
+            const btn = document.createElement('button');
+            btn.className = 'menu-btn';
+            btn.innerHTML = `${item.name} - ${item.price} ₽`;
+            btn.onclick = () => addDrink(item.name, item.price);
+            menuButtons.appendChild(btn);
+        });
+    }
 }
 
-function saveMenuItemsToFirebase() {
-    const itemsRef = firebase.database().ref('menu/items');
-    const itemsObj = {};
-    
-    menuItems.forEach(item => {
-        itemsObj['item' + item.id] = item;
-    });
-    
-    itemsRef.set(itemsObj);
-}
-
-// Функции админ-панели
+// Админ-панель
 function showAdminPanel() {
     document.getElementById('admin-panel').classList.remove('hidden');
     document.getElementById('order-interface').classList.add('hidden');
@@ -140,13 +135,12 @@ function loadMenuData() {
     const itemsList = document.getElementById('menu-items-list');
     const categorySelect = document.getElementById('new-item-category');
     
-    // Очищаем списки
     categoriesList.innerHTML = '<h3>Категории</h3>';
     itemsList.innerHTML = '<h3>Напитки</h3>';
     categorySelect.innerHTML = '';
     
-    // Заполняем категории
     menuCategories.forEach(category => {
+        // Добавляем категории в список
         const card = document.createElement('div');
         card.className = 'category-card';
         card.innerHTML = `
@@ -155,14 +149,13 @@ function loadMenuData() {
         `;
         categoriesList.appendChild(card);
         
-        // Добавляем в select
+        // Добавляем категории в select
         const option = document.createElement('option');
         option.value = category;
         option.textContent = category;
         categorySelect.appendChild(option);
     });
     
-    // Заполняем напитки
     menuItems.forEach(item => {
         const card = document.createElement('div');
         card.className = 'menu-item-card';
@@ -175,6 +168,10 @@ function loadMenuData() {
         `;
         itemsList.appendChild(card);
     });
+}
+
+function showAddItemForm() {
+    document.getElementById('add-item-form').classList.remove('hidden');
 }
 
 function addMenuItem() {
@@ -198,71 +195,41 @@ function addMenuItem() {
 
 function deleteMenuItem(id) {
     if (!confirm('Удалить этот напиток?')) return;
-    
     menuItems = menuItems.filter(item => item.id !== id);
     saveMenuItemsToFirebase();
 }
 
 function deleteCategory(category) {
-    if (!confirm(`Удалить категорию "${category}"? Все напитки в ней останутся без категории.`)) return;
-    
+    if (!confirm(`Удалить категорию "${category}"?`)) return;
     menuCategories = menuCategories.filter(cat => cat !== category);
     saveCategoriesToFirebase();
 }
 
-function updateMainMenu() {
-    const menuButtons = document.querySelector('.menu-buttons');
-    menuButtons.innerHTML = '';
-    
+function saveCategoriesToFirebase() {
+    db.ref('menu/categories').set(menuCategories);
+}
+
+function saveMenuItemsToFirebase() {
+    const itemsObj = {};
     menuItems.forEach(item => {
-        const btn = document.createElement('button');
-        btn.className = 'menu-btn';
-        btn.innerHTML = `${item.name} - ${item.price} ₽`;
-        btn.onclick = () => addDrink(item.name, item.price);
-        menuButtons.appendChild(btn);
+        itemsObj['item' + item.id] = item;
     });
+    db.ref('menu/items').set(itemsObj);
 }
 
-// Остальные функции (order, login, logout и т.д.) остаются без изменений
-function login() {
-    const email = document.getElementById('email').value;
-    const password = document.getElementById('password').value;
-    const errorMessage = document.getElementById('error-message');
-    
-    errorMessage.textContent = '';
-    
-    auth.signInWithEmailAndPassword(email, password)
-        .then(() => {
-            console.log("Login successful");
-        })
-        .catch(error => {
-            console.error("Login error:", error);
-            errorMessage.textContent = error.message;
-        });
-}
-
-function logout() {
-    auth.signOut();
-}
-
+// Функции заказа
 function addDrink(name, price) {
     if (!currentUser) {
         alert("Сначала войдите в систему!");
         return;
     }
     
-    const existingItemIndex = order.findIndex(item => item.name === name);
-    
-    if (existingItemIndex >= 0) {
-        order[existingItemIndex].quantity += 1;
+    const existingItem = order.find(item => item.name === name);
+    if (existingItem) {
+        existingItem.quantity += 1;
     } else {
-        order.push({ 
-            name, 
-            price,
-            quantity: 1
-        });
+        order.push({ name, price, quantity: 1 });
     }
-    
     updateOrderList();
 }
 
@@ -291,7 +258,6 @@ function updateOrderList() {
 
 function changeQuantity(index, delta) {
     const newQuantity = order[index].quantity + delta;
-    
     if (newQuantity <= 0) {
         removeItem(index);
     } else {
@@ -313,6 +279,25 @@ function clearOrder() {
     }
 }
 
+function login() {
+    const email = document.getElementById('email').value;
+    const password = document.getElementById('password').value;
+    const errorMessage = document.getElementById('error-message');
+    
+    errorMessage.textContent = '';
+    
+    auth.signInWithEmailAndPassword(email, password)
+        .then(() => console.log("Login successful"))
+        .catch(error => {
+            console.error("Login error:", error);
+            errorMessage.textContent = error.message;
+        });
+}
+
+function logout() {
+    auth.signOut();
+}
+
 function pay() {
     if (!currentUser) {
         alert("Войдите в систему");
@@ -325,6 +310,7 @@ function pay() {
     }
 
     let processedItems = 0;
+    const totalItems = order.reduce((sum, item) => sum + item.quantity, 0);
     
     order.forEach((item, index) => {
         for (let i = 0; i < item.quantity; i++) {
@@ -332,11 +318,10 @@ function pay() {
             window[callbackName] = function(response) {
                 delete window[callbackName];
                 if (response.status !== "success") {
-                    console.error("Ошибка сохранения позиции:", item.name, response.message);
+                    console.error("Ошибка сохранения:", item.name, response.message);
                 }
                 
-                processedItems++;
-                if (processedItems === getTotalItems()) {
+                if (++processedItems === totalItems) {
                     alert("Заказ сохранен!");
                     order = [];
                     updateOrderList();
@@ -356,8 +341,4 @@ function pay() {
             document.body.appendChild(script);
         }
     });
-}
-
-function getTotalItems() {
-    return order.reduce((sum, item) => sum + item.quantity, 0);
 }
