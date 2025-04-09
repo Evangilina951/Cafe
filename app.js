@@ -12,9 +12,12 @@ const firebaseConfig = {
 // Инициализация Firebase
 const app = firebase.initializeApp(firebaseConfig);
 const auth = firebase.auth();
+const db = firebase.database();
 
 let order = [];
 let currentUser = null;
+let menuCategories = ['Кофе', 'Чай', 'Десерты'];
+let menuItems = [];
 
 // Функция для гарантированного отображения элемента
 function showElement(element) {
@@ -38,6 +41,7 @@ auth.onAuthStateChanged(user => {
     
     const authForm = document.getElementById('auth-form');
     const orderInterface = document.getElementById('order-interface');
+    const adminBtn = document.querySelector('.admin-btn');
     
     if (user) {
         console.log("User logged in");
@@ -50,6 +54,14 @@ auth.onAuthStateChanged(user => {
         showElement(orderInterface);
         
         document.getElementById('user-email').textContent = user.email;
+        
+        // Проверка прав администратора
+        if (user.email === 'admin@dismail.com') {
+            adminBtn.style.display = 'block';
+            loadMenuFromFirebase();
+        } else {
+            adminBtn.style.display = 'none';
+        }
         
         // Дополнительная проверка для Firefox
         setTimeout(() => {
@@ -73,6 +85,140 @@ auth.onAuthStateChanged(user => {
     }
 });
 
+// Функции для работы с меню в Firebase
+function loadMenuFromFirebase() {
+    const menuRef = firebase.database().ref('menu');
+    
+    menuRef.on('value', (snapshot) => {
+        const data = snapshot.val();
+        if (data) {
+            menuCategories = data.categories || [];
+            menuItems = data.items ? Object.values(data.items) : [];
+            updateMainMenu();
+            
+            if (document.getElementById('admin-panel') && !document.getElementById('admin-panel').classList.contains('hidden')) {
+                loadMenuData();
+            }
+        }
+    });
+}
+
+function saveCategoriesToFirebase() {
+    firebase.database().ref('menu/categories').set(menuCategories);
+}
+
+function saveMenuItemsToFirebase() {
+    const itemsRef = firebase.database().ref('menu/items');
+    const itemsObj = {};
+    
+    menuItems.forEach(item => {
+        itemsObj['item' + item.id] = item;
+    });
+    
+    itemsRef.set(itemsObj);
+}
+
+// Функции админ-панели
+function showAdminPanel() {
+    document.getElementById('admin-panel').classList.remove('hidden');
+    document.getElementById('order-interface').classList.add('hidden');
+    loadMenuData();
+}
+
+function hideAdminPanel() {
+    document.getElementById('admin-panel').classList.add('hidden');
+    document.getElementById('order-interface').classList.remove('hidden');
+}
+
+function loadMenuData() {
+    const categoriesList = document.getElementById('categories-list');
+    const itemsList = document.getElementById('menu-items-list');
+    const categorySelect = document.getElementById('new-item-category');
+    
+    // Очищаем списки
+    categoriesList.innerHTML = '<h3>Категории</h3>';
+    itemsList.innerHTML = '<h3>Напитки</h3>';
+    categorySelect.innerHTML = '';
+    
+    // Заполняем категории
+    menuCategories.forEach(category => {
+        const card = document.createElement('div');
+        card.className = 'category-card';
+        card.innerHTML = `
+            <span>${category}</span>
+            <button onclick="deleteCategory('${category}')">×</button>
+        `;
+        categoriesList.appendChild(card);
+        
+        // Добавляем в select
+        const option = document.createElement('option');
+        option.value = category;
+        option.textContent = category;
+        categorySelect.appendChild(option);
+    });
+    
+    // Заполняем напитки
+    menuItems.forEach(item => {
+        const card = document.createElement('div');
+        card.className = 'menu-item-card';
+        card.innerHTML = `
+            <div>
+                <strong>${item.name}</strong>
+                <div>${item.price} ₽ • ${item.category}</div>
+            </div>
+            <button onclick="deleteMenuItem(${item.id})">×</button>
+        `;
+        itemsList.appendChild(card);
+    });
+}
+
+function addMenuItem() {
+    const name = document.getElementById('new-item-name').value;
+    const price = parseInt(document.getElementById('new-item-price').value);
+    const category = document.getElementById('new-item-category').value;
+    
+    if (!name || !price) return alert('Заполните все поля!');
+    
+    const newItem = {
+        id: Date.now(),
+        name,
+        price,
+        category
+    };
+    
+    menuItems.push(newItem);
+    saveMenuItemsToFirebase();
+    document.getElementById('add-item-form').classList.add('hidden');
+}
+
+function deleteMenuItem(id) {
+    if (!confirm('Удалить этот напиток?')) return;
+    
+    menuItems = menuItems.filter(item => item.id !== id);
+    saveMenuItemsToFirebase();
+}
+
+function deleteCategory(category) {
+    if (!confirm(`Удалить категорию "${category}"? Все напитки в ней останутся без категории.`)) return;
+    
+    menuCategories = menuCategories.filter(cat => cat !== category);
+    saveCategoriesToFirebase();
+}
+
+function updateMainMenu() {
+    const menuButtons = document.querySelector('.menu-buttons');
+    menuButtons.innerHTML = '';
+    
+    menuItems.forEach(item => {
+        const btn = document.createElement('button');
+        btn.className = 'menu-btn';
+        btn.innerHTML = `${item.name} - ${item.price} ₽`;
+        btn.onclick = () => addDrink(item.name, item.price);
+        menuButtons.appendChild(btn);
+    });
+}
+
+// Остальные функции (order, login, logout и т.д.) остаются без изменений
 function login() {
     const email = document.getElementById('email').value;
     const password = document.getElementById('password').value;
@@ -91,32 +237,28 @@ function login() {
 }
 
 function logout() {
-  auth.signOut();
+    auth.signOut();
 }
 
-// Новый функционал заказа с группировкой позиций
 function addDrink(name, price) {
-  if (!currentUser) {
-    alert("Сначала войдите в систему!");
-    return;
-  }
-  
-  // Ищем позицию в заказе
-  const existingItemIndex = order.findIndex(item => item.name === name);
-  
-  if (existingItemIndex >= 0) {
-    // Если позиция уже есть - увеличиваем количество
-    order[existingItemIndex].quantity += 1;
-  } else {
-    // Если позиции нет - добавляем новую
-    order.push({ 
-      name, 
-      price,
-      quantity: 1
-    });
-  }
-  
-  updateOrderList();
+    if (!currentUser) {
+        alert("Сначала войдите в систему!");
+        return;
+    }
+    
+    const existingItemIndex = order.findIndex(item => item.name === name);
+    
+    if (existingItemIndex >= 0) {
+        order[existingItemIndex].quantity += 1;
+    } else {
+        order.push({ 
+            name, 
+            price,
+            quantity: 1
+        });
+    }
+    
+    updateOrderList();
 }
 
 function updateOrderList() {
@@ -142,80 +284,75 @@ function updateOrderList() {
     document.getElementById("total").textContent = total;
 }
 
-
 function changeQuantity(index, delta) {
-  const newQuantity = order[index].quantity + delta;
-  
-  if (newQuantity <= 0) {
-    removeItem(index);
-  } else {
-    order[index].quantity = newQuantity;
-    updateOrderList();
-  }
+    const newQuantity = order[index].quantity + delta;
+    
+    if (newQuantity <= 0) {
+        removeItem(index);
+    } else {
+        order[index].quantity = newQuantity;
+        updateOrderList();
+    }
 }
 
 function removeItem(index) {
-  order.splice(index, 1);
-  updateOrderList();
+    order.splice(index, 1);
+    updateOrderList();
 }
 
 function clearOrder() {
-  if (order.length === 0) return;
-  if (confirm("Очистить заказ?")) {
-    order = [];
-    updateOrderList();
-  }
-}
-
-// Модифицированная функция оплаты с учетом количества
-function pay() {
-  if (!currentUser) {
-    alert("Войдите в систему");
-    return;
-  }
-
-  if (order.length === 0) {
-    alert("Добавьте напитки");
-    return;
-  }
-
-  let processedItems = 0;
-  
-  order.forEach((item, index) => {
-    // Для каждого экземпляра позиции (с учетом количества)
-    for (let i = 0; i < item.quantity; i++) {
-      const callbackName = `jsonpCallback_${Date.now()}_${index}_${i}`;
-      window[callbackName] = function(response) {
-        delete window[callbackName];
-        if (response.status !== "success") {
-          console.error("Ошибка сохранения позиции:", item.name, response.message);
-        }
-        
-        processedItems++;
-        // После сохранения всех позиций показываем уведомление
-        if (processedItems === getTotalItems()) {
-          alert("Заказ сохранен!");
-          order = [];
-          updateOrderList();
-        }
-      };
-
-      const params = new URLSearchParams({
-        name: item.name,
-        price: item.price,
-        email: currentUser.email,
-        date: new Date().toISOString(),
-        callback: callbackName
-      });
-
-      const script = document.createElement('script');
-      script.src = `https://script.google.com/macros/s/AKfycbyVSEyq7_3pbSqlAcYR0SO1pgbUno63xTzK6vjYJmllmiGpfANxhSfvKpO-2fYaJq5F8Q/exec?${params}`;
-      document.body.appendChild(script);
+    if (order.length === 0) return;
+    if (confirm("Очистить заказ?")) {
+        order = [];
+        updateOrderList();
     }
-  });
 }
 
-// Вспомогательная функция для подсчета общего количества позиций
+function pay() {
+    if (!currentUser) {
+        alert("Войдите в систему");
+        return;
+    }
+
+    if (order.length === 0) {
+        alert("Добавьте напитки");
+        return;
+    }
+
+    let processedItems = 0;
+    
+    order.forEach((item, index) => {
+        for (let i = 0; i < item.quantity; i++) {
+            const callbackName = `jsonpCallback_${Date.now()}_${index}_${i}`;
+            window[callbackName] = function(response) {
+                delete window[callbackName];
+                if (response.status !== "success") {
+                    console.error("Ошибка сохранения позиции:", item.name, response.message);
+                }
+                
+                processedItems++;
+                if (processedItems === getTotalItems()) {
+                    alert("Заказ сохранен!");
+                    order = [];
+                    updateOrderList();
+                }
+            };
+
+            const params = new URLSearchParams({
+                name: item.name,
+                price: item.price,
+                email: currentUser.email,
+                date: new Date().toISOString(),
+                callback: callbackName
+            });
+
+            const script = document.createElement('script');
+            script.src = `https://script.google.com/macros/s/AKfycbyVSEyq7_3pbSqlAcYR0SO1pgbUno63xTzK6vjYJmllmiGpfANxhSfvKpO-2fYaJq5F8Q/exec?${params}`;
+            document.body.appendChild(script);
+        }
+    });
+}
+
 function getTotalItems() {
-  return order.reduce((sum, item) => sum + item.quantity, 0);
+    return order.reduce((sum, item) => sum + item.quantity, 0);
 }
