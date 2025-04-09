@@ -30,24 +30,15 @@
             border-radius: 15px;
             box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
             text-align: center;
-            z-index: 100;
-        }
-
-        #auth-form input {
-            width: 100%;
-            padding: 12px;
-            margin: 12px 0;
-            border: 1px solid #6d341f;
-            border-radius: 8px;
-            background-color: #ffefdc;
-            color: #6d341f;
-            font-size: 16px;
+            z-index: 1000; /* Увеличено для надежности */
         }
 
         #order-interface {
             display: none;
             width: 100%;
             height: 100vh;
+            position: relative;
+            z-index: 100;
         }
 
         .menu-section {
@@ -222,32 +213,37 @@
         }
 
         .admin-btn {
-            display: none; /* Скрыта по умолчанию */
+            display: none;
             background-color: #6d341f;
             color: #ffefdc;
         }
 
         /* Админ-панель */
         #admin-panel {
-            background-color: #fff;
-            padding: 20px;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
             height: 100vh;
+            background-color: #fff;
+            padding: 30px;
+            z-index: 200; /* Выше основного интерфейса */
             overflow-y: auto;
         }
-        
+
         .admin-header {
             display: flex;
             justify-content: space-between;
             align-items: center;
             margin-bottom: 20px;
         }
-        
+
         .admin-actions {
             display: flex;
             gap: 10px;
             margin-bottom: 20px;
         }
-        
+
         #add-category-form, #add-item-form {
             display: flex;
             flex-direction: column;
@@ -256,14 +252,15 @@
             padding: 15px;
             background-color: #f5f5f5;
             border-radius: 8px;
+            max-width: 400px;
         }
-        
+
         .menu-management {
             display: grid;
             grid-template-columns: 250px 1fr;
             gap: 20px;
         }
-        
+
         .category-card, .menu-item-card {
             background-color: #fff;
             border: 1px solid #ddd;
@@ -287,68 +284,28 @@
         <h2>Вход для сотрудников</h2>
         <input type="email" id="email" placeholder="Ваш email">
         <input type="password" id="password" placeholder="Пароль">
-        <button onclick="login()">Войти</button>
+        <button id="login-btn">Войти</button>
         <p id="error-message"></p>
     </div>
 
     <!-- Основной интерфейс -->
     <div id="order-interface">
-        
-        <!-- Админ-панель -->
-        <div id="admin-panel" class="hidden">
-    <div class="admin-header">
-        <h2>Панель управления меню</h2>
-        <button class="back-btn" onclick="hideAdminPanel()">← Назад к заказу</button>
-    </div>
-    
-    <div class="admin-actions">
-        <button class="add-category-btn" onclick="showAddCategoryForm()">+ Добавить категорию</button>
-        <button class="add-item-btn" onclick="showAddItemForm()">+ Добавить напиток</button>
-    </div>
-
-    <!-- Форма добавления категории -->
-    <div id="add-category-form" class="hidden">
-        <input type="text" id="new-category-name" placeholder="Название категории">
-        <button onclick="addCategory()">Добавить</button>
-    </div>
-
-    <!-- Форма добавления напитка -->
-    <div id="add-item-form" class="hidden">
-        <input type="text" id="new-item-name" placeholder="Название">
-        <input type="number" id="new-item-price" placeholder="Цена">
-        <select id="new-item-category"></select>
-        <button onclick="addMenuItem()">Добавить</button>
-    </div>
-
-    <!-- Список категорий и напитков -->
-    <div class="menu-management">
-        <div id="categories-list"></div>
-        <div id="menu-items-list"></div>
-    </div>
-</div>
-            <!-- Список категорий и напитков -->
-            <div class="menu-management">
-                <div id="categories-list"></div>
-                <div id="menu-items-list"></div>
-            </div>
-        </div>
-
         <!-- Левая часть - меню -->
         <div class="menu-section">
             <div class="user-info">
                 Вы вошли как: <span id="user-email"></span>
-                <button class="admin-btn" style="display:none;">Управление меню</button>
-                <button class="logout-btn" onclick="logout()">Выйти</button>
+                <button class="admin-btn">Управление меню</button>
+                <button class="logout-btn">Выйти</button>
             </div>
             
             <h2>Меню напитков</h2>
-                <div class="menu-buttons">
-                            <!-- Стандартные кнопки меню (будут заменены при загрузке из Firebase) -->
-                    <button class="menu-btn" onclick="addDrink('Кофе', 100)">Кофе - 100 ₽</button>
-                    <button class="menu-btn" onclick="addDrink('Чай', 50)">Чай - 50 ₽</button>
-                    <button class="menu-btn" onclick="addDrink('Капучино', 150)">Капучино - 150 ₽</button>
-                    <button class="menu-btn" onclick="addDrink('Латте', 200)">Латте - 200 ₽</button>
-                </div>
+            <div class="menu-buttons" id="menu-buttons">
+                <!-- Кнопки будут загружены динамически -->
+                <button class="menu-btn" onclick="addDrink('Кофе', 100)">Кофе - 100 ₽</button>
+                <button class="menu-btn" onclick="addDrink('Чай', 50)">Чай - 50 ₽</button>
+                <button class="menu-btn" onclick="addDrink('Капучино', 150)">Капучино - 150 ₽</button>
+                <button class="menu-btn" onclick="addDrink('Латте', 200)">Латте - 200 ₽</button>
+            </div>
         </div>
 
         <!-- Правая часть - заказ -->
@@ -361,9 +318,42 @@
             </div>
             
             <div class="action-buttons">
-                <button class="action-btn clear-btn" onclick="clearOrder()">Очистить</button>
-                <button class="action-btn pay-btn" onclick="pay()">Оплатить</button>
+                <button class="action-btn clear-btn">Очистить</button>
+                <button class="action-btn pay-btn">Оплатить</button>
             </div>
+        </div>
+    </div>
+
+    <!-- Админ-панель -->
+    <div id="admin-panel" class="hidden">
+        <div class="admin-header">
+            <h2>Панель управления меню</h2>
+            <button class="back-btn">← Назад к заказу</button>
+        </div>
+        
+        <div class="admin-actions">
+            <button class="add-category-btn">+ Добавить категорию</button>
+            <button class="add-item-btn">+ Добавить напиток</button>
+        </div>
+
+        <!-- Форма добавления категории -->
+        <div id="add-category-form" class="hidden">
+            <input type="text" id="new-category-name" placeholder="Название категории">
+            <button id="add-category-btn">Добавить</button>
+        </div>
+
+        <!-- Форма добавления напитка -->
+        <div id="add-item-form" class="hidden">
+            <input type="text" id="new-item-name" placeholder="Название">
+            <input type="number" id="new-item-price" placeholder="Цена">
+            <select id="new-item-category"></select>
+            <button id="add-menu-item-btn">Добавить</button>
+        </div>
+
+        <!-- Список категорий и напитков -->
+        <div class="menu-management">
+            <div id="categories-list"></div>
+            <div id="menu-items-list"></div>
         </div>
     </div>
 
