@@ -3,13 +3,13 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Кофейня - Основной интерфейс</title>
-    <!-- Подключаем стили -->
+    <title>Кофейня</title>
     <link rel="stylesheet" href="css/auth.css">
     <link rel="stylesheet" href="css/main.css">
+    <link rel="stylesheet" href="css/admin.css">
 </head>
 <body>
-    <!-- Форма авторизации (первоначально видимая) -->
+    <!-- Форма авторизации -->
     <div id="auth-form">
         <h2>Вход для сотрудников</h2>
         <input type="email" id="email" placeholder="Ваш email">
@@ -18,9 +18,8 @@
         <p id="error-message"></p>
     </div>
 
-    <!-- Основной интерфейс заказа (первоначально скрыт) -->
+    <!-- Основной интерфейс -->
     <div id="order-interface" class="hidden">
-        <!-- Левая часть - меню -->
         <div class="menu-section">
             <div class="user-info">
                 Вы вошли как: <span id="user-email"></span>
@@ -31,11 +30,10 @@
             <div class="menu-divider"></div>
             
             <div class="menu-columns" id="menu-columns">
-                <!-- Колонки с категориями будут загружены динамически -->
+                <!-- Колонки будут загружены динамически -->
             </div>
         </div>
 
-        <!-- Правая часть - заказ -->
         <div class="order-section">
             <h2>Текущий заказ</h2>
             <ul id="order-list"></ul>
@@ -51,7 +49,10 @@
         </div>
     </div>
 
-    <!-- Подключаем Firebase и скрипты -->
+    <!-- Админ-панель -->
+    <div id="admin-panel" class="hidden"></div>
+
+    <!-- Firebase -->
     <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-app.js"></script>
     <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-auth.js"></script>
     <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-database.js"></script>
