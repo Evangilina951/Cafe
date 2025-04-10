@@ -20,6 +20,7 @@ let currentUser = null;
 let menuCategories = [];
 let menuItems = [];
 let isLoadingMenu = true;
+let activeCategoryFilter = null;
 
 // DOM элементы
 const elements = {
@@ -27,7 +28,7 @@ const elements = {
     orderInterface: document.getElementById('order-interface'),
     adminPanel: document.getElementById('admin-panel'),
     userEmail: document.getElementById('user-email'),
-    menuButtons: document.getElementById('menu-buttons'),
+    menuColumns: document.getElementById('menu-columns'),
     orderList: document.getElementById('order-list'),
     totalElement: document.getElementById('total'),
     emailInput: document.getElementById('email'),
@@ -52,7 +53,8 @@ const elements = {
     categoriesList: document.getElementById('categories-list'),
     menuItemsList: document.getElementById('menu-items-list'),
     ingredientsList: document.getElementById('ingredients-list'),
-    addIngredientBtn: document.getElementById('add-ingredient-btn')
+    addIngredientBtn: document.getElementById('add-ingredient-btn'),
+    categoryFilter: document.getElementById('category-filter')
 };
 
 // Функции для работы с DOM
@@ -198,25 +200,56 @@ function initializeMenuData() {
 }
 
 function updateMainMenu() {
-    const menuButtons = document.querySelector('.menu-buttons');
-    if (!menuButtons) return;
+    if (!elements.menuColumns) return;
     
     if (isLoadingMenu) {
-        menuButtons.innerHTML = '<div class="menu-loading">Загрузка меню...</div>';
+        elements.menuColumns.innerHTML = '<div class="menu-loading">Загрузка меню...</div>';
         return;
     }
     
     if (menuItems.length > 0) {
-        menuButtons.innerHTML = '';
+        elements.menuColumns.innerHTML = '';
+        
+        // Группируем блюда по категориям
+        const itemsByCategory = {};
         menuItems.forEach(item => {
-            const btn = document.createElement('button');
-            btn.className = 'menu-btn';
-            btn.textContent = `${item.name} - ${item.price} ₽`;
-            btn.onclick = () => addDrink(item.name, item.price);
-            menuButtons.appendChild(btn);
+            if (!itemsByCategory[item.category]) {
+                itemsByCategory[item.category] = [];
+            }
+            itemsByCategory[item.category].push(item);
+        });
+        
+        // Создаем колонки для каждой категории
+        Object.keys(itemsByCategory).forEach(category => {
+            const column = document.createElement('div');
+            column.className = 'menu-column';
+            
+            const title = document.createElement('h3');
+            title.className = 'category-title';
+            title.textContent = category;
+            column.appendChild(title);
+            
+            const buttonsContainer = document.createElement('div');
+            buttonsContainer.className = 'menu-buttons';
+            
+            itemsByCategory[category].forEach(item => {
+                const btn = document.createElement('button');
+                btn.className = 'menu-btn';
+                btn.innerHTML = `
+                    <div class="item-name">${item.name}</div>
+                    <div class="item-price">${item.price} ₽</div>
+                    <div class="item-category">${item.category}</div>
+                    ${item.ingredients ? `<div class="item-ingredients">${item.ingredients.join(', ')}</div>` : ''}
+                `;
+                btn.onclick = () => addDrink(item.name, item.price);
+                buttonsContainer.appendChild(btn);
+            });
+            
+            column.appendChild(buttonsContainer);
+            elements.menuColumns.appendChild(column);
         });
     } else {
-        menuButtons.innerHTML = '<div class="menu-error">Ошибка: Меню не загружено</div>';
+        elements.menuColumns.innerHTML = '<div class="menu-error">Ошибка: Меню не загружено</div>';
     }
 }
 
@@ -246,13 +279,6 @@ function resetAddItemForm() {
             <button class="remove-ingredient-btn">×</button>
         </div>
     `;
-    
-    // Удаляем старые обработчики перед добавлением новых
-    if (elements.addIngredientBtn) {
-        const newBtn = elements.addIngredientBtn.cloneNode(true);
-        elements.addIngredientBtn.parentNode.replaceChild(newBtn, elements.addIngredientBtn);
-        elements.addIngredientBtn = newBtn;
-    }
     
     initIngredientsHandlers();
 }
@@ -350,14 +376,39 @@ function loadMenuData() {
     const categoriesList = document.getElementById('categories-list');
     const itemsList = document.getElementById('menu-items-list');
     const categorySelect = document.getElementById('new-item-category');
+    const categoryFilter = document.getElementById('category-filter');
     
-    if (!categoriesList || !itemsList || !categorySelect) return;
+    if (!categoriesList || !itemsList || !categorySelect || !categoryFilter) return;
     
-    categoriesList.innerHTML = '<h3>Категории</h3>';
-    itemsList.innerHTML = '<h3>Напитки</h3>';
+    // Загрузка категорий
+    categoriesList.innerHTML = '<h3 style="margin-bottom: 20px; text-align: center;">Категории</h3>';
+    itemsList.innerHTML = '<h3 style="margin-bottom: 20px; text-align: center;">Блюда</h3>';
     categorySelect.innerHTML = '';
+    categoryFilter.innerHTML = '';
     
+    // Кнопка "Все категории"
+    const allFilterBtn = document.createElement('button');
+    allFilterBtn.className = 'filter-btn' + (activeCategoryFilter === null ? ' active' : '');
+    allFilterBtn.textContent = 'Все';
+    allFilterBtn.onclick = () => {
+        activeCategoryFilter = null;
+        loadMenuData();
+    };
+    categoryFilter.appendChild(allFilterBtn);
+    
+    // Кнопки для каждой категории
     menuCategories.forEach(category => {
+        // Добавляем в фильтр
+        const filterBtn = document.createElement('button');
+        filterBtn.className = 'filter-btn' + (activeCategoryFilter === category ? ' active' : '');
+        filterBtn.textContent = category;
+        filterBtn.onclick = () => {
+            activeCategoryFilter = category;
+            loadMenuData();
+        };
+        categoryFilter.appendChild(filterBtn);
+        
+        // Добавляем в список категорий
         const categoryCard = document.createElement('div');
         categoryCard.className = 'category-card';
         categoryCard.innerHTML = `
@@ -366,13 +417,27 @@ function loadMenuData() {
         `;
         categoriesList.appendChild(categoryCard);
         
+        // Добавляем в выпадающий список
         const option = document.createElement('option');
         option.value = category;
         option.textContent = category;
         categorySelect.appendChild(option);
     });
     
-    menuItems.forEach(item => {
+    // Фильтрация блюд
+    const filteredItems = activeCategoryFilter 
+        ? menuItems.filter(item => item.category === activeCategoryFilter)
+        : menuItems;
+    
+    // Загрузка блюд
+    itemsList.innerHTML = '<h3 style="margin-bottom: 20px; text-align: center;">Блюда</h3>';
+    
+    if (filteredItems.length === 0) {
+        itemsList.innerHTML += '<p>Нет блюд в выбранной категории</p>';
+        return;
+    }
+    
+    filteredItems.forEach(item => {
         const itemCard = document.createElement('div');
         itemCard.className = 'menu-item-card';
         itemCard.dataset.id = item.id;
@@ -393,7 +458,8 @@ function loadMenuData() {
             <div class="item-main-info">
                 <div>
                     <strong>${item.name}</strong>
-                    <div>${item.price} ₽ • ${item.category}</div>
+                    <div class="item-category">${item.category}</div>
+                    <div class="item-price">${item.price} ₽</div>
                     ${ingredientsHtml}
                 </div>
                 <div class="item-actions">
@@ -527,13 +593,6 @@ function initAdminPanelHandlers() {
 function initEditFormHandlers(editForm) {
     if (!editForm) return;
     
-    // Удаляем старый обработчик перед добавлением нового
-    const addBtn = editForm.querySelector('.add-edit-ingredient-btn');
-    if (addBtn) {
-        const newBtn = addBtn.cloneNode(true);
-        addBtn.parentNode.replaceChild(newBtn, addBtn);
-    }
-    
     // Обработчики для существующих кнопок удаления
     editForm.querySelectorAll('.remove-ingredient-btn').forEach(btn => {
         btn.addEventListener('click', function() {
@@ -542,9 +601,9 @@ function initEditFormHandlers(editForm) {
     });
     
     // Обработчик для кнопки добавления ингредиента
-    const newAddBtn = editForm.querySelector('.add-edit-ingredient-btn');
-    if (newAddBtn) {
-        newAddBtn.addEventListener('click', function() {
+    const addBtn = editForm.querySelector('.add-edit-ingredient-btn');
+    if (addBtn) {
+        addBtn.addEventListener('click', function() {
             const ingredientsList = this.previousElementSibling;
             const newIngredient = document.createElement('div');
             newIngredient.className = 'ingredient-item';
