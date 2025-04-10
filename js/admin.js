@@ -1,5 +1,5 @@
-import { db } from './firebase-config.js';
-import { menuCategories, menuItems } from './menu.js';
+import { db } from '/Cafe/js//firebase-config.js';
+import { menuCategories, menuItems } from '/Cafe/js/menu.js';
 
 // DOM элементы
 const elements = {
