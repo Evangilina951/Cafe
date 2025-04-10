@@ -4,7 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Кофейня</title>
-    <style>
+        <style>
         * {
             box-sizing: border-box;
             margin: 0;
@@ -102,7 +102,6 @@
             display: none !important;
         }
 
-        /* Стили для кнопок меню */
         .menu-columns {
             display: flex;
             gap: 30px;
@@ -131,7 +130,6 @@
             border: none;
             padding: 15px 20px;
             border-radius: 12px;
-            font-size: 16px;
             cursor: pointer;
             transition: background-color 0.3s;
             text-align: center;
@@ -144,19 +142,19 @@
 
         .menu-btn .item-name {
             font-weight: bold;
-            margin-bottom: 5px;
             color: #ffefdc;
             text-align: center;
+            margin-bottom: 5px;
+            font-size: 16px;
         }
 
         .menu-btn .item-price {
-            margin-bottom: 5px;
             color: #f8d56b;
             font-weight: bold;
             text-align: center;
+            font-size: 14px;
         }
 
-        /* Стили для кнопок управления количеством */
         .item-controls {
             display: flex;
             align-items: center;
@@ -201,7 +199,6 @@
             margin-left: 5px;
         }
 
-        /* Стили для кнопок действий */
         .action-buttons {
             display: flex;
             justify-content: space-between;
@@ -233,7 +230,6 @@
             opacity: 0.8;
         }
 
-        /* Стили для списка заказов */
         #order-list li {
             display: flex;
             align-items: center;
@@ -259,7 +255,6 @@
             font-size: 16px;
         }
 
-        /* Стиль для кнопки выхода */
         .user-info {
             display: flex;
             align-items: center;
@@ -291,7 +286,6 @@
             margin-left: auto;
         }
 
-        /* Админ-панель */
         #admin-panel {
             position: fixed;
             top: 0;
@@ -396,6 +390,38 @@
         .categories-list h3 {
             margin-bottom: 20px;
             text-align: center;
+            font-size: 18px;
+        }
+
+        .category-card {
+            background-color: rgba(255, 255, 255, 0.7);
+            border: 1px solid #ddd;
+            border-radius: 12px;
+            padding: 15px;
+            margin-bottom: 15px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .category-card span {
+            font-size: 16px;
+            color: #6d341f;
+        }
+
+        .delete-category-btn {
+            background-color: #c62828;
+            color: white;
+            border: none;
+            border-radius: 50%;
+            padding: 5px 10px;
+            cursor: pointer;
+            font-size: 16px;
+            width: 28px;
+            height: 28px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
         }
 
         .menu-items-container {
@@ -417,6 +443,7 @@
             border: none;
             border-radius: 4px;
             cursor: pointer;
+            font-size: 14px;
         }
 
         .filter-btn.active {
@@ -435,50 +462,24 @@
             border: 1px solid #ddd;
             border-radius: 12px;
             padding: 20px;
-            display: flex;
-            flex-direction: column;
         }
 
         .item-main-info {
             width: 100%;
         }
 
-        .item-name {
-            font-size: 18px;
+        .menu-item-card .item-name {
+            font-size: 16px;
             font-weight: bold;
             color: #6d341f;
             margin-bottom: 8px;
         }
 
-        .item-category {
-            color: #8d6e63;
-            margin-bottom: 8px;
-        }
-
-        .item-price {
+        .menu-item-card .item-price {
             color: #6d341f;
             font-weight: bold;
-            margin-bottom: 15px;
-        }
-
-        .item-ingredients {
-            margin-top: 15px;
-        }
-
-        .item-ingredients strong {
-            color: #6d341f;
-            display: block;
-            margin-bottom: 5px;
-        }
-
-        .item-ingredients ul {
-            margin-top: 5px;
-            padding-left: 20px;
-        }
-
-        .item-ingredients li {
-            color: #8d6e63;
-            margin-bottom: 3px;
+            margin-bottom: 8px;
+            text-align: left;
         }
 
         .item-actions {
@@ -492,7 +493,7 @@
             border: none;
             border-radius: 6px;
             cursor: pointer;
-            font-size: 16px;
+            font-size: 14px;
         }
 
         .edit-item-btn {
