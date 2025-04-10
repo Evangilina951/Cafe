@@ -1,5 +1,5 @@
-import { db } from './firebase-config.js';
-import { currentUser } from './auth.js';
+import { db } from '/Cafe/js/firebase-config.js';
+import { currentUser } from '/Cafe/js/auth.js';
 
 let menuCategories = [];
 let menuItems = [];
