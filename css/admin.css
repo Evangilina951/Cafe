@@ -1,1 +1,57 @@
+/* Стили для админ-панели */
+#admin-panel {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100vh;
+    background-color: #ffefdc;
+    padding: 30px;
+    z-index: 200;
+    overflow-y: auto;
+}
 
+/* Заголовок админ-панели */
+.admin-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 25px;
+}
+
+/* Кнопки действий в админке */
+.admin-actions {
+    display: flex;
+    gap: 15px;
+    margin-bottom: 25px;
+}
+
+/* Стили для карточек категорий */
+.category-card {
+    background-color: rgba(255, 255, 255, 0.7);
+    border: 1px solid #ddd;
+    border-radius: 12px;
+    padding: 15px;
+    margin-bottom: 15px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+/* Кнопка удаления категории */
+.delete-category-btn {
+    background-color: #c62828;
+    color: white;
+    border: none;
+    border-radius: 50%;
+    padding: 5px 10px;
+    cursor: pointer;
+    font-size: 16px;
+    width: 28px;
+    height: 28px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+/* ... (другие специфические стили админки) ... */
