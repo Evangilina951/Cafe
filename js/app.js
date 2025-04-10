@@ -837,3 +837,17 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     }
 });
+
+// Обработчик кнопки "Управление меню"
+document.querySelector('.admin-btn')?.addEventListener('click', function() {
+    document.getElementById('order-interface').classList.add('hidden');
+    document.getElementById('admin-panel').classList.remove('hidden');
+    
+    // Загрузка админ-панели
+    fetch('admin.html')
+        .then(response => response.text())
+        .then(html => {
+            document.getElementById('admin-panel').innerHTML = html;
+            // Подключите admin.js здесь при необходимости
+        });
+});
