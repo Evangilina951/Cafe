@@ -382,7 +382,7 @@ function loadMenuData() {
     
     // Загрузка категорий
     categoriesList.innerHTML = '<h3 style="margin-bottom: 20px; text-align: center;">Категории</h3>';
-    itemsList.innerHTML = '<h3 style="margin-bottom: 20px; text-align: center;">Блюда</h3>';
+    itemsList.innerHTML = ''; // Убираем дублирующий заголовок "Блюда"
     categorySelect.innerHTML = '';
     categoryFilter.innerHTML = '';
     
