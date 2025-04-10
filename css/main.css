@@ -59,4 +59,121 @@ body {
     overflow-y: auto;
 }
 
-/* ... (другие общие стили) ... */
+/* Кнопки меню */
+.menu-btn {
+    background-color: #6d341f;
+    border: none;
+    padding: 15px 20px;
+    border-radius: 12px;
+    cursor: pointer;
+    transition: background-color 0.3s;
+    text-align: center;
+    width: 100%;
+    color: #ffefdc;
+}
+
+.menu-btn:hover {
+    background-color: #5a2b19;
+}
+
+.menu-btn .item-name {
+    font-weight: bold;
+    text-align: center;
+    margin-bottom: 5px;
+    font-size: 16px;
+}
+
+.menu-btn .item-price {
+    color: #f8d56b;
+    font-weight: bold;
+    text-align: center;
+    font-size: 14px;
+}
+
+/* Кнопки управления количеством */
+.quantity-btn {
+    width: 30px;
+    height: 30px;
+    border: none;
+    border-radius: 50%;
+    font-size: 20px;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.plus-btn {
+    background-color: #e8f5e9;
+    color: #2e7d32;
+}
+
+.minus-btn {
+    background-color: #ffebee;
+    color: #c62828;
+}
+
+.remove-btn {
+    background-color: #ffebee;
+    color: #c62828;
+    width: 30px;
+    height: 30px;
+    border: none;
+    border-radius: 50%;
+    font-size: 20px;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin-left: 5px;
+}
+
+/* Кнопки действий */
+.action-btn {
+    padding: 15px 25px;
+    border: none;
+    border-radius: 12px;
+    font-size: 18px;
+    cursor: pointer;
+    flex: 1;
+    transition: opacity 0.3s;
+}
+
+.clear-btn {
+    background-color: #ffebee;
+    color: #c62828;
+}
+
+.pay-btn {
+    background-color: #e8f5e9;
+    color: #2e7d32;
+}
+
+.action-btn:hover {
+    opacity: 0.8;
+}
+
+/* Кнопки пользователя */
+.logout-btn, .admin-btn {
+    background-color: #ffebee;
+    color: #c62828;
+    border: none;
+    padding: 10px 20px;
+    border-radius: 8px;
+    cursor: pointer;
+    transition: background-color 0.3s;
+    font-size: 16px;
+}
+
+.logout-btn:hover, .admin-btn:hover {
+    background-color: #ffcdd2;
+}
+
+.admin-btn {
+    display: none;
+    background-color: #6d341f;
+    color: #ffefdc;
+    padding: 12px 24px;
+    font-size: 18px;
+    margin-left: auto;
+}
