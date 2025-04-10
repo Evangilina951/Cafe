@@ -1,1 +1,50 @@
+/* Основные стили для формы авторизации */
+#auth-form {
+    position: fixed;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    width: 350px;
+    padding: 30px;
+    background-color: rgba(255, 255, 255, 0.9);
+    border-radius: 15px;
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+    text-align: center;
+    z-index: 1000;
+}
 
+/* Стили для полей ввода */
+#auth-form input {
+    width: 100%;
+    padding: 12px 15px;
+    margin: 10px 0;
+    border: 1px solid #d7ccc8;
+    border-radius: 8px;
+    font-size: 16px;
+    background-color: #fff;
+}
+
+/* Стили для кнопки входа */
+#auth-form button {
+    width: 100%;
+    padding: 12px;
+    margin-top: 15px;
+    background-color: #6d341f;
+    color: white;
+    border: none;
+    border-radius: 8px;
+    font-size: 16px;
+    cursor: pointer;
+    transition: background-color 0.3s;
+}
+
+#auth-form button:hover {
+    background-color: #5a2b19;
+}
+
+/* Стили для сообщения об ошибке */
+#error-message {
+    color: #c62828;
+    margin-top: 10px;
+    min-height: 20px;
+}
