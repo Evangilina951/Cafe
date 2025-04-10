@@ -1,7 +1,7 @@
-import { initAuth, currentUser } from './auth.js';
-import { loadMenuFromFirebase, addDrink } from './menu.js';
-import { initOrder, addToOrder } from './order.js';
-import { initAdmin } from './admin.js';
+import { initAuth, currentUser } from '/Cafe/js/auth.js';
+import { loadMenuFromFirebase, addDrink } from '/Cafe/js/menu.js';
+import { initOrder, addToOrder } from '/Cafe/js/order.js';
+import { initAdmin } from '/Cafe/js/admin.js';
 
 // Инициализация при загрузке страницы
 document.addEventListener('DOMContentLoaded', () => {
