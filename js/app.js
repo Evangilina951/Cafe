@@ -207,7 +207,28 @@ function updateMainMenu() {
 function showAdminPanel() {
     hideElement(elements.orderInterface);
     showElement(document.getElementById('admin-panel'));
-    initAdminPanel();
+    
+    // Проверяем, существует ли функция initAdminPanel
+    if (typeof initAdminPanel === 'function') {
+        initAdminPanel();
+    } else {
+        console.error('Функция initAdminPanel не определена');
+        // Загружаем admin.js динамически, если функция не найдена
+        loadAdminScript();
+    }
+}
+
+function loadAdminScript() {
+    const script = document.createElement('script');
+    script.src = 'js/admin.js';
+    script.onload = function() {
+        if (typeof initAdminPanel === 'function') {
+            initAdminPanel();
+        } else {
+            console.error('Функция initAdminPanel все еще не определена после загрузки admin.js');
+        }
+    };
+    document.head.appendChild(script);
 }
 
 function addDrink(name, price) {
