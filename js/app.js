@@ -206,23 +206,8 @@ function updateMainMenu() {
 // Админ-панель
 function showAdminPanel() {
     hideElement(elements.orderInterface);
-    showElement(adminElements.adminPanel);
+    showElement(document.getElementById('admin-panel'));
     initAdminPanel();
-}
-    
-    // Создаем контейнер для админ-панели
-    const adminPanel = document.createElement('div');
-    adminPanel.id = 'admin-panel';
-    document.body.appendChild(adminPanel);
-    
-    // Загружаем админ-панель
-    fetch('admin.html')
-        .then(response => response.text())
-        .then(html => {
-            adminPanel.innerHTML = html;
-            // Инициализируем админ-панель
-            initAdminPanel();
-        });
 }
 
 function addDrink(name, price) {
