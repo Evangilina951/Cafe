@@ -1,4 +1,4 @@
-import { auth } from './firebase-config.js';
+import { auth } from '/Cafe/js/firebase-config.js';
 
 let currentUser = null;
 
