@@ -1,4 +1,4 @@
-import { currentUser } from './auth.js';
+import { currentUser } from '/Cafe/js/auth.js';
 
 let order = [];
 
