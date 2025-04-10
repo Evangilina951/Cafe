@@ -207,13 +207,12 @@ function updateMainMenu() {
 // Админ-панель
 function showAdminPanel() {
     hideElement(elements.orderInterface);
-    showElement(document.getElementById('admin-panel'));
-    
-    // Проверяем и инициализируем админ-панель
-    if (typeof initAdminPanel === 'function') {
-        initAdminPanel();
-    } else {
-        console.error('Функция initAdminPanel не найдена');
+    const adminPanel = document.getElementById('admin-panel');
+    if (adminPanel) {
+        showElement(adminPanel);
+        if (typeof initAdminPanel === 'function') {
+            initAdminPanel();
+        }
     }
 }
 
