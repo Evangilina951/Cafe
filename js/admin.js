@@ -1,3 +1,5 @@
+let activeCategoryFilter = null;
+
 // DOM элементы админ-панели
 const adminElements = {
     adminPanel: document.getElementById('admin-panel'),
