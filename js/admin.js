@@ -1,5 +1,3 @@
-let activeCategoryFilter = null;
-
 // DOM элементы админ-панели
 const adminElements = {
     adminPanel: document.getElementById('admin-panel'),
@@ -64,10 +62,20 @@ function initAdminEventListeners() {
     initIngredientsHandlers();
 }
 
-function hideAdminPanel() {
-    if (adminElements.adminPanel) {
-        adminElements.adminPanel.remove();
+function showElement(element) {
+    if (element) {
+        element.classList.remove('hidden');
     }
+}
+
+function hideElement(element) {
+    if (element) {
+        element.classList.add('hidden');
+    }
+}
+
+function hideAdminPanel() {
+    hideElement(adminElements.adminPanel);
     showElement(document.getElementById('order-interface'));
 }
 
@@ -486,4 +494,6 @@ function updateMenuInFirebase() {
 }
 
 // Инициализация админ-панели при загрузке
-document.addEventListener('DOMContentLoaded', initAdminPanel);
+if (document.getElementById('admin-panel')) {
+    initAdminPanel();
+}
