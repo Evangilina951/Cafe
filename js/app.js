@@ -15,6 +15,7 @@ const app = firebase.initializeApp(firebaseConfig);
 const auth = firebase.auth();
 const db = firebase.database();
 
+// Глобальные переменные
 let order = [];
 let currentUser = null;
 let menuCategories = [];
@@ -41,15 +42,17 @@ const elements = {
 
 // Функции для работы с DOM
 function showElement(element) {
-    if (!element) return;
-    element.style.display = 'block';
-    element.classList.remove('hidden');
+    if (element) {
+        element.style.display = 'block';
+        element.classList.remove('hidden');
+    }
 }
 
 function hideElement(element) {
-    if (!element) return;
-    element.style.display = 'none';
-    element.classList.add('hidden');
+    if (element) {
+        element.style.display = 'none';
+        element.classList.add('hidden');
+    }
 }
 
 // Обработчик состояния авторизации
@@ -162,7 +165,6 @@ function updateMainMenu() {
     if (menuItems.length > 0) {
         elements.menuColumns.innerHTML = '';
         
-        // Группируем блюда по категориям
         const itemsByCategory = {};
         menuItems.forEach(item => {
             if (!itemsByCategory[item.category]) {
@@ -171,7 +173,6 @@ function updateMainMenu() {
             itemsByCategory[item.category].push(item);
         });
         
-        // Создаем колонки для каждой категории
         Object.keys(itemsByCategory).forEach(category => {
             const column = document.createElement('div');
             column.className = 'menu-column';
@@ -208,29 +209,15 @@ function showAdminPanel() {
     hideElement(elements.orderInterface);
     showElement(document.getElementById('admin-panel'));
     
-    // Проверяем, существует ли функция initAdminPanel
+    // Проверяем и инициализируем админ-панель
     if (typeof initAdminPanel === 'function') {
         initAdminPanel();
     } else {
-        console.error('Функция initAdminPanel не определена');
-        // Загружаем admin.js динамически, если функция не найдена
-        loadAdminScript();
+        console.error('Функция initAdminPanel не найдена');
     }
 }
 
-function loadAdminScript() {
-    const script = document.createElement('script');
-    script.src = 'js/admin.js';
-    script.onload = function() {
-        if (typeof initAdminPanel === 'function') {
-            initAdminPanel();
-        } else {
-            console.error('Функция initAdminPanel все еще не определена после загрузки admin.js');
-        }
-    };
-    document.head.appendChild(script);
-}
-
+// Работа с заказом
 function addDrink(name, price) {
     if (!currentUser) {
         alert("Сначала войдите в систему!");
