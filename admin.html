@@ -1,69 +1,74 @@
-<div class="admin-header">
-    <h2>Панель управления меню</h2>
-    <button class="back-btn">← Назад к заказу</button>
-</div>
-
-<div class="admin-actions">
-    <button class="add-category-btn">+ Добавить категорию</button>
-    <button class="add-item-btn">+ Добавить блюдо</button>
-</div>
-
-<!-- Форма добавления категории -->
-<div id="add-category-form" class="hidden">
-    <input type="text" id="new-category-name" placeholder="Название категории">
-    <button id="add-category-btn">Добавить категорию</button>
-</div>
-
-<!-- Форма добавления блюда -->
-<div id="add-item-form" class="hidden">
-    <div class="form-group">
-        <label>Категория</label>
-        <select id="new-item-category"></select>
+<!-- Админ-панель -->
+<div id="admin-panel" class="hidden">
+    <div class="admin-header">
+        <h2>Панель управления меню</h2>
+        <button class="back-btn">← Назад к заказу</button>
     </div>
     
-    <div class="form-group">
-        <label>Название</label>
-        <input type="text" id="new-item-name" placeholder="Введите название">
+    <div class="admin-actions">
+        <button class="add-category-btn" type="button">+ Добавить категорию</button>
+        <button class="add-item-btn" type="button">+ Добавить блюдо</button>
     </div>
-    
-    <div class="form-group">
-        <label>Цена</label>
-        <input type="number" id="new-item-price" placeholder="Введите цену">
+
+    <!-- Форма добавления категории -->
+    <div id="add-category-form" class="hidden">
+        <input type="text" id="new-category-name" placeholder="Название категории" required>
+        <button id="add-category-btn" type="button">Добавить категорию</button>
     </div>
-    
-    <div class="form-group">
-        <label>Состав:</label>
-        <div id="ingredients-list">
-            <div class="ingredient-item">
-                <input type="text" class="ingredient-name" placeholder="Название ингредиента">
-                <input type="text" class="ingredient-quantity" placeholder="Количество">
-                <button class="remove-ingredient-btn">×</button>
+
+    <!-- Форма добавления блюда -->
+    <div id="add-item-form" class="hidden">
+        <div class="form-group">
+            <label for="new-item-category">Категория</label>
+            <select id="new-item-category" required></select>
+        </div>
+        
+        <div class="form-group">
+            <label for="new-item-name">Название</label>
+            <input type="text" id="new-item-name" placeholder="Введите название" required>
+        </div>
+        
+        <div class="form-group">
+            <label for="new-item-price">Цена</label>
+            <input type="number" id="new-item-price" placeholder="Введите цену" min="0" step="1" required>
+        </div>
+        
+        <div class="form-group">
+            <label>Состав:</label>
+            <div id="ingredients-list">
+                <div class="ingredient-item">
+                    <input type="text" class="ingredient-name" placeholder="Название ингредиента" required>
+                    <input type="text" class="ingredient-quantity" placeholder="Количество" required>
+                    <button class="remove-ingredient-btn" type="button">×</button>
+                </div>
+            </div>
+            <button id="add-ingredient-btn" class="add-edit-ingredient-btn" type="button">+ Добавить ингредиент</button>
+        </div>
+        
+        <div class="form-actions">
+            <button id="add-menu-item-btn" class="save-edit-btn" type="button">Добавить блюдо</button>
+        </div>
+    </div>
+
+    <!-- Основное содержимое админ-панели -->
+    <div class="menu-management">
+        <div class="categories-list" id="categories-list">
+            <h3>Категории</h3>
+            <!-- Категории будут загружены динамически -->
+        </div>
+        
+        <div class="menu-items-container">
+            <div class="category-filter" id="category-filter">
+                <!-- Кнопки фильтрации будут добавлены динамически -->
+            </div>
+            <div id="menu-items-list" class="menu-items-grid">
+                <!-- Блюда будут загружены динамически -->
             </div>
         </div>
-        <button id="add-ingredient-btn" class="add-edit-ingredient-btn">+ Добавить ингредиент</button>
-    </div>
-    
-    <div class="form-actions">
-        <button id="add-menu-item-btn" class="save-edit-btn">Добавить блюдо</button>
     </div>
 </div>
 
-<!-- Основное содержимое админ-панели -->
-<div class="menu-management">
-    <div class="categories-list" id="categories-list">
-        <h3>Категории</h3>
-        <!-- Категории будут загружены динамически -->
-    </div>
-    
-    <div class="menu-items-container">
-        <div class="category-filter" id="category-filter">
-            <!-- Кнопки фильтрации будут добавлены динамически -->
-        </div>
-        <div id="menu-items-list" class="menu-items-grid">
-            <!-- Блюда будут загружены динамически -->
-        </div>
-    </div>
-</div>
+<!-- Подключение скриптов -->
 <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-app.js"></script>
 <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-auth.js"></script>
 <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-database.js"></script>
