@@ -54,4 +54,79 @@
     justify-content: center;
 }
 
-/* ... (другие специфические стили админки) ... */
+/* Кнопки админ-панели */
+.back-btn {
+    padding: 12px 24px;
+    background-color: #4CAF50;
+    color: white;
+    border: none;
+    border-radius: 8px;
+    font-size: 16px;
+    cursor: pointer;
+    transition: background-color 0.3s;
+.back-btn:hover {
+    background-color: #3e8e41;
+}
+
+.add-category-btn, .add-item-btn {
+    padding: 12px 24px;
+    font-size: 16px;
+    background-color: #6d341f;
+    color: white;
+    border: none;
+    border-radius: 8px;
+    cursor: pointer;
+    transition: background-color 0.3s;
+}
+
+.add-category-btn:hover, .add-item-btn:hover {
+    background-color: #5a2b19;
+}
+
+/* Формы */
+#add-category-form, #add-item-form {
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+    margin-bottom: 25px;
+    padding: 25px;
+    background-color: rgba(255, 255, 255, 0.7);
+    border-radius: 12px;
+    max-width: 500px;
+}
+
+/* Списки категорий и блюд */
+.menu-management {
+    display: grid;
+    grid-template-columns: 300px 1fr;
+    gap: 20px;
+}
+
+.category-card {
+    background-color: rgba(255, 255, 255, 0.7);
+    border: 1px solid #ddd;
+    border-radius: 12px;
+    padding: 15px;
+    margin-bottom: 15px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.delete-category-btn {
+    background-color: #c62828;
+    color: white;
+    border: none;
+    border-radius: 50%;
+    padding: 5px 10px;
+    cursor: pointer;
+    font-size: 16px;
+    width: 28px;
+    height: 28px;
+}
+
+.menu-items-grid {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 20px;
+}
