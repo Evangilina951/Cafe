@@ -128,7 +128,6 @@
 
         .menu-btn {
             background-color: #6d341f;
-            color: #ffefdc;
             border: none;
             padding: 15px 20px;
             border-radius: 12px;
@@ -146,21 +145,16 @@
         .menu-btn .item-name {
             font-weight: bold;
             margin-bottom: 5px;
-            color: #ffefdc; /* Цвет фона страницы */
-        }
-        
-        .menu-btn .item-price {
-            margin-bottom: 5px;
-            color: #ffefdc; /* Цвет фона страницы */
-            font-weight: bold;
-        }
-        
-        /* Убираем линию под заголовком "Блюда" в админке */
-        .menu-items-container h3 {
-            border-bottom: none;
-            margin-bottom: 10px;
+            color: #ffefdc;
+            text-align: center;
         }
 
+        .menu-btn .item-price {
+            margin-bottom: 5px;
+            color: #f8d56b;
+            font-weight: bold;
+            text-align: center;
+        }
 
         /* Стили для кнопок управления количеством */
         .item-controls {
@@ -392,19 +386,7 @@
         .menu-management {
             display: grid;
             grid-template-columns: 300px 1fr;
-            gap: 30px;
-            position: relative;
-        }
-
-        .menu-management::after {
-            content: "";
-            position: absolute;
-            left: 315px;
-            top: 0;
-            bottom: 0;
-            width: 1px;
-            background-color: #6d341f;
-            opacity: 0.3;
+            gap: 20px;
         }
 
         .categories-list {
@@ -413,37 +395,7 @@
 
         .categories-list h3 {
             margin-bottom: 20px;
-            padding-bottom: 10px;
-            border-bottom: 1px solid #6d341f;
             text-align: center;
-        }
-
-        .menu-items-container h3 {
-            margin-bottom: 20px;
-            padding-bottom: 10px;
-            border-bottom: 1px solid #6d341f;
-            text-align: center;
-        }
-
-        .category-card {
-            background-color: rgba(255, 255, 255, 0.7);
-            border: 1px solid #ddd;
-            border-radius: 12px;
-            padding: 15px;
-            margin-bottom: 15px;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-        }
-
-        .delete-category-btn {
-            background-color: #c62828;
-            color: white;
-            border: none;
-            border-radius: 4px;
-            padding: 8px 12px;
-            cursor: pointer;
-            font-size: 16px;
         }
 
         .menu-items-container {
@@ -454,7 +406,7 @@
         .category-filter {
             display: flex;
             gap: 10px;
-            margin-bottom: 20px;
+            margin-bottom: 15px;
             flex-wrap: wrap;
         }
 
@@ -767,7 +719,6 @@
             </div>
             
             <div class="menu-items-container">
-                <h3>Блюда</h3>
                 <div class="category-filter" id="category-filter">
                     <!-- Кнопки фильтрации будут добавлены динамически -->
                 </div>
