@@ -27,6 +27,27 @@ function initAdminPanel() {
     initAdminEventListeners();
 }
 
+if (typeof menuCategories === 'undefined') {
+    var menuCategories = [];
+}
+
+if (typeof menuItems === 'undefined') {
+    var menuItems = [];
+}
+
+let activeCategoryFilter = null;
+
+// Делаем функцию initAdminPanel глобально доступной
+window.initAdminPanel = function() {
+    loadMenuData();
+    initAdminEventListeners();
+};
+
+// Инициализация админ-панели при загрузке
+if (document.getElementById('admin-panel')) {
+    initAdminPanel();
+}
+
 function initAdminEventListeners() {
     // Кнопка "Назад"
     if (adminElements.backBtn) {
