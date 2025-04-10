@@ -206,6 +206,9 @@ function updateMainMenu() {
 // Админ-панель
 function showAdminPanel() {
     hideElement(elements.orderInterface);
+    showElement(adminElements.adminPanel);
+    initAdminPanel();
+}
     
     // Создаем контейнер для админ-панели
     const adminPanel = document.createElement('div');
@@ -375,3 +378,4 @@ document.addEventListener('DOMContentLoaded', () => {
 // Глобальные функции для использования в HTML
 window.changeQuantity = changeQuantity;
 window.removeItem = removeItem;
+window.showAdminPanel = showAdminPanel;
