@@ -238,8 +238,6 @@ function updateMainMenu() {
                 btn.innerHTML = `
                     <div class="item-name">${item.name}</div>
                     <div class="item-price">${item.price} ₽</div>
-                    <div class="item-category">${item.category}</div>
-                    ${item.ingredients ? `<div class="item-ingredients">${item.ingredients.join(', ')}</div>` : ''}
                 `;
                 btn.onclick = () => addDrink(item.name, item.price);
                 buttonsContainer.appendChild(btn);
