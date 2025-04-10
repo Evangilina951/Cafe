@@ -4,9 +4,8 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Кофейня</title>
-    <link rel="stylesheet" href="css/auth.css">
-    <link rel="stylesheet" href="css/main.css">
-    <link rel="stylesheet" href="css/admin.css">
+    <link rel="stylesheet" href="auth.css">
+    <link rel="stylesheet" href="main.css">
 </head>
 <body>
     <!-- Форма авторизации -->
@@ -19,7 +18,8 @@
     </div>
 
     <!-- Основной интерфейс -->
-    <div id="order-interface" class="hidden">
+    <div id="order-interface">
+        <!-- Левая часть - меню -->
         <div class="menu-section">
             <div class="user-info">
                 Вы вошли как: <span id="user-email"></span>
@@ -34,6 +34,7 @@
             </div>
         </div>
 
+        <!-- Правая часть - заказ -->
         <div class="order-section">
             <h2>Текущий заказ</h2>
             <ul id="order-list"></ul>
@@ -49,14 +50,10 @@
         </div>
     </div>
 
-    <!-- Админ-панель -->
-    <div id="admin-panel" class="hidden"></div>
-
     <!-- Firebase -->
     <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-app.js"></script>
     <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-auth.js"></script>
     <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-database.js"></script>
-    <script src="js/app.js"></script>
-    <script src="js/admin.js"></script>
+    <script type="module" src="main.js"></script>
 </body>
 </html>
