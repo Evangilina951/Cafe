@@ -1,4 +1,3 @@
-/* Общие стили для всего приложения */
 * {
     box-sizing: border-box;
     margin: 0;
@@ -13,20 +12,14 @@ body {
     overflow: hidden;
 }
 
-/* Стили для скрытых элементов */
-.hidden {
-    display: none !important;
-}
-
-/* Основной интерфейс заказа */
 #order-interface {
-    display: flex;
+    display: none;
     width: 100%;
     height: 100vh;
     position: relative;
+    z-index: 100;
 }
 
-/* Секция меню */
 .menu-section {
     position: fixed;
     left: 0;
@@ -38,7 +31,6 @@ body {
     background-color: #ffefdc;
 }
 
-/* Разделитель */
 .menu-divider {
     height: 2px;
     background-color: #6d341f;
@@ -46,7 +38,6 @@ body {
     opacity: 0.3;
 }
 
-/* Секция заказа */
 .order-section {
     position: fixed;
     right: 0;
@@ -59,7 +50,33 @@ body {
     overflow-y: auto;
 }
 
-/* Кнопки меню */
+.hidden {
+    display: none !important;
+}
+
+.menu-columns {
+    display: flex;
+    gap: 30px;
+}
+
+.menu-column {
+    flex: 1;
+}
+
+.category-title {
+    font-size: 20px;
+    font-weight: bold;
+    color: #6d341f;
+    margin-bottom: 15px;
+    text-align: center;
+}
+
+.menu-buttons {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+}
+
 .menu-btn {
     background-color: #6d341f;
     border: none;
@@ -69,7 +86,6 @@ body {
     transition: background-color 0.3s;
     text-align: center;
     width: 100%;
-    color: #ffefdc;
 }
 
 .menu-btn:hover {
@@ -78,6 +94,7 @@ body {
 
 .menu-btn .item-name {
     font-weight: bold;
+    color: #ffefdc;
     text-align: center;
     margin-bottom: 5px;
     font-size: 16px;
@@ -90,7 +107,13 @@ body {
     font-size: 14px;
 }
 
-/* Кнопки управления количеством */
+.item-controls {
+    display: flex;
+    align-items: center;
+    gap: 5px;
+    margin-left: auto;
+}
+
 .quantity-btn {
     width: 30px;
     height: 30px;
@@ -114,8 +137,6 @@ body {
 }
 
 .remove-btn {
-    background-color: #ffebee;
-    color: #c62828;
     width: 30px;
     height: 30px;
     border: none;
@@ -125,10 +146,18 @@ body {
     display: flex;
     align-items: center;
     justify-content: center;
+    background-color: #ffebee;
+    color: #c62828;
     margin-left: 5px;
 }
 
-/* Кнопки действий */
+.action-buttons {
+    display: flex;
+    justify-content: space-between;
+    margin-top: 30px;
+    gap: 15px;
+}
+
 .action-btn {
     padding: 15px 25px;
     border: none;
@@ -153,7 +182,38 @@ body {
     opacity: 0.8;
 }
 
-/* Кнопки пользователя */
+#order-list li {
+    display: flex;
+    align-items: center;
+    padding: 15px 0;
+    border-bottom: 1px solid #d7ccc8;
+}
+
+.item-name {
+    flex: 1;
+    font-size: 16px;
+}
+
+.item-price {
+    width: 80px;
+    text-align: right;
+    margin-right: 15px;
+    font-size: 16px;
+}
+
+.quantity {
+    width: 30px;
+    text-align: center;
+    font-size: 16px;
+}
+
+.user-info {
+    display: flex;
+    align-items: center;
+    gap: 15px;
+    margin-bottom: 25px;
+}
+
 .logout-btn, .admin-btn {
     background-color: #ffebee;
     color: #c62828;
@@ -176,4 +236,17 @@ body {
     padding: 12px 24px;
     font-size: 18px;
     margin-left: auto;
+}
+
+.order-total {
+    margin-top: 25px;
+    padding-top: 20px;
+    font-size: 18px;
+    font-weight: bold;
+    border-top: 2px solid #6d341f;
+}
+
+#total {
+    font-size: 20px;
+    color: #6d341f;
 }
