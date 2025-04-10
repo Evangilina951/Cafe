@@ -1,4 +1,3 @@
-/* Основные стили для формы авторизации */
 #auth-form {
     position: fixed;
     top: 50%;
@@ -13,7 +12,6 @@
     z-index: 1000;
 }
 
-/* Стили для полей ввода */
 #auth-form input {
     width: 100%;
     padding: 12px 15px;
@@ -24,7 +22,6 @@
     background-color: #fff;
 }
 
-/* Стили для кнопки входа */
 #auth-form button {
     width: 100%;
     padding: 12px;
@@ -42,9 +39,8 @@
     background-color: #5a2b19;
 }
 
-/* Стили для сообщения об ошибке */
 #error-message {
     color: #c62828;
     margin-top: 10px;
-    min-height: 20px;
+    font-size: 14px;
 }
