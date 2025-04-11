@@ -479,3 +479,5 @@ export function initAdmin() {
     
     initIngredientsHandlers();
 }
+
+export { initAuth, currentUser, auth };
