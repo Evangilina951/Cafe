@@ -199,9 +199,10 @@
 }
 
 .item-price {
-    color: #6d341f;
+    color: #4CAF50;
     font-weight: bold;
     margin-bottom: 10px;
+    text-align: left;
 }
 
 .item-ingredients {
