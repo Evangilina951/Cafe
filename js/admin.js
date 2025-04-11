@@ -87,7 +87,7 @@ function resetAddItemForm() {
     elements.newItemPrice.value = '';
     elements.ingredientsList.innerHTML = `
         <div class="ingredient-item">
-            <input type="text" class="ingredient-name" placeholder="Название">
+            <input type="text" class="ingredient-name" placeholder="Название ингредиента">
             <input type="text" class="ingredient-quantity" placeholder="Количество">
             <button class="remove-ingredient-btn">×</button>
         </div>
@@ -109,8 +109,8 @@ function initIngredientsHandlers() {
         ingredientsList.appendChild(newIngredient);
         
         // Обработчик удаления
-        newIngredient.querySelector('.remove-ingredient-btn').addEventListener('click', () => {
-            newIngredient.remove();
+        newIngredient.querySelector('.remove-ingredient-btn').addEventListener('click', function() {
+            this.closest('.ingredient-item').remove();
         });
     });
 
@@ -239,15 +239,24 @@ function loadMenuData() {
         itemCard.dataset.id = item.id;
         itemCard.innerHTML = `
             <div class="item-main-info">
+                <div class="item-category">${item.category}</div>
                 <div class="item-name">${item.name}</div>
                 <div class="item-price">${item.price} ₽</div>
+                ${Array.isArray(item.ingredients) && item.ingredients.length ? `
+                    <div class="item-ingredients">
+                        <strong>Состав:</strong>
+                        <ul>
+                            ${item.ingredients.map(ing => `<li>- ${ing}</li>`).join('')}
+                        </ul>
+                    </div>
+                ` : ''}
             </div>
             <div class="item-actions">
                 <button class="edit-item-btn">Редактировать</button>
                 <button class="delete-item-btn">Удалить</button>
             </div>
             
-            <!-- Форма редактирования (изначально скрыта) -->
+            <!-- Форма редактирования -->
             <div class="edit-form hidden">
                 <div class="form-group">
                     <label>Категория</label>
@@ -349,8 +358,8 @@ function initAdminPanelHandlers() {
                 `;
                 ingredientsList.appendChild(newIngredient);
                 
-                newIngredient.querySelector('.remove-ingredient-btn').addEventListener('click', () => {
-                    newIngredient.remove();
+                newIngredient.querySelector('.remove-ingredient-btn').addEventListener('click', function() {
+                    this.closest('.ingredient-item').remove();
                 });
             });
             
