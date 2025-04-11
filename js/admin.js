@@ -55,24 +55,6 @@ export function initAdmin() {
     initIngredientsHandlers();
 }
 
-function showAdminPanel() {
-    if (adminPanel && orderInterface) {
-        adminPanel.style.display = 'block';
-        orderInterface.style.display = 'none';
-        loadMenuData();
-    }
-}
-
-function hideAdminPanel() {
-    if (adminPanel && orderInterface) {
-        adminPanel.style.display = 'none';
-        adminPanel.classList.add('hidden');
-        orderInterface.style.display = 'block';
-        window.location.hash = '';
-    }
-}
-
-
 // DOM элементы
 const elements = {
     adminPanel: document.getElementById('admin-panel'),
