@@ -212,8 +212,18 @@ function renderMenuInterface() {
         const categoryCard = document.createElement('div');
         categoryCard.className = 'category-card';
         categoryCard.innerHTML = `
-            <span>${category}</span>
-            <button class="delete-category-btn">×</button>
+            <div class="category-content">
+                <span>${category}</span>
+                <div class="category-actions">
+                    <button class="edit-category-btn" title="Редактировать"></button>
+                    <button class="delete-category-btn" title="Удалить">×</button>
+                </div>
+            </div>
+            <div class="edit-category-form hidden">
+                <input type="text" class="edit-category-input" value="${category}">
+                <button class="save-category-btn">Сохранить</button>
+                <button class="cancel-category-btn">Отмена</button>
+            </div>
         `;
         elements.categoriesList.appendChild(categoryCard);
 
@@ -265,8 +275,8 @@ function createMenuItemCard(item) {
             ` : ''}
         </div>
         <div class="item-actions">
-            <button class="edit-item-btn">Редактировать</button>
-            <button class="delete-item-btn">Удалить</button>
+            <button class="edit-item-btn" title="Редактировать">✏️</button>
+            <button class="delete-item-btn" title="Удалить">×</button>
         </div>
         
         <!-- Форма редактирования -->
@@ -294,10 +304,9 @@ function createMenuItemCard(item) {
                 <label>Состав:</label>
                 <div class="edit-ingredients-list">
                     ${ingredients.map(ing => {
-                        // Разделяем на последнее число и название
                         const parts = ing.split(' ');
-                        const quantity = parts.pop(); // Последний элемент - количество
-                        const name = parts.join(' '); // Все остальное - название
+                        const quantity = parts.pop();
+                        const name = parts.join(' ');
                         
                         return `
                             <div class="ingredient-item">
@@ -322,10 +331,73 @@ function createMenuItemCard(item) {
 }
 
 function setupAdminPanelHandlers() {
+    // Редактирование категории
+    document.querySelectorAll('.edit-category-btn').forEach(btn => {
+        btn.addEventListener('click', function() {
+            const card = this.closest('.category-card');
+            card.querySelector('.category-content').classList.add('hidden');
+            card.querySelector('.edit-category-form').classList.remove('hidden');
+        });
+    });
+
+    // Сохранение изменений категории
+    document.querySelectorAll('.save-category-btn').forEach(btn => {
+        btn.addEventListener('click', function() {
+            const card = this.closest('.category-card');
+            const newName = card.querySelector('.edit-category-input').value.trim();
+            const oldName = card.querySelector('span').textContent;
+            
+            if (!newName) {
+                alert('Введите название категории');
+                return;
+            }
+            
+            if (newName !== oldName) {
+                if (menuCategories.includes(newName)) {
+                    alert('Категория с таким названием уже существует');
+                    return;
+                }
+                
+                // Обновляем название категории
+                const index = menuCategories.indexOf(oldName);
+                menuCategories[index] = newName;
+                
+                // Обновляем все товары этой категории
+                menuItems.forEach(item => {
+                    if (item.category === oldName) {
+                        item.category = newName;
+                    }
+                });
+                
+                updateMenuInFirebase()
+                    .then(() => {
+                        renderMenuInterface();
+                    })
+                    .catch(error => {
+                        console.error("Ошибка сохранения:", error);
+                        alert("Не удалось сохранить изменения");
+                    });
+            } else {
+                // Без изменений - просто скрываем форму
+                card.querySelector('.category-content').classList.remove('hidden');
+                card.querySelector('.edit-category-form').classList.add('hidden');
+            }
+        });
+    });
+
+    // Отмена редактирования категории
+    document.querySelectorAll('.cancel-category-btn').forEach(btn => {
+        btn.addEventListener('click', function() {
+            const card = this.closest('.category-card');
+            card.querySelector('.category-content').classList.remove('hidden');
+            card.querySelector('.edit-category-form').classList.add('hidden');
+        });
+    });
+
     // Удаление категории
     document.querySelectorAll('.delete-category-btn').forEach(btn => {
         btn.addEventListener('click', () => {
-            const category = btn.previousElementSibling?.textContent;
+            const category = btn.closest('.category-content').querySelector('span')?.textContent;
             if (category && confirm(`Удалить категорию "${category}"?`)) {
                 const index = menuCategories.indexOf(category);
                 if (index !== -1) {
