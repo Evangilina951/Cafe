@@ -317,7 +317,7 @@ function loadMenuData() {
                 </div>
                 <div class="form-actions">
                     <button type="button" class="save-edit-btn">Сохранить</button>
-                    <button type="button, class="cancel-edit-btn">Отмена</button>
+                    <button type="button" class="cancel-edit-btn">Отмена</button>
                 </div>
             </div>
         `;
