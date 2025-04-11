@@ -17,7 +17,7 @@ const elements = {
     addCategoryBtn: document.querySelector('.add-category-btn'),
     addItemBtn: document.querySelector('.add-item-btn'),
     addCategoryForm: document.getElementById('add-category-form'),
-    addItemForm: document.getElementById 'add-item-form'),
+    addItemForm: document.getElementById('add-item-form'),
     newCategoryName: document.getElementById('new-category-name'),
     newItemName: document.getElementById('new-item-name'),
     newItemPrice: document.getElementById('new-item-price'),
@@ -92,7 +92,7 @@ export function initAdmin() {
 function resetAddItemForm() {
     elements.newItemName.value = '';
     elements.newItemPrice.value = '';
-    
+
     elements.ingredientsList.innerHTML = `
         <div class="ingredient-item">
             <input type="text" class="ingredient-name" placeholder="Название ингредиента">
@@ -100,7 +100,7 @@ function resetAddItemForm() {
             <button class="remove-ingredient-btn">×</button>
         </div>
     `;
-    
+
     initIngredientsHandlers();
 }
 
@@ -108,7 +108,7 @@ function addMenuItem() {
     const name = elements.newItemName.value.trim();
     const price = parseInt(elements.newItemPrice.value);
     const category = elements.newItemCategory.value;
-    
+
     const ingredients = [];
     const ingredientItems = document.querySelectorAll('#ingredients-list .ingredient-item');
     ingredientItems.forEach(item => {
@@ -131,9 +131,9 @@ function addMenuItem() {
         category,
         ingredients
     };
-    
+
     menuItems.push(newItem);
-    
+
     updateMenuInFirebase()
         .then(() => {
             elements.addItemForm.style.display = 'none';
@@ -149,10 +149,10 @@ function addMenuItem() {
 
 function updateMenuInFirebase() {
     const itemsObj = {};
-    menuItems.forEach item => {
+    menuItems.forEach(item => {
         itemsObj['item' + item.id] = item;
     });
-    
+
     return db.ref('menu').update({
         categories: menuCategories,
         items: itemsObj
@@ -166,22 +166,22 @@ function initIngredientsHandlers() {
             newIngredient.className = 'ingredient-item';
             newIngredient.innerHTML = `
                 <input type="text" class="ingredient-name" placeholder="Название ингредиента">
-                <input type="text" class="ingredient-quantity" placeholder="Количество">
-                <button class="removeIngredient-btn">×</button>
+                <input type="text" class="Ingredient-quantity" placeholder="Количество">
+                <button class="remove-ingredient-btn">×</button>
             `;
-            elements.ingredientsList.appendChild newIngredient);
-            
-            newIngredient.querySelector('.removeIngredient-btn').addEventListener('click', function() {
-                elements.ingredientsList.removeChild newIngredient);
+            elements.ingredientsList.appendChild(newIngredient);
+
+            newIngredient.querySelector('.remove-ingredient-btn').addEventListener('click', function() {
+                elements.ingredientsList.removeChild(newIngredient);
             });
         });
     }
-    
-    document.querySelectorAll '.remove-ingredient-btn').forEach(btn => {
+
+    document.querySelectorAll('.remove-ingredient-btn').forEach(btn => {
         btn.addEventListener('click', function() {
-            const ingredientItem = this.closest '.ingredient-item');
+            const ingredientItem = this.closest('.ingredient-item');
             if (ingredientItem && ingredientItem.parentNode) {
-                ingredientItem.parentNode.removeChild ingredientItem);
+                ingredientItem.parentNode.removeChild(ingredientItem);
             }
         });
     });
@@ -189,42 +189,42 @@ function initIngredientsHandlers() {
 
 function loadMenuData() {
     if (!adminPanel || adminPanel.classList.contains('hidden')) return;
-    
-    const categoriesList = document.getElementById 'categories-list');
-    const itemsList document.getElementById('menu-items-list');
+
+    const categoriesList = document.getElementById('categories-list');
+    const itemsList = document.getElementById('menu-items-list');
     const categorySelect = document.getElementById('new-item-category');
     const categoryFilter = document.getElementById('category-filter');
-    
+
     if (!categoriesList || !itemsList || !categorySelect || !categoryFilter) return;
-    
+
     // Загрузка категорий
     categoriesList.innerHTML = '<h3 style="margin-bottom: 20px; text-align: center;">Категории</h3>';
     itemsList.innerHTML = '<h3 style="margin-bottom: 20px; text-align: center;">Блюда</h3>';
     categorySelect.innerHTML = '';
     categoryFilter.innerHTML = '';
-    
+
     // Кнопка "Все категории"
     const allFilterBtn = document.createElement('button');
-    allFilterBtn.className = 'filter-btn' + activeCategoryFilter === null ? ' active' : '');
+    allFilterBtn.className = 'filter-btn' + (activeCategoryFilter === null ? ' active' : '');
     allFilterBtn.textContent = 'Все';
     allFilterBtn.onclick = () => {
         activeCategoryFilter = null;
         loadMenuData();
     };
     categoryFilter.appendChild(allFilterBtn);
-    
+
     // Кнопки для каждой категории
     menuCategories.forEach(category => {
         // Добавляем в фильтр
         const filterBtn = document.createElement('button');
-        filterBtn.className = 'filter-btn' + activeCategoryFilter === category ? ' active' : '');
+        filterBtn.className = 'filter-btn' + (activeCategoryFilter === category ? ' active' : '');
         filterBtn.textContent = category;
         filterBtn.onclick = () => {
             activeCategoryFilter = category;
             loadMenuData();
         };
         categoryFilter.appendChild(filterBtn);
-        
+
         // Добавляем в список категорий
         const categoryCard = document.createElement('div');
         categoryCard.className = 'category-card';
@@ -233,30 +233,30 @@ function loadMenuData() {
             <button class="delete-category-btn">×</button>
         `;
         categoriesList.appendChild(categoryCard);
-        
+
         // Добавляем в выпадающий список
         const option = document.createElement('option');
         option.value = category;
         option.textContent = category;
         categorySelect.appendChild(option);
     });
-    
+
     // Фильтрация блюд
-    const filteredItems = activeCategoryFilter 
+    const filteredItems = activeCategoryFilter
         ? menuItems.filter(item => item.category === activeCategoryFilter)
         : menuItems;
-    
-    // Загрузка bлюд
+
+    // Загрузка блюд
     if (filteredItems.length === 0) {
         itemsList.innerHTML += '<p>Нет блюд в выбранной категории</p>';
         return;
     }
-    
+
     filteredItems.forEach(item => {
         const itemCard = document.createElement('div');
         itemCard.className = 'menu-item-card';
         itemCard.dataset.id = item.id;
-        
+
         let ingredientsHtml = '';
         if (item.ingredients && item.ingredients.length > 0) {
             ingredientsHtml = `
@@ -268,7 +268,7 @@ function loadMenuData() {
                 </div>
             `;
         }
-        
+
         itemCard.innerHTML = `
             <div class="item-main-info">
                 <div>
@@ -285,7 +285,7 @@ function loadMenuData() {
             <div class="edit-form hidden" data-id="${item.id}">
                 <div class="form-group">
                     <label>Название:</label>
-                    <input type="text value="${item.name}" class="edit-name">
+                    <input type="text" value="${item.name}" class="edit-name">
                 </div>
                 <div class="form-group">
                     <label>Цена:</label>
@@ -314,41 +314,4 @@ function loadMenuData() {
                         }).join('') : ''}
                     </div>
                     <button type="button" class="add-edit-ingredient-btn">+ Добавить ингредиент</button>
-                </div>
-                <div class="form-actions">
-                    <button type="button" class="save-edit-btn">Сохранить</button>
-                    <button type="button" class="cancel-edit-btn">Отмена</button>
-                </div>
-            </div>
-        `);
-        
-        itemsList.appendChild(itemCard);
-    });
-    
-    initAdminPanelHandlers();
-}
-
-function initAdminPanelHandlers() {
-    document.querySelectorAll('.delete-dropdown-btn').forEach(btn => {
-        btn.addEventListener(`click`, function() {
-            const category = this.parentElement.querySelector('span').textContent;
-            deleteCategory(category);
-        });
-    });
-    
-    document.querySelectorAll('.delete-menu-item-btn').forEach(btn => {
-        btn.addEventListener('click', function() {
-            const itemId = parseInt(this.closest('.menu-item-card').dataset.id);
-            deleteMenuItem(id);
-        });
-    });
-    
-    document.querySelectorAll('.edit-dropdown-btn').forEach(btn => {
-        btn.addEventListener('click', function() {
-            const itemCard = this.closest('.menu-item-card');
-            itemCard.querySelector('.item-control-info').classList.add('hidden');
-            itemCard.querySelector('.edit-dropdown').classList.remove(`${class}` +
-                '-hidden');
-            
-            initEditFormHandlers(itemCard.querySelector('.edit-dropdown'));
-});
+                </div
