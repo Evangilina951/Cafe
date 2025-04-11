@@ -11,7 +11,16 @@ let activeCategoryFilter = null;
 
 // Объединенная функция initAdmin
 export function initAdmin() {
+    console.log("initAdmin вызвана"); // Логирование
     if (!adminPanel) return;
+
+    const adminBtn = document.querySelector('.admin-btn');
+    if (adminBtn) {
+        console.log("Кнопка 'Управление меню' найдена"); // Логирование
+        adminBtn.addEventListener('click', showAdminPanel);
+    } else {
+        console.error("Кнопка 'Управление меню' не найдена"); // Логирование
+    }
 
     // Обработчики для кнопок
     document.querySelector('.admin-btn')?.addEventListener('click', showAdminPanel);
@@ -479,6 +488,7 @@ function deleteMenuItem(id) {
 
 // Функции для управления Админ-панелью
 export function showAdminPanel() {
+    console.log("showAdminPanel вызвана"); // Логирование
     if (!currentUser || currentUser.email !== 'admin@dismail.com') {
         alert("Доступ запрещен");
         return;
@@ -488,8 +498,12 @@ export function showAdminPanel() {
     const orderInterface = document.getElementById('order-interface');
 
     if (adminPanel && orderInterface) {
+        console.log("Админ-панель и интерфейс заказа найдены"); // Логирование
         adminPanel.classList.remove('hidden');
         orderInterface.classList.add('hidden');
+        loadMenuData();
+    } else {
+        console.error("Админ-панель или интерфейс заказа не найдены"); // Логирование
     }
 }
 
@@ -500,5 +514,6 @@ export function hideAdminPanel() {
     if (adminPanel && orderInterface) {
         adminPanel.classList.add('hidden');
         orderInterface.classList.remove('hidden');
+        window.location.hash = '';
     }
 }
