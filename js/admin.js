@@ -213,7 +213,7 @@ function loadMenuData() {
     };
     categoryFilter.appendChild(allFilterBtn);
     
-    // Кнопки для каждой категории
+     // Кнопки для каждой категории
     menuCategories.forEach(category => {
         // Добавляем в фильтр
         const filterBtn = document.createElement('button');
