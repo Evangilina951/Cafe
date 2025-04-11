@@ -1,5 +1,6 @@
 import { db } from '/Cafe/js/firebase-config.js';
 import { menuCategories, menuItems, loadMenuFromFirebase } from '/Cafe/js/menu.js';
+import { currentUser } from '/Cafe/js/auth.js';
 
 const adminPanel = document.getElementById('admin-panel');
 const orderInterface = document.getElementById('order-interface');
@@ -496,6 +497,11 @@ function deleteMenuItem(id) {
 
 // Функции для управления Админ-панелью
 export function showAdminPanel() {
+    if (!currentUser || currentUser.email !== 'admin@dismail.com') {
+        alert("Доступ запрещен");
+        return;
+    }
+
     const adminPanel = document.getElementById('admin-panel');
     const orderInterface = document.getElementById('order-interface');
 
