@@ -8,9 +8,11 @@ const addItemForm = document.getElementById('add-item-form');
 
 let activeCategoryFilter = null;
 
+// Объединенная функция initAdmin
 export function initAdmin() {
     if (!adminPanel) return;
 
+    // Обработчики для кнопок
     document.querySelector('.admin-btn')?.addEventListener('click', showAdminPanel);
     document.querySelector('.back-btn')?.addEventListener('click', hideAdminPanel);
     document.querySelector('.add-category-btn')?.addEventListener('click', () => {
@@ -22,6 +24,34 @@ export function initAdmin() {
     });
     document.getElementById('add-category-btn')?.addEventListener('click', addCategory);
     document.getElementById('add-menu-item-btn')?.addEventListener('click', addMenuItem);
+
+    // Обработчики для элементов из объекта elements
+    if (elements.adminBtn) {
+        elements.adminBtn.addEventListener('click', showAdminPanel);
+    }
+    if (elements.backBtn) {
+        elements.backBtn.addEventListener('click', hideAdminPanel);
+    }
+    if (elements.addCategoryBtn) {
+        elements.addCategoryBtn.addEventListener('click', () => {
+            elements.addCategoryForm.style.display = 'block';
+        });
+    }
+    if (elements.addItemBtn) {
+        elements.addItemBtn.addEventListener('click', () => {
+            elements.addItemForm.style.display = 'block';
+            resetAddItemForm();
+        });
+    }
+    if (elements.confirmAddCategory) {
+        elements.confirmAddCategory.addEventListener('click', addCategory);
+    }
+    if (elements.confirmAddItem) {
+        elements.confirmAddItem.addEventListener('click', addMenuItem);
+    }
+
+    // Инициализация обработчиков ингредиентов
+    initIngredientsHandlers();
 }
 
 function showAdminPanel() {
@@ -462,37 +492,4 @@ function deleteMenuItem(id) {
             console.error("Ошибка удаления напитка:", error);
             alert("Не удалось удалить напиток");
         });
-}
-
-export function initAdmin() {
-    if (elements.adminBtn) {
-        elements.adminBtn.addEventListener('click', showAdminPanel);
-    }
-    
-    if (elements.backBtn) {
-        elements.backBtn.addEventListener('click', hideAdminPanel);
-    }
-    
-    if (elements.addCategoryBtn) {
-        elements.addCategoryBtn.addEventListener('click', () => {
-            elements.addCategoryForm.style.display = 'block';
-        });
-    }
-    
-    if (elements.addItemBtn) {
-        elements.addItemBtn.addEventListener('click', () => {
-            elements.addItemForm.style.display = 'block';
-            resetAddItemForm();
-        });
-    }
-    
-    if (elements.confirmAddCategory) {
-        elements.confirmAddCategory.addEventListener('click', addCategory);
-    }
-    
-    if (elements.confirmAddItem) {
-        elements.confirmAddItem.addEventListener('click', addMenuItem);
-    }
-    
-    initIngredientsHandlers();
 }
