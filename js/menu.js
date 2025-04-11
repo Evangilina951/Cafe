@@ -1,5 +1,6 @@
 import { db } from '/Cafe/js/firebase-config.js';
 import { currentUser } from '/Cafe/js/auth.js';
+import { addToOrder } from '/Cafe/js/order.js';
 
 let menuCategories = [];
 let menuItems = [];
@@ -101,7 +102,7 @@ function updateMainMenu() {
                     <div class="item-name">${item.name}</div>
                     <div class="item-price">${item.price} ₽</div>
                 `;
-                btn.onclick = () => addDrink(item.name, item.price);
+                btn.onclick = () => addToOrder(item.name, item.price);
                 buttonsContainer.appendChild(btn);
             });
             
@@ -111,16 +112,6 @@ function updateMainMenu() {
     } else {
         elements.menuColumns.innerHTML = '<div class="menu-error">Ошибка: Меню не загружено</div>';
     }
-}
-
-export function addDrink(name, price) {
-    if (!currentUser) {
-        alert("Сначала войдите в систему!");
-        return;
-    }
-    
-    // Здесь должна быть логика добавления в заказ, которая будет в order.js
-    console.log(`Добавлен напиток: ${name}, цена: ${price}`);
 }
 
 export { menuCategories, menuItems };
