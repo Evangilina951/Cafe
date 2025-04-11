@@ -85,10 +85,38 @@ function pay() {
         return;
     }
 
-    // Здесь должна быть логика оплаты
-    alert("Заказ сохранен!");
-    order = [];
-    updateOrderList();
+    let processedItems = 0;
+    const totalItems = order.reduce((sum, item) => sum + item.quantity, 0);
+    
+    order.forEach((item, index) => {
+        for (let i = 0; i < item.quantity; i++) {
+            const callbackName = `jsonpCallback_${Date.now()}_${index}_${i}`;
+            window[callbackName] = function(response) {
+                delete window[callbackName];
+                if (response.status !== "success") {
+                    console.error("Ошибка сохранения:", item.name, response.message);
+                }
+                
+                if (++processedItems === totalItems) {
+                    alert("Заказ сохранен!");
+                    order = [];
+                    updateOrderList();
+                }
+            };
+
+            const params = new URLSearchParams({
+                name: item.name,
+                price: item.price,
+                email: currentUser.email,
+                date: new Date().toISOString(),
+                callback: callbackName
+            });
+
+            const script = document.createElement('script');
+            script.src = `https://script.google.com/macros/s/AKfycbyVSEyq7_3pbSqlAcYR0SO1pgbUno63xTzK6vjYJmllmiGpfANxhSfvKpO-2fYaJq5F8Q/exec?${params}`;
+            document.body.appendChild(script);
+        }
+    });
 }
 
 // Инициализация обработчиков событий
