@@ -11,6 +11,11 @@ const elements = {
 };
 
 export function addToOrder(name, price) {
+    if (!currentUser) {
+        alert("Сначала войдите в систему!");
+        return;
+    }
+    
     const existingItem = order.find(item => item.name === name);
     if (existingItem) {
         existingItem.quantity += 1;
@@ -110,3 +115,5 @@ export function initOrder() {
         });
     }
 }
+
+export { order, updateOrderList };
