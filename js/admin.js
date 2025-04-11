@@ -142,10 +142,10 @@ function addMenuItem() {
         name,
         price,
         category,
-        ingredients
+        ingredients: ingredients // гарантируем наличие массива
     };
 
-    menuItems.push(newItem);
+     menuItems.push(newItem);
     updateMenuInFirebase()
         .then(() => {
             hideElement(elements.addItemForm);
@@ -250,15 +250,18 @@ function createMenuItemCard(item) {
     card.className = 'menu-item-card';
     card.dataset.id = item.id;
     
+    // Проверяем наличие ингредиентов и устанавливаем пустой массив, если их нет
+    const ingredients = item.ingredients || [];
+    
     card.innerHTML = `
         <div class="item-main-info">
             <div class="item-category">${item.category}</div>
             <div class="item-name">${item.name}</div>
             <div class="item-price">${item.price} ₽</div>
-            ${item.ingredients?.length ? `
+            ${ingredients.length ? `
                 <div class="item-ingredients">
                     <strong>Состав:</strong>
-                    <ul>${item.ingredients.map(ing => `<li>- ${ing}</li>`).join('')}</ul>
+                    <ul>${ingredients.map(ing => `<li>- ${ing}</li>`).join('')}</ul>
                 </div>
             ` : ''}
         </div>
@@ -291,7 +294,7 @@ function createMenuItemCard(item) {
             <div class="form-group">
                 <label>Состав:</label>
                 <div class="edit-ingredients-list">
-                    ${item.ingredients.map(ing => {
+                    ${ingredients.map(ing => {
                         const [name, ...quantityParts] = ing.split(' ');
                         const quantity = quantityParts.join(' ');
                         return `
