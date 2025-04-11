@@ -333,6 +333,28 @@ function setupAdminPanelHandlers() {
                 }
             }
         });
+
+        document.addEventListener('click', function(e) {
+        if (e.target.classList.contains('add-edit-ingredient-btn')) {
+            const editForm = e.target.closest('.edit-form');
+            if (!editForm) return;
+            
+            const ingredientsList = editForm.querySelector('.edit-ingredients-list');
+            const newIngredient = document.createElement('div');
+            newIngredient.className = 'ingredient-item';
+            newIngredient.innerHTML = `
+                <input type="text" class="ingredient-name" placeholder="Название">
+                <input type="text" class="ingredient-quantity" placeholder="Количество">
+                <button class="remove-ingredient-btn">×</button>
+            `;
+            ingredientsList.appendChild(newIngredient);
+        }
+        
+        // Обработчик для удаления ингредиентов
+        if (e.target.classList.contains('remove-ingredient-btn')) {
+            e.target.closest('.ingredient-item').remove();
+        }
+    });
     });
 
     // Удаление товара
