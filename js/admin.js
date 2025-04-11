@@ -287,11 +287,11 @@ function setupAdminPanelHandlers() {
         });
     });
 
-    // Удаление товара
+    // Удаление товара - ИСПРАВЛЕННАЯ ВЕРСИЯ
     document.querySelectorAll('.delete-item-btn').forEach(btn => {
         btn.addEventListener('click', () => {
             const itemId = parseInt(btn.closest('.menu-item-card')?.dataset.id);
-            if (!isNaN(itemId) {
+            if (!isNaN(itemId)) {
                 const index = menuItems.findIndex(item => item.id === itemId);
                 if (index !== -1 && confirm('Удалить этот товар?')) {
                     menuItems.splice(index, 1);
