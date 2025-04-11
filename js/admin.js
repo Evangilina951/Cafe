@@ -95,8 +95,8 @@ function resetAddItemForm() {
     elements.newItemPrice.value = '';
     elements.ingredientsList.innerHTML = `
         <div class="ingredient-item">
-            <input type="text" class="ingredient-name" placeholder="Название">
-            <input type="text" class="ingredient-quantity" placeholder="Количество">
+            <input type="text" class="ingredient-name" placeholder="Название (например: Говядина на кости)">
+            <input type="number" class="ingredient-quantity" placeholder="Количество" min="0.1" step="0.1" value="1">
             <button class="remove-ingredient-btn">×</button>
         </div>
     `;
@@ -117,8 +117,8 @@ function addIngredientField() {
     const newIngredient = document.createElement('div');
     newIngredient.className = 'ingredient-item';
     newIngredient.innerHTML = `
-        <input type="text" class="ingredient-name" placeholder="Название">
-        <input type="text" class="ingredient-quantity" placeholder="Количество">
+        <input type="text" class="ingredient-name" placeholder="Название (например: Говядина на кости)">
+        <input type="number" class="ingredient-quantity" placeholder="Количество" min="0.1" step="0.1" value="1">
         <button class="remove-ingredient-btn">×</button>
     `;
     elements.ingredientsList.appendChild(newIngredient);
@@ -163,7 +163,7 @@ function getIngredientsList() {
     return Array.from(document.querySelectorAll('.ingredient-item'))
         .map(item => {
             const name = item.querySelector('.ingredient-name')?.value.trim();
-            const quantity = item.querySelector('.ingredient-quantity')?.value.trim();
+            const quantity = item.querySelector('.ingredient-quantity')?.value;
             return name && quantity ? `${name} ${quantity}` : null;
         })
         .filter(Boolean);
@@ -250,7 +250,6 @@ function createMenuItemCard(item) {
     card.className = 'menu-item-card';
     card.dataset.id = item.id;
     
-    // Проверяем наличие ингредиентов и устанавливаем пустой массив, если их нет
     const ingredients = item.ingredients || [];
     
     card.innerHTML = `
@@ -295,12 +294,15 @@ function createMenuItemCard(item) {
                 <label>Состав:</label>
                 <div class="edit-ingredients-list">
                     ${ingredients.map(ing => {
-                        const [name, ...quantityParts] = ing.split(' ');
-                        const quantity = quantityParts.join(' ');
+                        // Разделяем на последнее число и название
+                        const parts = ing.split(' ');
+                        const quantity = parts.pop(); // Последний элемент - количество
+                        const name = parts.join(' '); // Все остальное - название
+                        
                         return `
                             <div class="ingredient-item">
                                 <input type="text" class="ingredient-name" value="${name}">
-                                <input type="text" class="ingredient-quantity" value="${quantity}">
+                                <input type="number" class="ingredient-quantity" value="${quantity}" min="0.1" step="0.1">
                                 <button class="remove-ingredient-btn">×</button>
                             </div>
                         `;
@@ -349,6 +351,30 @@ function setupAdminPanelHandlers() {
         });
     });
 
+    // Делегирование событий для кнопок добавления/удаления ингредиентов
+    document.addEventListener('click', function(e) {
+        // Добавление ингредиента
+        if (e.target.classList.contains('add-edit-ingredient-btn')) {
+            const editForm = e.target.closest('.edit-form');
+            if (!editForm) return;
+            
+            const ingredientsList = editForm.querySelector('.edit-ingredients-list');
+            const newIngredient = document.createElement('div');
+            newIngredient.className = 'ingredient-item';
+            newIngredient.innerHTML = `
+                <input type="text" class="ingredient-name" placeholder="Название (например: Говядина на кости)">
+                <input type="number" class="ingredient-quantity" placeholder="Количество" min="0.1" step="0.1" value="1">
+                <button class="remove-ingredient-btn">×</button>
+            `;
+            ingredientsList.appendChild(newIngredient);
+        }
+        
+        // Удаление ингредиента
+        if (e.target.classList.contains('remove-ingredient-btn')) {
+            e.target.closest('.ingredient-item')?.remove();
+        }
+    });
+
     // Редактирование товара
     document.querySelectorAll('.edit-item-btn').forEach(btn => {
         btn.addEventListener('click', function() {
@@ -357,36 +383,6 @@ function setupAdminPanelHandlers() {
             
             // Переключаем видимость формы
             editForm.classList.toggle('hidden');
-            
-            // Очищаем старые обработчики
-            const addBtn = editForm.querySelector('.add-edit-ingredient-btn');
-            const newAddBtn = addBtn.cloneNode(true);
-            addBtn.parentNode.replaceChild(newAddBtn, addBtn);
-            
-            // Инициализация обработчиков для формы редактирования
-            newAddBtn.addEventListener('click', function() {
-                const ingredientsList = editForm.querySelector('.edit-ingredients-list');
-                const newIngredient = document.createElement('div');
-                newIngredient.className = 'ingredient-item';
-                newIngredient.innerHTML = `
-                    <input type="text" class="ingredient-name" placeholder="Название">
-                    <input type="text" class="ingredient-quantity" placeholder="Количество">
-                    <button class="remove-ingredient-btn">×</button>
-                `;
-                ingredientsList.appendChild(newIngredient);
-                
-                // Обработчик удаления для нового ингредиента
-                newIngredient.querySelector('.remove-ingredient-btn').addEventListener('click', function() {
-                    this.closest('.ingredient-item').remove();
-                });
-            });
-            
-            // Обработчики для существующих кнопок удаления
-            editForm.querySelectorAll('.remove-ingredient-btn').forEach(ingBtn => {
-                ingBtn.addEventListener('click', function() {
-                    this.closest('.ingredient-item').remove();
-                });
-            });
             
             // Сохранение изменений
             editForm.querySelector('.save-edit-btn').addEventListener('click', () => {
@@ -412,17 +408,22 @@ function saveEditedItem(itemCard) {
     
     // Получаем список ингредиентов
     const ingredients = [];
+    let isValid = true;
+    
     editForm.querySelectorAll('.ingredient-item').forEach(item => {
         const ingName = item.querySelector('.ingredient-name').value.trim();
-        const ingQuantity = item.querySelector('.ingredient-quantity').value.trim();
-        if (ingName && ingQuantity) {
+        const ingQuantity = item.querySelector('.ingredient-quantity').value;
+        
+        if (!ingName || !ingQuantity || parseFloat(ingQuantity) < 0.1) {
+            isValid = false;
+            item.querySelector('.ingredient-quantity').style.borderColor = 'red';
+        } else {
             ingredients.push(`${ingName} ${ingQuantity}`);
         }
     });
     
-    // Валидация
-    if (!name || isNaN(price) || !category || ingredients.length === 0) {
-        alert('Заполните все обязательные поля и добавьте хотя бы один ингредиент!');
+    if (!isValid || !name || isNaN(price) || !category || ingredients.length === 0) {
+        alert('Проверьте данные:\n- Все поля должны быть заполнены\n- Количество должно быть числом ≥ 0.1\n- Должен быть хотя бы один ингредиент');
         return;
     }
     
