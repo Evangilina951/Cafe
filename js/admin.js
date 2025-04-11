@@ -19,7 +19,6 @@ const elements = {
 };
 
 let activeCategoryFilter = null;
-let currentlyEditingItem = null;
 
 // Вспомогательные функции
 function showElement(element) {
@@ -43,14 +42,28 @@ function setupButton(selector, handler) {
 
 // Основные функции админ-панели
 export function initAdmin() {
+    // Проверяем, находимся ли мы на странице админ-панели
+    if (!window.location.pathname.includes('admin.html')) {
+        return;
+    }
+
     if (!elements.adminPanel) {
         console.error("Admin panel element not found");
         return;
     }
 
+    // Проверка прав администратора
+    if (!currentUser || currentUser.email !== 'admin@dismail.com') {
+        alert("Доступ разрешен только администратору");
+        window.location.href = '/Cafe/index.html';
+        return;
+    }
+
     // Настройка обработчиков кнопок
-    setupButton('.admin-btn', showAdminPanel);
-    setupButton('.back-btn', hideAdminPanel);
+    setupButton('.back-btn', () => {
+        window.location.href = '/Cafe/index.html';
+    });
+    
     setupButton('.add-category-btn', () => showElement(elements.addCategoryForm));
     setupButton('.add-item-btn', () => {
         showElement(elements.addItemForm);
@@ -60,26 +73,7 @@ export function initAdmin() {
     setupButton('#add-menu-item-btn', addMenuItem);
 
     initIngredientsHandlers();
-}
-
-function showAdminPanel() {
-    if (!currentUser || currentUser.email !== 'admin@dismail.com') {
-        alert("Доступ разрешен только администратору");
-        return;
-    }
-
-    if (elements.adminPanel && elements.orderInterface) {
-        showElement(elements.adminPanel);
-        hideElement(elements.orderInterface);
-        loadMenuData();
-    }
-}
-
-function hideAdminPanel() {
-    if (elements.adminPanel && elements.orderInterface) {
-        hideElement(elements.adminPanel);
-        showElement(elements.orderInterface);
-    }
+    loadMenuData();
 }
 
 function resetAddItemForm() {
@@ -448,4 +442,17 @@ function addCategory() {
     } else {
         alert('Категория с таким названием уже существует');
     }
+}
+
+// Инициализация админ-панели только если мы на нужной странице
+if (window.location.pathname.includes('admin.html')) {
+    // Ждем проверки авторизации перед инициализацией
+    const auth = (await import('/Cafe/js/firebase-config.js')).auth;
+    auth.onAuthStateChanged(user => {
+        if (user && user.email === 'admin@dismail.com') {
+            initAdmin();
+        } else {
+            window.location.href = '/Cafe/index.html';
+        }
+    });
 }
