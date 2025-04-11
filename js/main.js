@@ -3,6 +3,21 @@ import { loadMenuFromFirebase } from '/Cafe/js/menu.js';
 import { initOrder } from '/Cafe/js/order.js';
 import { initAdmin } from '/Cafe/js/admin.js';
 import { auth } from '/Cafe/js/firebase-config.js'; // Явный импорт auth
+import { showAdminPanel, hideAdminPanel } from '/Cafe/js/admin.js'; //Импорт входа в Админ-панель
+
+//Для работы входа в Админ-панель
+document.addEventListener('DOMContentLoaded', () => {
+    const adminBtn = document.querySelector('.admin-btn');
+    const backBtn = document.querySelector('.back-btn');
+
+    if (adminBtn) {
+        adminBtn.addEventListener('click', showAdminPanel);
+    }
+
+    if (backBtn) {
+        backBtn.addEventListener('click', hideAdminPanel);
+    }
+});
 
 //Для работы кнопки оплаты
 document.addEventListener('DOMContentLoaded', () => {
