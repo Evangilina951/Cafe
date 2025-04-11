@@ -49,7 +49,6 @@
     transition: background-color 0.3s;
 }
 
-
 .add-category-btn:hover, .add-item-btn:hover {
     background-color: #5a2b19;
 }
@@ -92,14 +91,19 @@
 
 .menu-management {
     display: grid;
-    grid-template-columns: 300px 1fr; /* Категории слева (300px), блюда справа (остальное место) */
+    grid-template-columns: 300px 1fr;
     gap: 20px;
     align-items: start;
 }
 
 .categories-list {
-    border-right: 1px solid #d7ccc8; /* Цвет как в оригинале */
+    border-right: 1px solid #d7ccc8;
     padding-right: 20px;
+    height: 100%;
+}
+
+.menu-items-container {
+    padding-left: 20px;
 }
 
 .categories-list h3 {
@@ -141,7 +145,7 @@
 
 .menu-items-container {
     display: flex;
-    flex-direction: column; /* Фильтр сверху, блюда снизу */
+    flex-direction: column;
     gap: 15px;
 }
 
@@ -178,24 +182,41 @@
     border: 1px solid #ddd;
     border-radius: 12px;
     padding: 20px;
+    margin-bottom: 15px;
 }
 
-.item-main-info {
-    width: 100%;
+.item-category {
+    color: #6d341f;
+    font-size: 14px;
+    margin-bottom: 5px;
 }
 
-.menu-item-card .item-name {
+.item-name {
     font-size: 16px;
     font-weight: bold;
     color: #6d341f;
-    margin-bottom: 8px;
+    margin-bottom: 5px;
 }
 
-.menu-item-card .item-price {
+.item-price {
     color: #6d341f;
     font-weight: bold;
-    margin-bottom: 8px;
-    text-align: left;
+    margin-bottom: 10px;
+}
+
+.item-ingredients {
+    margin-top: 10px;
+}
+
+.item-ingredients ul {
+    list-style-type: none;
+    padding-left: 0;
+    margin-top: 5px;
+}
+
+.item-ingredients li {
+    padding: 2px 0;
+    font-size: 14px;
 }
 
 .item-actions {
@@ -228,32 +249,33 @@
     padding: 20px;
     background-color: rgba(255, 255, 255, 0.8);
     border-radius: 8px;
+    border: 1px solid #ddd;
 }
 
 .form-group {
-    margin-bottom: 20px;
+    margin-bottom: 15px;
 }
 
 .form-group label {
     display: block;
-    margin-bottom: 8px;
+    margin-bottom: 5px;
     font-weight: bold;
     color: #6d341f;
 }
 
-.form-group input, .form-group select {
+.form-group input, 
+.form-group select {
     width: 100%;
-    padding: 10px 12px;
+    padding: 8px 12px;
     border: 1px solid #ddd;
-    border-radius: 6px;
-    font-size: 16px;
+    border-radius: 4px;
+    font-size: 14px;
 }
 
 .edit-ingredients-list {
-    margin-top: 15px;
+    margin-top: 10px;
 }
 
-/* Стили для списка ингредиентов */
 .ingredient-item {
     display: flex;
     gap: 10px;
@@ -261,7 +283,8 @@
     align-items: center;
 }
 
-.ingredient-name, .ingredient-quantity {
+.ingredient-name, 
+.ingredient-quantity {
     flex: 1;
     padding: 10px 12px;
     border: 1px solid #ddd;
@@ -301,7 +324,8 @@
     margin-top: 20px;
 }
 
-.save-edit-btn, .cancel-edit-btn {
+.save-edit-btn, 
+.cancel-edit-btn {
     padding: 10px 20px;
     border-radius: 6px;
     cursor: pointer;
@@ -318,59 +342,4 @@
     background-color: #c62828;
     color: white;
     border: none;
-}
-
-/* Дополнительные стили для формы редактирования */
-.edit-form {
-    margin-top: 20px;
-    padding: 20px;
-    background-color: rgba(255, 255, 255, 0.8);
-    border-radius: 8px;
-    border: 1px solid #ddd;
-}
-
-.edit-form .form-group {
-    margin-bottom: 15px;
-}
-
-.edit-form label {
-    display: block;
-    margin-bottom: 5px;
-    font-weight: bold;
-    color: #6d341f;
-}
-
-.edit-form input, 
-.edit-form select {
-    width: 100%;
-    padding: 8px 12px;
-    border: 1px solid #ddd;
-    border-radius: 4px;
-    font-size: 14px;
-}
-
-.edit-ingredients-list {
-    margin-top: 10px;
-}
-
-.edit-form .form-actions {
-    display: flex;
-    gap: 10px;
-    margin-top: 15px;
-}
-
-.edit-form .save-edit-btn,
-.edit-form .cancel-edit-btn {
-    padding: 8px 16px;
-    font-size: 14px;
-}
-
-.edit-form .save-edit-btn {
-    background-color: #4CAF50;
-    color: white;
-}
-
-.edit-form .cancel-edit-btn {
-    background-color: #c62828;
-    color: white;
 }
