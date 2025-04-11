@@ -1,12 +1,16 @@
 import { initAuth, currentUser } from '/Cafe/js/auth.js';
 import { loadMenuFromFirebase } from '/Cafe/js/menu.js';
 import { initOrder } from '/Cafe/js/order.js';
-import { initAdmin } from '/Cafe/js/admin.js';
+import { initAdmin, showAdminPanel, hideAdminPanel } from '/Cafe/js/admin.js'; // Импорт из admin.js
 import { auth } from '/Cafe/js/firebase-config.js'; // Явный импорт auth
-import { showAdminPanel, hideAdminPanel } from '/Cafe/js/admin.js'; //Импорт входа в Админ-панель
 
-//Для работы входа в Админ-панель
 document.addEventListener('DOMContentLoaded', () => {
+    // Инициализация модулей
+    initAuth();
+    initOrder();
+    initAdmin();
+
+    // Обработчики для админ-панели
     const adminBtn = document.querySelector('.admin-btn');
     const backBtn = document.querySelector('.back-btn');
 
@@ -17,30 +21,7 @@ document.addEventListener('DOMContentLoaded', () => {
     if (backBtn) {
         backBtn.addEventListener('click', hideAdminPanel);
     }
-});
 
-//Для работы кнопки оплаты
-document.addEventListener('DOMContentLoaded', () => {
-    initOrder();
-});
-
-// Функция для показа админ-панели (добавлена, так как она используется)
-function showAdminPanel() {
-    const adminPanel = document.getElementById('admin-panel');
-    const orderInterface = document.getElementById('order-interface');
-    if (adminPanel && orderInterface) {
-        adminPanel.style.display = 'block';
-        adminPanel.classList.remove('hidden');
-        orderInterface.style.display = 'none';
-    }
-}
-
-document.addEventListener('DOMContentLoaded', () => {
-    // Инициализация модулей
-    initAuth();
-    initOrder();
-    initAdmin();
-    
     // Проверка авторизации и загрузка меню
     auth.onAuthStateChanged(user => {
         if (user) {
@@ -58,4 +39,4 @@ document.addEventListener('DOMContentLoaded', () => {
         addItemForm.style.flexDirection = 'column';
         addItemForm.style.gap = '10px';
     }
-}); 
+});
