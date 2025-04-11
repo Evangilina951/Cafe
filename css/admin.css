@@ -1,3 +1,17 @@
+* {
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
+}
+
+body {
+    font-family: 'Arial', sans-serif;
+    background-color: #ffefdc;
+    color: #6d341f;
+    height: 100vh;
+    overflow: hidden;
+}
+
 #admin-panel {
     position: fixed;
     top: 0;
@@ -44,49 +58,46 @@
     background-color: #6d341f;
     color: white;
     border: none;
-    border-radius: 8px;
-    cursor: pointer;
-    transition: background-color 0.3s;
+    border-radius: 8box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+    text-align: center;
+    z-index: 1000;
 }
 
-.add-category-btn:hover, .add-item-btn:hover {
-    background-color: #5a2b19;
-}
-
-#add-category-form, #add-item-form {
-    display: flex;
-    flex-direction: column;
-    gap: 20px;
-    margin-bottom: 25px;
-    padding: 25px;
-    background-color: rgba(255, 255, 255, 0.7);
-    border-radius: 12px;
-    max-width: 500px;
-}
-
-#add-category-form input,
-#add-item-form input,
-#add-item-form select {
+#auth-form input {
+    width: 100%;
     padding: 12px 15px;
+    margin: 10px 0;
     border: 1px solid #d7ccc8;
     border-radius: 8px;
     font-size: 16px;
-    width: 100%;
+    background-color: #fff;
 }
 
-#add-category-form button,
-#add-item-form button {
+#auth-form button {
+    width: 100%;
     padding: 12px;
+    margin-top: 15px;
+    background-color: #6d341f;
+    color: white;
     border: none;
     border-radius: 8px;
     font-size: 16px;
     cursor: pointer;
-    margin-top: 10px;
+    transition: background-color 0.3s;
 }
 
-#add-category-btn {
-    background-color: #6d341f;
-    color: white;
+#auth-form button:hover {
+    background-color: #5a2b19;
+}
+
+#error-message {
+    color: #c62828;
+    margin-top: 10px;
+    font-size: 14px;
+}
+
+.hidden {
+    display: none !important;
 }
 
 .menu-management {
@@ -129,188 +140,101 @@
     padding: 5px 10px;
     cursor: pointer;
     font-size: 16px;
-    width: 28px;
-    height: 28px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
+    width: 28box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+    text-align: center;
+    z-index: 1000;
 }
 
-.menu-items-container {
-    display: flex;
-    flex-direction: column;
-}
-
-.category-filter {
-    display: flex;
-    gap: 10px;
-    margin-bottom: 15px;
-    flex-wrap: wrap;
-}
-
-.filter-btn {
-    padding: 8px 12px;
-    background-color: #6d341f;
-    color: white;
-    border: none;
-    border-radius: 4px;
-    cursor: pointer;
-    font-size: 14px;
-}
-
-.filter-btn.active {
-    background-color: #4CAF50;
-}
-
-.menu-items-grid {
-    display: grid;
-    grid-template-columns: repeat(2, 1fr);
-    gap: 20px;
-    align-content: start;
-}
-
-.menu-item-card {
-    background-color: rgba(255, 255, 255, 0.7);
-    border: 1px solid #ddd;
-    border-radius: 12px;
-    padding: 20px;
-}
-
-.item-main-info {
+#auth-form input {
     width: 100%;
-}
-
-.menu-item-card .item-name {
-    font-size: 16px;
-    font-weight: bold;
-    color: #6d341f;
-    margin-bottom: 8px;
-}
-
-.menu-item-card .item-price {
-    color: #6d341f;
-    font-weight: bold;
-    margin-bottom: 8px;
-    text-align: left;
-}
-
-.item-actions {
-    display: flex;
-    gap: 10px;
-    margin-top: 15px;
-}
-
-.edit-item-btn, .delete-item-btn {
-    padding: 8px 12px;
-    border: none;
-    border-radius: 6px;
-    cursor: pointer;
-    font-size: 14px;
-}
-
-.edit-item-btn {
-    background-color: #6d341f;
-    color: white;
-}
-
-.delete-item-btn {
-    background-color: #c62828;
-    color: white;
-}
-
-.edit-form {
-    width: 100%;
-    margin-top: 20px;
-    padding: 20px;
-    background-color: rgba(255, 255, 255, 0.8);
+    padding: 12px 15px;
+    margin: 10px 0;
+    border: 1px solid #d7ccc8;
     border-radius: 8px;
+    font-size: 16px;
+    background-color: #fff;
 }
 
-.form-group {
-    margin-bottom: 20px;
-}
-
-.form-group label {
-    display: block;
-    margin-bottom: 8px;
-    font-weight: bold;
-    color: #6d341f;
-}
-
-.form-group input, .form-group select {
+#auth-form button {
     width: 100%;
-    padding: 10px 12px;
-    border: 1px solid #ddd;
-    border-radius: 6px;
-    font-size: 16px;
-}
-
-.edit-ingredients-list {
+    padding: 12px;
     margin-top: 15px;
-}
-
-.ingredient-item {
-    display: flex;
-    gap: 10px;
-    margin-bottom: 12px;
-    align-items: center;
-}
-
-.ingredient-name, .ingredient-quantity {
-    flex: 1;
-    padding: 10px 12px;
-    border: 1px solid #ddd;
-    border-radius: 6px;
-    font-size: 16px;
-}
-
-.remove-ingredient-btn {
-    background-color: #c62828;
+    background-color: #6d341f;
     color: white;
     border: none;
-    border-radius: 6px;
-    padding: 10px;
+    border-radius: 8px;
+    font-size: 16px;
     cursor: pointer;
-    width: 36px;
-    height: 36px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
+    transition: background-color 0.3s;
+}
+
+#auth-form button:hover {
+    background-color: #5a2b19;
+}
+
+#error-message {
+    color: #c62828;
+    margin-top: 10px;
+    font-size: 14px;
+}
+
+.hidden {
+    display: none !important;
+}
+
+.menu-management {
+    display: grid;
+    grid-template-columns: 300px 1fr;
+    gap: 20px;
+}
+
+.categories-list {
+    padding-right: 20px;
+}
+
+.categories-list h3 {
+    margin-bottom: 20px;
+    text-align: center;
     font-size: 18px;
 }
 
-.add-edit-ingredient-btn {
+.category-card {
+    background-color: rgba(255, 255, 255, 0.7);
+    border: 1px solid #ddd;
+    border-radius: 12box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+    text-align: center;
+    z-index: 1000;
+}
+
+#auth-form input {
+    width: 100%;
+    padding: 12px 15px;
+    margin: 10px 0;
+    border: 1px solid #d7ccc8;
+    border-radius: 8px;
+    font-size: 16px;
+    background-color: #fff;
+}
+
+#auth-form button {
+    width: 100%;
+    padding: 12px;
+    margin-top: 15px;
     background-color: #6d341f;
     color: white;
     border: none;
-    padding: 10px 15px;
-    border-radius: 6px;
-    cursor: pointer;
-    margin-top: 15px;
+    border-radius: 8px;
     font-size: 16px;
-}
-
-.form-actions {
-    display: flex;
-    gap: 15px;
-    margin-top: 20px;
-}
-
-.save-edit-btn, .cancel-edit-btn {
-    padding: 10px 20px;
-    border-radius: 6px;
     cursor: pointer;
-    font-size: 16px;
+    transition: background-color 0.3s;
 }
 
-.save-edit-btn {
-    background-color: #4CAF50;
-    color: white;
-    border: none;
+#auth-form button:hover {
+    background-color: #5a2b19;
 }
 
-.cancel-edit-btn {
-    background-color: #c62828;
-    color: white;
-    border: none;
+#error-message {
+    color: #c62828;
+    margin-top: 10px;
+    font-size: 14px;
 }
