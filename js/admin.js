@@ -2,6 +2,9 @@ import { db } from '/Cafe/js/firebase-config.js';
 import { menuCategories, menuItems } from '/Cafe/js/menu.js';
 import { currentUser } from '/Cafe/js/auth.js';
 
+let menuCategories = [];
+let menuItems = [];
+
 // Получаем DOM элементы
 const elements = {
     adminPanel: document.getElementById('admin-panel'),
@@ -59,6 +62,17 @@ export function initAdmin() {
         return;
     }
 
+     try {
+        // Явно загружаем данные из Firebase
+        const { loadMenuFromFirebase } = await import('/Cafe/js/menu.js');
+        await loadMenuFromFirebase();
+        
+        // Обновляем локальные переменные
+        menuCategories = [...window.menuCategories];
+        menuItems = [...window.menuItems];
+        
+        console.log("Данные загружены:", { menuCategories, menuItems });
+
     // Настройка обработчиков кнопок
     setupButton('.back-btn', () => {
         window.location.href = '/Cafe/index.html';
@@ -74,6 +88,9 @@ export function initAdmin() {
 
     initIngredientsHandlers();
     loadMenuData();
+     } catch (error) {
+        console.error("Ошибка инициализации админ-панели:", error);
+    }
 }
 
 function resetAddItemForm() {
