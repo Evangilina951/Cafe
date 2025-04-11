@@ -493,3 +493,24 @@ function deleteMenuItem(id) {
             alert("Не удалось удалить напиток");
         });
 }
+
+// Функции для управления Админ-панелью
+export function showAdminPanel() {
+    const adminPanel = document.getElementById('admin-panel');
+    const orderInterface = document.getElementById('order-interface');
+
+    if (adminPanel && orderInterface) {
+        adminPanel.classList.remove('hidden');
+        orderInterface.classList.add('hidden');
+    }
+}
+
+export function hideAdminPanel() {
+    const adminPanel = document.getElementById('admin-panel');
+    const orderInterface = document.getElementById('order-interface');
+
+    if (adminPanel && orderInterface) {
+        adminPanel.classList.add('hidden');
+        orderInterface.classList.remove('hidden');
+    }
+}
