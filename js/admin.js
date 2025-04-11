@@ -5,7 +5,7 @@ import { currentUser } from '/Cafe/js/auth.js';
 // Получаем DOM элементы
 const elements = {
     adminPanel: document.getElementById('admin-panel'),
-    orderInterface: document.getElementById('order-interface'),
+    backBtn: document.querySelector('.back-btn'),
     addCategoryForm: document.getElementById('add-category-form'),
     addItemForm: document.getElementById('add-item-form'),
     newCategoryName: document.getElementById('new-category-name'),
