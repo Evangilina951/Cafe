@@ -115,3 +115,6 @@ function updateMainMenu() {
 }
 
 export { menuCategories, menuItems };
+
+window.menuCategories = menuCategories;
+window.menuItems = menuItems;
