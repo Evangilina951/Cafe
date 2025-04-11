@@ -6,6 +6,10 @@
     <title>Кофейня</title>
     <link rel="stylesheet" href="/Cafe/css/auth.css">
     <link rel="stylesheet" href="/Cafe/css/main.css">
+     <!-- Подключение Firebase через CDN -->
+    <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-app.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-auth.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-database.js"></script>
 </head>
 <body>
     <!-- Форма авторизации -->
@@ -49,11 +53,7 @@
             </div>
         </div>
     </div>
-
-    <!-- Firebase -->
-    <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-app.js"></script>
-    <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-auth.js"></script>
-    <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-database.js"></script>
+    <script type="module" src="/Cafe/js/firebase-config.js"></script>
     <script type="module" src="/Cafe/js/main.js"></script>
 </body>
 </html>
