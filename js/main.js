@@ -4,6 +4,17 @@ import { initOrder } from '/Cafe/js/order.js';
 import { initAdmin } from '/Cafe/js/admin.js';
 import { auth } from '/Cafe/js/firebase-config.js'; // Явный импорт auth
 
+// Функция для показа админ-панели (добавлена, так как она используется)
+function showAdminPanel() {
+    const adminPanel = document.getElementById('admin-panel');
+    const orderInterface = document.getElementById('order-interface');
+    if (adminPanel && orderInterface) {
+        adminPanel.style.display = 'block';
+        adminPanel.classList.remove('hidden');
+        orderInterface.style.display = 'none';
+    }
+}
+
 document.addEventListener('DOMContentLoaded', () => {
     // Инициализация модулей
     initAuth();
@@ -19,7 +30,6 @@ document.addEventListener('DOMContentLoaded', () => {
             }
         }
     });
-});
 
     // Стили для формы добавления напитка
     const addItemForm = document.getElementById('add-item-form');
@@ -28,4 +38,4 @@ document.addEventListener('DOMContentLoaded', () => {
         addItemForm.style.flexDirection = 'column';
         addItemForm.style.gap = '10px';
     }
-});
+}); 
