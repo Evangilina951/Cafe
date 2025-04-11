@@ -1,8 +1,8 @@
 import { initAuth, currentUser } from '/Cafe/js/auth.js';
 import { loadMenuFromFirebase } from '/Cafe/js/menu.js';
 import { initOrder } from '/Cafe/js/order.js';
-import { initAdmin, showAdminPanel, hideAdminPanel } from '/Cafe/js/admin.js'; // Импорт из admin.js
-import { auth } from '/Cafe/js/firebase-config.js'; // Явный импорт auth
+import { initAdmin, showAdminPanel, hideAdminPanel } from '/Cafe/js/admin.js';
+import { auth } from '/Cafe/js/firebase-config.js';
 
 document.addEventListener('DOMContentLoaded', () => {
     // Инициализация модулей
