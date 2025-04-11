@@ -6,8 +6,7 @@
     <title>Кофейня</title>
     <link rel="stylesheet" href="/Cafe/css/auth.css">
     <link rel="stylesheet" href="/Cafe/css/main.css">
-    <link rel="stylesheet" href="/Cafe/css/admin.css">
-    <!-- Подключение Firebase через CDN -->
+    <!-- Firebase -->
     <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-app.js"></script>
     <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-auth.js"></script>
     <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-database.js"></script>
@@ -31,9 +30,9 @@
                 <button class="admin-btn">Управление меню</button>
                 <button class="logout-btn">Выйти</button>
             </div>
-
+            
             <div class="menu-divider"></div>
-
+            
             <div class="menu-columns" id="menu-columns">
                 <!-- Колонки будут загружены динамически -->
             </div>
@@ -43,58 +42,15 @@
         <div class="order-section">
             <h2>Текущий заказ</h2>
             <ul id="order-list"></ul>
-
+            
             <div class="order-total">
                 Итого к оплате: <span id="total">0</span> ₽
             </div>
-
+            
             <div class="action-buttons">
                 <button class="action-btn clear-btn">Очистить</button>
                 <button class="action-btn pay-btn">Оплатить</button>
             </div>
-        </div>
-    </div>
-
-    <!-- Админ-панель -->
-    <div id="admin-panel" class="hidden">
-        <h2>Управление меню</h2>
-        <button class="back-btn">← Назад к заказу</button>
-
-        <!-- Управление категориями -->
-        <div class="admin-section">
-            <h3>Категории</h3>
-            <button class="add-category-btn">Добавить категорию</button>
-            <div id="categories-list"></div>
-            <form id="add-category-form" class="hidden">
-                <input type="text" id="new-category-name" placeholder="Название категории">
-                <button type="button" id="add-category-btn">Добавить</button>
-            </form>
-        </div>
-
-        <!-- Управление напитками -->
-        <div class="admin-section">
-            <h3>Напитки</h3>
-            <button class="add-item-btn">Добавить напиток</button>
-            <div id="menu-items-list"></div>
-            <form id="add-item-form" class="hidden">
-                <input type="text" id="new-item-name" placeholder="Название напитка">
-                <input type="number" id="new-item-price" placeholder="Цена">
-                <select id="new-item-category"></select>
-                <div id="ingredients-list">
-                    <div class="ingredient-item">
-                        <input type="text" class="ingredient-name" placeholder="Название ингредиента">
-                        <input type="text" class="ingredient-quantity" placeholder="Количество">
-                        <button class="remove-ingredient-btn">×</button>
-                    </div>
-                </div>
-                <button type="button" id="add-menu-item-btn">Добавить</button>
-            </form>
-        </div>
-
-        <!-- Фильтр по категориям -->
-        <div class="admin-section">
-            <h3>Фильтр</h3>
-            <div id="category-filter"></div>
         </div>
     </div>
 
@@ -103,7 +59,6 @@
     <script type="module" src="/Cafe/js/auth.js"></script>
     <script type="module" src="/Cafe/js/menu.js"></script>
     <script type="module" src="/Cafe/js/order.js"></script>
-    <script type="module" src="/Cafe/js/admin.js"></script>
     <script type="module" src="/Cafe/js/main.js"></script>
 </body>
 </html>
