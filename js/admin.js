@@ -1,5 +1,5 @@
 import { db } from '/Cafe/js/firebase-config.js';
-import { menuCategories, menuItems, loadMenuFromFirebase } from '/Cafe/js/menu.js';
+import { menuCategories, menuItems } from '/Cafe/js/menu.js';
 import { currentUser } from '/Cafe/js/auth.js';
 
 // Получаем все необходимые DOM элементы
@@ -21,15 +21,26 @@ const elements = {
 let activeCategoryFilter = null;
 
 // Инициализация админ-панели
-export function initAdmin() {
-  if (!elements.adminPanel) {
-    console.error("Admin panel element not found");
-    return;
-  }
+if (!adminPanel) return;
+
+    // Обработчики кнопок
+    document.querySelector('.admin-btn')?.addEventListener('click', () => {
+        if (!currentUser || currentUser.email !== 'admin@dismail.com') {
+            alert("Доступ разрешен только администратору");
+            return;
+        }
+        adminPanel.style.display = 'block';
+        if (orderInterface) orderInterface.style.display = 'none';
+        loadMenuData();
+    });
+
+  
 
   // Назначаем обработчики событий
   document.querySelector('.admin-btn')?.addEventListener('click', showAdminPanel);
-  document.querySelector('.back-btn')?.addEventListener('click', hideAdminPanel);
+  document.querySelector('.back-btn')?.addEventListener('click', () => {
+        if (adminPanel) adminPanel.style.display = 'none';
+        if (orderInterface) orderInterface.style.display = 'block';
   document.querySelector('.add-category-btn')?.addEventListener('click', () => {
     elements.addCategoryForm.style.display = 'block';
   });
