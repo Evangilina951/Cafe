@@ -17,7 +17,7 @@ const elements = {
     addCategoryBtn: document.querySelector('.add-category-btn'),
     addItemBtn: document.querySelector('.add-item-btn'),
     addCategoryForm: document.getElementById('add-category-form'),
-    addItemForm: document.getElementById('add-item-form'),
+    addItemForm: document.getElementById 'add-item-form'),
     newCategoryName: document.getElementById('new-category-name'),
     newItemName: document.getElementById('new-item-name'),
     newItemPrice: document.getElementById('new-item-price'),
@@ -96,7 +96,7 @@ function resetAddItemForm() {
     elements.ingredientsList.innerHTML = `
         <div class="ingredient-item">
             <input type="text" class="ingredient-name" placeholder="Название ингредиента">
-            <input type="text" class="ingredient-quantity, placeholder="Количество">
+            <input type="text" class="ingredient-quantity" placeholder="Количество">
             <button class="remove-ingredient-btn">×</button>
         </div>
     `;
@@ -149,7 +149,7 @@ function addMenuItem() {
 
 function updateMenuInFirebase() {
     const itemsObj = {};
-    menuItems.forEach(item => {
+    menuItems.forEach item => {
         itemsObj['item' + item.id] = item;
     });
     
@@ -169,19 +169,19 @@ function initIngredientsHandlers() {
                 <input type="text" class="ingredient-quantity" placeholder="Количество">
                 <button class="removeIngredient-btn">×</button>
             `;
-            elements.ingredientsList.appendChild(newIngredient);
+            elements.ingredientsList.appendChild newIngredient);
             
             newIngredient.querySelector('.removeIngredient-btn').addEventListener('click', function() {
-                elements.ingredientsList.removeChild(newIngredient);
+                elements.ingredientsList.removeChild newIngredient);
             });
         });
     }
     
-    document.querySelectorAll('.remove-ingredient-btn').forEach(btn => {
+    document.querySelectorAll '.remove-ingredient-btn').forEach(btn => {
         btn.addEventListener('click', function() {
-            const ingredientItem = this.closest('.ingredient-item');
+            const ingredientItem = this.closest '.ingredient-item');
             if (ingredientItem && ingredientItem.parentNode) {
-                ingredientItem.parentNode.removeChild(ingredientItem);
+                ingredientItem.parentNode.removeChild ingredientItem);
             }
         });
     });
@@ -190,8 +190,8 @@ function initIngredientsHandlers() {
 function loadMenuData() {
     if (!adminPanel || adminPanel.classList.contains('hidden')) return;
     
-    const categoriesList = document.getElementById('categories-list');
-    const itemsList = document.getElementById('menu-items-list');
+    const categoriesList = document.getElementById 'categories-list');
+    const itemsList document.getElementById('menu-items-list');
     const categorySelect = document.getElementById('new-item-category');
     const categoryFilter = document.getElementById('category-filter');
     
@@ -205,7 +205,7 @@ function loadMenuData() {
     
     // Кнопка "Все категории"
     const allFilterBtn = document.createElement('button');
-    allFilterBtn.className = 'filter-btn' + (activeCategoryFilter === null ? ' active' : '');
+    allFilterBtn.className = 'filter-btn' + activeCategoryFilter === null ? ' active' : '');
     allFilterBtn.textContent = 'Все';
     allFilterBtn.onclick = () => {
         activeCategoryFilter = null;
@@ -213,11 +213,11 @@ function loadMenuData() {
     };
     categoryFilter.appendChild(allFilterBtn);
     
-     // Кнопки для каждой категории
+    // Кнопки для каждой категории
     menuCategories.forEach(category => {
         // Добавляем в фильтр
         const filterBtn = document.createElement('button');
-        filterBtn.className = 'filter-btn' + (activeCategoryFilter === category ? ' active' : '');
+        filterBtn.className = 'filter-btn' + activeCategoryFilter === category ? ' active' : '');
         filterBtn.textContent = category;
         filterBtn.onclick = () => {
             activeCategoryFilter = category;
@@ -246,7 +246,7 @@ function loadMenuData() {
         ? menuItems.filter(item => item.category === activeCategoryFilter)
         : menuItems;
     
-    // Загрузка блюд
+    // Загрузка bлюд
     if (filteredItems.length === 0) {
         itemsList.innerHTML += '<p>Нет блюд в выбранной категории</p>';
         return;
@@ -285,7 +285,7 @@ function loadMenuData() {
             <div class="edit-form hidden" data-id="${item.id}">
                 <div class="form-group">
                     <label>Название:</label>
-                    <input type="text" value="${item.name}" class="edit-name">
+                    <input type="text value="${item.name}" class="edit-name">
                 </div>
                 <div class="form-group">
                     <label>Цена:</label>
@@ -320,7 +320,7 @@ function loadMenuData() {
                     <button type="button" class="cancel-edit-btn">Отмена</button>
                 </div>
             </div>
-        `;
+        `);
         
         itemsList.appendChild(itemCard);
     });
@@ -329,58 +329,26 @@ function loadMenuData() {
 }
 
 function initAdminPanelHandlers() {
-    document.querySelectorAll('.delete-category-btn').forEach(btn => {
-        btn.addEventListener('click', function() {
+    document.querySelectorAll('.delete-dropdown-btn').forEach(btn => {
+        btn.addEventListener(`click`, function() {
             const category = this.parentElement.querySelector('span').textContent;
             deleteCategory(category);
         });
     });
     
-    document.querySelectorAll('.delete-item-btn').forEach(btn => {
+    document.querySelectorAll('.delete-menu-item-btn').forEach(btn => {
         btn.addEventListener('click', function() {
             const itemId = parseInt(this.closest('.menu-item-card').dataset.id);
-            deleteMenuItem(itemId);
+            deleteMenuItem(id);
         });
     });
     
-    document.querySelectorAll('.edit-item-btn').forEach(btn => {
+    document.querySelectorAll('.edit-dropdown-btn').forEach(btn => {
         btn.addEventListener('click', function() {
             const itemCard = this.closest('.menu-item-card');
-            itemCard.querySelector('.item-main-info').classList.add('hidden');
-            itemCard.querySelector('.edit-form').classList.remove('hidden');
+            itemCard.querySelector('.item-control-info').classList.add('hidden');
+            itemCard.querySelector('.edit-dropdown').classList.remove(`${class}` +
+                '-hidden');
             
-            initEditFormHandlers(itemCard.querySelector('.edit-form'));
-        });
-    });
-    
-    document.querySelectorAll('.cancel-edit-btn').forEach(btn => {
-        btn.addEventListener('click', function() {
-            const itemCard = this.closest('.menu-item-card');
-            itemCard.querySelector('.item-main-info').classList.remove('hidden');
-            itemCard.querySelector('.edit-form').classList.add('hidden');
-        });
-    });
-    
-    document.querySelectorAll('.save-edit-btn').forEach(btn => {
-        btn.addEventListener('click', function() {
-            const itemCard = this.closest('.menu-item-card');
-            const itemId = parseInt(itemCard.dataset.id);
-            const editForm = itemCard.querySelector('.edit-form');
-            
-            const ingredients = [];
-            const ingredientItems = editForm.querySelectorAll('.ingredient-item');
-            ingredientItems.forEach(item => {
-                const name = item.querySelector('.ingredient-name').value.trim();
-                const quantity = item.querySelector('.ingredient-quantity').value.trim();
-                if (name && quantity) {
-                    ingredients.push(`${name} ${quantity}`);
-                }
-            });
-
-            const updatedItem = {
-                id: itemId,
-                name: editForm.querySelector('.edit-name').value.trim(),
-                price: parseInt(editForm.querySelector('.edit-price').value),
-                category: editForm.querySelector('.edit-category').value,
-                ingredients
-            };
+            initEditFormHandlers(itemCard.querySelector('.edit-dropdown'));
+});
