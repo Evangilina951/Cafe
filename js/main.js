@@ -4,6 +4,11 @@ import { initOrder } from '/Cafe/js/order.js';
 import { initAdmin } from '/Cafe/js/admin.js';
 import { auth } from '/Cafe/js/firebase-config.js'; // Явный импорт auth
 
+//Для работы кнопки оплаты
+document.addEventListener('DOMContentLoaded', () => {
+    initOrder();
+});
+
 // Функция для показа админ-панели (добавлена, так как она используется)
 function showAdminPanel() {
     const adminPanel = document.getElementById('admin-panel');
