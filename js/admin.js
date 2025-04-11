@@ -96,15 +96,16 @@ function resetAddItemForm() {
 
 function initIngredientsHandlers() {
     // Обработчик добавления ингредиента
-    document.getElementById('add-ingredient-btn')?.addEventListener('click', () => {
+    document.getElementById('add-ingredient-btn').addEventListener('click', function() {
+        const ingredientsList = document.getElementById('ingredients-list');
         const newIngredient = document.createElement('div');
         newIngredient.className = 'ingredient-item';
         newIngredient.innerHTML = `
-            <input type="text" class="ingredient-name" placeholder="Название">
-            <input type="text" class="ingredient-quantity" placeholder="Количество">
-            <button class="remove-ingredient-btn">×</button>
-        `;
-        elements.ingredientsList.appendChild(newIngredient);
+        <input type="text" class="ingredient-name" placeholder="Название ингредиента">
+        <input type="text" class="ingredient-quantity" placeholder="Количество">
+        <button class="remove-ingredient-btn">×</button>
+    `;
+    ingredientsList.appendChild(newIngredient);
         
         // Обработчик удаления
         newIngredient.querySelector('.remove-ingredient-btn').addEventListener('click', () => {
