@@ -1,6 +1,21 @@
 import { db } from '/Cafe/js/firebase-config.js';
 import { menuCategories, menuItems } from '/Cafe/js/menu.js';
 
+const adminPanel = document.getElementById('admin-panel');
+const orderInterface = document.getElementById('order-interface');
+
+function showAdminPanel() {
+    if (!adminPanel || !orderInterface) {
+        console.error('Элементы админ-панели не найдены!');
+        return;
+    }
+    adminPanel.style.display = 'block';
+    adminPanel.classList.remove('hidden');
+    orderInterface.style.display = 'none';
+    loadMenuData();
+    window.location.hash = 'admin';
+}
+
 // DOM элементы
 const elements = {
     adminPanel: document.getElementById('admin-panel'),
@@ -25,17 +40,9 @@ const elements = {
 
 let activeCategoryFilter = null;
 
-function showAdminPanel() {
-    elements.adminPanel.style.display = 'block';
-    elements.adminPanel.classList.remove('hidden');
-    document.getElementById('order-interface').style.display = 'none';
-    loadMenuData();
-    window.location.hash = 'admin';
-}
-
 function hideAdminPanel() {
-    elements.adminPanel.style.display = 'none';
-    elements.adminPanel.classList.add('hidden');
+    adminPanel.style.display = 'none';
+    adminPanel.classList.add('hidden');
     document.getElementById('order-interface').style.display = 'block';
     window.location.hash = '';
 }
@@ -139,7 +146,7 @@ function initIngredientsHandlers() {
 }
 
 function loadMenuData() {
-    if (!elements.adminPanel || elements.adminPanel.classList.contains('hidden')) return;
+    if (!adminPanel || adminPanel.classList.contains('hidden')) return;
     
     const categoriesList = document.getElementById('categories-list');
     const itemsList = document.getElementById('menu-items-list');
