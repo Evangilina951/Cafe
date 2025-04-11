@@ -1,19 +1,42 @@
 import { db } from '/Cafe/js/firebase-config.js';
-import { menuCategories, menuItems } from '/Cafe/js/menu.js';
+import { menuCategories, menuItems, loadMenuFromFirebase } from '/Cafe/js/menu.js';
 
 const adminPanel = document.getElementById('admin-panel');
 const orderInterface = document.getElementById('order-interface');
+const addCategoryForm = document.getElementById('add-category-form');
+const addItemForm = document.getElementById('add-item-form');
+
+let activeCategoryFilter = null;
+
+export function initAdmin() {
+    if (!adminPanel) return;
+
+    document.querySelector('.admin-btn')?.addEventListener('click', showAdminPanel);
+    document.querySelector('.back-btn')?.addEventListener('click', hideAdminPanel);
+    document.querySelector('.add-category-btn')?.addEventListener('click', () => {
+        addCategoryForm.style.display = 'block';
+    });
+    document.querySelector('.add-item-btn')?.addEventListener('click', () => {
+        addItemForm.style.display = 'block';
+        resetAddItemForm();
+    });
+    document.getElementById('add-category-btn')?.addEventListener('click', addCategory);
+    document.getElementById('add-menu-item-btn')?.addEventListener('click', addMenuItem);
+}
 
 function showAdminPanel() {
-    if (!adminPanel || !orderInterface) {
-        console.error('Элементы админ-панели не найдены!');
-        return;
+    if (adminPanel && orderInterface) {
+        adminPanel.style.display = 'block';
+        orderInterface.style.display = 'none';
+        loadMenuData();
     }
-    adminPanel.style.display = 'block';
-    adminPanel.classList.remove('hidden');
-    orderInterface.style.display = 'none';
-    loadMenuData();
-    window.location.hash = 'admin';
+}
+
+function hideAdminPanel() {
+    if (adminPanel && orderInterface) {
+        adminPanel.style.display = 'none';
+        orderInterface.style.display = 'block';
+    }
 }
 
 // DOM элементы
