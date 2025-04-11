@@ -1,7 +1,3 @@
-import firebase from 'firebase/app';
-import 'firebase/auth';
-import 'firebase/database';
-
 const firebaseConfig = {
     apiKey: "AIzaSyDB8Vtxg3SjVyHRJ3ZOXT8osnHYrO_uw4A",
     authDomain: "cafe-90de8.firebaseapp.com",
@@ -13,8 +9,10 @@ const firebaseConfig = {
     measurementId: "G-2FVD2KRF16"
 };
 
-const app = firebase.initializeApp(firebaseConfig);
+// Инициализация Firebase
+firebase.initializeApp(firebaseConfig);
 const auth = firebase.auth();
 const db = firebase.database();
 
+// Экспорт
 export { auth, db };
