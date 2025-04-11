@@ -1,5 +1,4 @@
 #admin-panel {
-    border: 3px solid red !important;
     position: fixed;
     top: 0;
     left: 0;
@@ -50,6 +49,7 @@
     transition: background-color 0.3s;
 }
 
+
 .add-category-btn:hover, .add-item-btn:hover {
     background-color: #5a2b19;
 }
@@ -92,11 +92,13 @@
 
 .menu-management {
     display: grid;
-    grid-template-columns: 300px 1fr;
+    grid-template-columns: 300px 1fr; /* Категории слева (300px), блюда справа (остальное место) */
     gap: 20px;
+    align-items: start;
 }
 
 .categories-list {
+    border-right: 1px solid #d7ccc8; /* Цвет как в оригинале */
     padding-right: 20px;
 }
 
@@ -139,7 +141,8 @@
 
 .menu-items-container {
     display: flex;
-    flex-direction: column;
+    flex-direction: column; /* Фильтр сверху, блюда снизу */
+    gap: 15px;
 }
 
 .category-filter {
@@ -250,6 +253,7 @@
     margin-top: 15px;
 }
 
+/* Стили для списка ингредиентов */
 .ingredient-item {
     display: flex;
     gap: 10px;
