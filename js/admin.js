@@ -232,29 +232,29 @@ function loadMenuData() {
     }
 
     filteredItems.forEach(item => {
-        const itemCard = document.createElement('div');
-        itemCard.className = 'menu-item-card';
-        itemCard.dataset.id = item.id;
-        itemCard.innerHTML = `
-            <div class="item-main-info">
-                <div>
-                    <strong>${item.name}</strong>
-                    <div class="item-category">${item.category}</div>
-                    <div class="item-price">${item.price} ₽</div>
-                    ${item.ingredients.length ? `
-                        <div class="item-ingredients">
-                            <strong>Состав:</strong>
-                            <ul>${item.ingredients.map(ing => `<li>${ing}</li>`).join('')}</ul>
-                        </div>
-                    ` : ''}
-                </div>
-                <div class="item-actions">
-                    <button class="edit-item-btn">✏️</button>
-                    <button class="delete-item-btn">×</button>
-                </div>
+    const itemCard = document.createElement('div');
+    itemCard.className = 'menu-item-card';
+    itemCard.dataset.id = item.id;
+    itemCard.innerHTML = `
+        <div class="item-main-info">
+            <div>
+                <strong>${item.name}</strong>
+                <div class="item-category">${item.category}</div>
+                <div class="item-price">${item.price} ₽</div>
+                ${Array.isArray(item.ingredients) && item.ingredients.length ? `
+                    <div class="item-ingredients">
+                        <strong>Состав:</strong>
+                        <ul>${item.ingredients.map(ing => `<li>${ing}</li>`).join('')}</ul>
+                    </div>
+                ` : ''}
             </div>
-        `;
-        elements.menuItemsList.appendChild(itemCard);
+            <div class="item-actions">
+                <button class="edit-item-btn">✏️</button>
+                <button class="delete-item-btn">×</button>
+            </div>
+        </div>
+    `;
+    elements.menuItemsList.appendChild(itemCard);
     });
 
     initAdminPanelHandlers();
