@@ -166,7 +166,7 @@ function initIngredientsHandlers() {
             newIngredient.className = 'ingredient-item';
             newIngredient.innerHTML = `
                 <input type="text" class="ingredient-name" placeholder="Название ингредиента">
-                <input type="text" class="Ingredient-quantity" placeholder="Количество">
+                <input type="text" class="ingredient-quantity" placeholder="Количество">
                 <button class="remove-ingredient-btn">×</button>
             `;
             elements.ingredientsList.appendChild(newIngredient);
@@ -314,4 +314,191 @@ function loadMenuData() {
                         }).join('') : ''}
                     </div>
                     <button type="button" class="add-edit-ingredient-btn">+ Добавить ингредиент</button>
-                </div
+                </div>
+                <div class="form-actions">
+                    <button type="button" class="save-edit-btn">Сохранить</button>
+                    <button type="button" class="cancel-edit-btn">Отмена</button>
+                </div>
+            </div>
+        `;
+
+        itemsList.appendChild(itemCard);
+    });
+
+    initAdminPanelHandlers();
+}
+
+function initAdminPanelHandlers() {
+    document.querySelectorAll('.delete-category-btn').forEach(btn => {
+        btn.addEventListener('click', function() {
+            const category = this.parentElement.querySelector('span').textContent;
+            deleteCategory(category);
+        });
+    });
+
+    document.querySelectorAll('.delete-item-btn').forEach(btn => {
+        btn.addEventListener('click', function() {
+            const itemId = parseInt(this.closest('.menu-item-card').dataset.id);
+            deleteMenuItem(itemId);
+        });
+    });
+
+    document.querySelectorAll('.edit-item-btn').forEach(btn => {
+        btn.addEventListener('click', function() {
+            const itemCard = this.closest('.menu-item-card');
+            itemCard.querySelector('.item-main-info').classList.add('hidden');
+            itemCard.querySelector('.edit-form').classList.remove('hidden');
+
+            initEditFormHandlers(itemCard.querySelector('.edit-form'));
+        });
+    });
+
+    document.querySelectorAll('.cancel-edit-btn').forEach(btn => {
+        btn.addEventListener('click', function() {
+            const itemCard = this.closest('.menu-item-card');
+            itemCard.querySelector('.item-main-info').classList.remove('hidden');
+            itemCard.querySelector('.edit-form').classList.add('hidden');
+        });
+    });
+
+    document.querySelectorAll('.save-edit-btn').forEach(btn => {
+        btn.addEventListener('click', function() {
+            const itemCard = this.closest('.menu-item-card');
+            const itemId = parseInt(itemCard.dataset.id);
+            const editForm = itemCard.querySelector('.edit-form');
+
+            const ingredients = [];
+            const ingredientItems = editForm.querySelectorAll('.ingredient-item');
+            ingredientItems.forEach(item => {
+                const name = item.querySelector('.ingredient-name').value.trim();
+                const quantity = item.querySelector('.ingredient-quantity').value.trim();
+                if (name && quantity) {
+                    ingredients.push(`${name} ${quantity}`);
+                }
+            });
+
+            const updatedItem = {
+                id: itemId,
+                name: editForm.querySelector('.edit-name').value.trim(),
+                price: parseInt(editForm.querySelector('.edit-price').value),
+                category: editForm.querySelector('.edit-category').value,
+                ingredients
+            };
+
+            const index = menuItems.findIndex(item => item.id === itemId);
+            if (index !== -1) {
+                menuItems[index] = updatedItem;
+
+                updateMenuInFirebase()
+                    .then(() => {
+                        itemCard.querySelector('.item-main-info').classList.remove('hidden');
+                        itemCard.querySelector('.edit-form').classList.add('hidden');
+                        loadMenuData();
+                    })
+                    .catch(error => {
+                        console.error("Ошибка сохранения изменений:", error);
+                        alert("Не удалось сохранить изменения");
+                    });
+            }
+        });
+    });
+}
+
+function initEditFormHandlers(editForm) {
+    if (!editForm) return;
+
+    editForm.querySelectorAll('.remove-ingredient-btn').forEach(btn => {
+        btn.addEventListener('click', function() {
+            this.closest('.ingredient-item').remove();
+        });
+    });
+
+    const addBtn = editForm.querySelector('.add-edit-ingredient-btn');
+    if (addBtn) {
+        addBtn.addEventListener('click', function() {
+            const ingredientsList = this.previousElementSibling;
+            const newIngredient = document.createElement('div');
+            newIngredient.className = 'ingredient-item';
+            newIngredient.innerHTML = `
+                <input type="text" class="ingredient-name" placeholder="Название">
+                <input type="text" class="ingredient-quantity" placeholder="Количество">
+                <button class="remove-ingredient-btn">×</button>
+            `;
+            ingredientsList.appendChild(newIngredient);
+
+            newIngredient.querySelector('.remove-ingredient-btn').addEventListener('click', function() {
+                this.closest('.ingredient-item').remove();
+            });
+        });
+    }
+}
+
+function addCategory() {
+    const name = elements.newCategoryName.value.trim();
+    if (!name) {
+        alert('Введите название категории');
+        return;
+    }
+
+    if (!menuCategories.includes(name)) {
+        menuCategories.push(name);
+        db.ref('menu/categories').set(menuCategories)
+            .then(() => {
+                elements.newCategoryName.value = '';
+                elements.addCategoryForm.style.display = 'none';
+                loadMenuData();
+            })
+            .catch(error => {
+                console.error("Ошибка сохранения категории:", error);
+                alert("Не удалось сохранить категорию");
+            });
+    }
+}
+
+function deleteCategory(category) {
+    if (!confirm(`Удалить категорию "${category}"? Все напитки этой категории также будут удалены.`)) {
+        return;
+    }
+
+    const itemsToKeep = menuItems.filter(item => item.category !== category);
+    menuItems = itemsToKeep;
+    menuCategories = menuCategories.filter(c => c !== category);
+
+    updateMenuInFirebase()
+        .then(() => {
+            loadMenuData();
+        })
+        .catch(error => {
+            console.error("Ошибка удаления категории:", error);
+            alert("Не удалось удалить категорию");
+        });
+}
+
+function deleteMenuItem(id) {
+    if (!confirm('Удалить этот напиток?')) return;
+
+    menuItems = menuItems.filter(item => item.id !== id);
+
+    updateMenuInFirebase()
+        .then(() => {
+            loadMenuData();
+        })
+        .catch(error => {
+            console.error("Ошибка удаления напитка:", error);
+            alert("Не удалось удалить напиток");
+        });
+}
+
+// Показать админ-панель
+export function showAdminPanel() {
+    console.log("showAdminPanel вызвана"); // Логирование
+    if (!currentUser || currentUser.email !== 'admin@dismail.com') {
+        alert("Доступ запрещен");
+        return;
+    }
+
+    const adminPanel = document.getElementById('admin-panel');
+    const orderInterface = document.getElementById('order-interface');
+
+    if (adminPanel && orderInterface) {
+        console.log("Админ-панель и интерфейс заказа найдены"); // Логирование
