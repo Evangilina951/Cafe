@@ -134,7 +134,7 @@ function addMenuItem() {
         price,
         category,
         ingredients: ingredients.filter(Boolean),
-        visible: true // Явно устанавливаем true по умолчанию
+        visible: true
     };
 
     menuItems.push(newItem);
@@ -169,16 +169,13 @@ function getIngredientsList() {
 function updateMenuInFirebase() {
     const itemsObj = {};
     menuItems.forEach(item => {
-        // Гарантируем, что visible всегда будет boolean
-        const visible = typeof item.visible === 'boolean' ? item.visible : true;
-        
         itemsObj[`item${item.id}`] = {
             id: item.id,
             name: item.name,
             price: item.price,
             category: item.category,
             ingredients: item.ingredients.filter(Boolean),
-            visible // Используем проверенное значение
+            visible: !!item.visible
         };
     });
 
@@ -277,9 +274,8 @@ function createMenuItemCard(item) {
         <div class="item-actions">
             <button class="edit-item-btn" title="Редактировать">✏️</button>
             <button class="delete-item-btn" title="Удалить">×</button>
-            <label class="visibility-toggle">
+            <label class="visibility-toggle" title="${item.visible ? 'Скрыть' : 'Показать'}">
                 <input type="checkbox" class="visibility-checkbox" ${item.visible ? 'checked' : ''}>
-                Отображать
             </label>
         </div>
         
@@ -303,11 +299,9 @@ function createMenuItemCard(item) {
                 <input type="number" class="edit-item-price" value="${item.price}">
             </div>
             
-            <div class="form-group">
-                <label>
-                    <input type="checkbox" class="edit-item-visible" ${item.visible ? 'checked' : ''}>
-                    Отображать в основном меню
-                </label>
+            <div class="form-group visibility-group">
+                <input type="checkbox" class="edit-item-visible visibility-checkbox" id="edit-visible-${item.id}" ${item.visible ? 'checked' : ''}>
+                <label for="edit-visible-${item.id}">Отображать в основном меню</label>
             </div>
             
             <div class="form-group">
@@ -383,7 +377,7 @@ function saveEditedItem(itemCard) {
             price,
             category,
             ingredients: [...ingredients],
-            visible // Здесь visible всегда будет boolean благодаря checked
+            visible
         };
         
         updateMenuInFirebase()
@@ -405,14 +399,16 @@ function setupAdminPanelHandlers() {
             const itemId = parseInt(this.closest('.menu-item-card').dataset.id);
             const itemIndex = menuItems.findIndex(item => item.id === itemId);
             if (itemIndex !== -1) {
-                // Гарантируем, что visible будет boolean
-                menuItems[itemIndex].visible = !!this.checked;
+                menuItems[itemIndex].visible = this.checked;
                 updateMenuInFirebase()
-                    .then(() => renderMenuInterface())
+                    .then(() => {
+                        // Обновляем подсказку
+                        const toggle = this.closest('.visibility-toggle');
+                        toggle.title = this.checked ? 'Скрыть' : 'Показать';
+                    })
                     .catch(error => {
                         console.error("Ошибка сохранения:", error);
                         alert("Не удалось изменить видимость блюда");
-                        // Восстанавливаем предыдущее состояние чекбокса
                         this.checked = !this.checked;
                     });
             }
