@@ -299,11 +299,6 @@ function createMenuItemCard(item) {
                 <input type="number" class="edit-item-price" value="${item.price}">
             </div>
             
-            <div class="form-group visibility-group">
-                <input type="checkbox" class="edit-item-visible visibility-checkbox" id="edit-visible-${item.id}" ${item.visible ? 'checked' : ''}>
-                <label for="edit-visible-${item.id}">Отображать в основном меню</label>
-            </div>
-            
             <div class="form-group">
                 <label>Состав:</label>
                 <div class="edit-ingredients-list">
@@ -347,7 +342,8 @@ function saveEditedItem(itemCard) {
     const category = editForm.querySelector('.edit-item-category').value;
     const name = editForm.querySelector('.edit-item-name').value.trim();
     const price = parseFloat(editForm.querySelector('.edit-item-price').value);
-    const visible = editForm.querySelector('.edit-item-visible').checked;
+    // Получаем значение видимости из переключателя в карточке
+    const visible = itemCard.querySelector('.visibility-checkbox').checked;
     
     const ingredients = [];
     let isValid = true;
