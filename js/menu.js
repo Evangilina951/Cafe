@@ -76,52 +76,48 @@ function updateMainMenu() {
         const visibleItems = menuItems.filter(item => item.visible !== false);
     
         if (visibleItems.length > 0) {
-            elements.menuColumns.innerHTML = '';
-        
-        // Группируем блюда по категориям
-        const itemsByCategory = {};
-        visibleItems.forEach(item => {
-            if (!itemsByCategory[item.category]) {
-                itemsByCategory[item.category] = [];
-            }
-            itemsByCategory[item.category].push(item);
-        });
-        
-        // Создаем колонки для каждой категории
-        Object.keys(itemsByCategory).forEach(category => {
-            const column = document.createElement('div');
-            column.className = 'menu-column';
-            
-            const title = document.createElement('h3');
-            title.className = 'category-title';
-            title.textContent = category;
-            column.appendChild(title);
-            
-            const buttonsContainer = document.createElement('div');
-            buttonsContainer.className = 'menu-buttons';
-            
-            itemsByCategory[category].forEach(item => {
-                const btn = document.createElement('button');
-                btn.className = 'menu-btn';
-                btn.innerHTML = `
-                    <div class="item-name">${item.name}</div>
-                    <div class="item-price">${item.price} ₽</div>
-                `;
-                btn.onclick = () => addToOrder(item.name, item.price);
-                buttonsContainer.appendChild(btn);
+            // Группируем блюда по категориям
+            const itemsByCategory = {};
+            visibleItems.forEach(item => {
+                if (!itemsByCategory[item.category]) {
+                    itemsByCategory[item.category] = [];
+                }
+                itemsByCategory[item.category].push(item);
             });
             
-            column.appendChild(buttonsContainer);
-            elements.menuColumns.appendChild(column);
-        });
-              } else {
-        elements.menuColumns.innerHTML = '<div class="menu-error">Нет доступных блюд в меню</div>';
-    }
-}
+            // Создаем колонки для каждой категории
+            Object.keys(itemsByCategory).forEach(category => {
+                const column = document.createElement('div');
+                column.className = 'menu-column';
+                
+                const title = document.createElement('h3');
+                title.className = 'category-title';
+                title.textContent = category;
+                column.appendChild(title);
+                
+                const buttonsContainer = document.createElement('div');
+                buttonsContainer.className = 'menu-buttons';
+                
+                itemsByCategory[category].forEach(item => {
+                    const btn = document.createElement('button');
+                    btn.className = 'menu-btn';
+                    btn.innerHTML = `
+                        <div class="item-name">${item.name}</div>
+                        <div class="item-price">${item.price} ₽</div>
+                    `;
+                    btn.onclick = () => addToOrder(item.name, item.price);
+                    buttonsContainer.appendChild(btn);
+                });
+                
+                column.appendChild(buttonsContainer);
+                elements.menuColumns.appendChild(column);
+            });
+        } else {
+            elements.menuColumns.innerHTML = '<div class="menu-error">Нет доступных блюд в меню</div>';
+        }
     } else {
         elements.menuColumns.innerHTML = '<div class="menu-error">Ошибка: Меню не загружено</div>';
     }
-      
 }
 
 export { menuCategories, menuItems };
