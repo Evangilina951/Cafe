@@ -213,16 +213,18 @@ function renderMenuInterface() {
         categoryCard.className = 'category-card';
         categoryCard.innerHTML = `
             <div class="category-content">
-                <span>${category}</span>
+                <span class="category-name">${category}</span>
                 <div class="category-actions">
-                    <button class="edit-category-btn" title="Редактировать"></button>
+                    <button class="edit-category-btn" title="Редактировать">✏️</button>
                     <button class="delete-category-btn" title="Удалить">×</button>
                 </div>
             </div>
             <div class="edit-category-form hidden">
                 <input type="text" class="edit-category-input" value="${category}">
-                <button class="save-category-btn">Сохранить</button>
-                <button class="cancel-category-btn">Отмена</button>
+                <div class="category-form-actions">
+                    <button class="save-category-btn">Сохранить</button>
+                    <button class="cancel-category-btn">Отмена</button>
+                </div>
             </div>
         `;
         elements.categoriesList.appendChild(categoryCard);
@@ -279,7 +281,6 @@ function createMenuItemCard(item) {
             <button class="delete-item-btn" title="Удалить">×</button>
         </div>
         
-        <!-- Форма редактирования -->
         <div class="edit-form hidden">
             <div class="form-group">
                 <label>Категория</label>
@@ -345,7 +346,7 @@ function setupAdminPanelHandlers() {
         btn.addEventListener('click', function() {
             const card = this.closest('.category-card');
             const newName = card.querySelector('.edit-category-input').value.trim();
-            const oldName = card.querySelector('span').textContent;
+            const oldName = card.querySelector('.category-name').textContent;
             
             if (!newName) {
                 alert('Введите название категории');
@@ -397,7 +398,7 @@ function setupAdminPanelHandlers() {
     // Удаление категории
     document.querySelectorAll('.delete-category-btn').forEach(btn => {
         btn.addEventListener('click', () => {
-            const category = btn.closest('.category-content').querySelector('span')?.textContent;
+            const category = btn.closest('.category-content').querySelector('.category-name')?.textContent;
             if (category && confirm(`Удалить категорию "${category}"?`)) {
                 const index = menuCategories.indexOf(category);
                 if (index !== -1) {
