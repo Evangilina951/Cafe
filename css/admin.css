@@ -387,17 +387,21 @@
 
 .edit-category-form {
     display: flex;
-    gap: 10px;
-    align-items: center;
+    flex-direction: column;
+    gap: 15px;
     width: 100%;
+    padding: 15px;
+    background-color: rgba(255, 255, 255, 0.8);
+    border-radius: 8px;
+    margin-top: 10px;
 }
 
 .edit-category-input {
-    flex: 1;
-    padding: 8px 12px;
+    width: 100%;
+    padding: 10px;
     border: 1px solid #d7ccc8;
-    border-radius: 8px;
-    font-size: 14px;
+    border-radius: 6px;
+    font-size: 16px;
 }
 
 .category-card {
@@ -459,3 +463,29 @@
 .edit-item-btn:hover {
     background-color: rgba(109, 52, 31, 0.1);
 }
+
+.category-form-actions {
+    display: flex;
+    gap: 10px;
+    justify-content: flex-end;
+}
+
+.save-category-btn, .cancel-category-btn {
+    padding: 8px 16px;
+    border-radius: 6px;
+    cursor: pointer;
+    font-size: 14px;
+}
+
+.save-category-btn {
+    background-color: #4CAF50;
+    color: white;
+    border: none;
+}
+
+.cancel-category-btn {
+    background-color: #c62828;
+    color: white;
+    border: none;
+}
+
