@@ -137,6 +137,7 @@ function addMenuItem() {
         price,
         category,
         ingredients: ingredients.filter(Boolean) // Фильтруем null/undefined
+        visible: true // По умолчанию блюдо видимо
     };
 
     menuItems.push(newItem);
