@@ -265,9 +265,11 @@ function createMenuItemCard(item) {
             <div class="item-name">${item.name}</div>
             <div class="item-price">${item.price} ₽</div>
             ${ingredients.length ? `
-                <div class="item-ingredients">
-                    <strong>Состав:</strong>
-                    <ul>${ingredients.map(ing => `<li>- ${ing}</li>`).join('')}</ul>
+                <div class="ingredients-toggle">
+                    <button class="toggle-ingredients-btn">Состав ▼</button>
+                    <div class="item-ingredients hidden">
+                        <ul>${ingredients.map(ing => `<li>- ${ing}</li>`).join('')}</ul>
+                    </div>
                 </div>
             ` : ''}
         </div>
@@ -325,6 +327,19 @@ function createMenuItemCard(item) {
         </div>
     `;
     
+    // Добавляем обработчик для кнопки состава
+    if (ingredients.length) {
+        const toggleBtn = card.querySelector('.toggle-ingredients-btn');
+        const ingredientsBlock = card.querySelector('.item-ingredients');
+        
+        toggleBtn.addEventListener('click', function() {
+            ingredientsBlock.classList.toggle('hidden');
+            this.textContent = ingredientsBlock.classList.contains('hidden') 
+                ? 'Состав ▼' 
+                : 'Состав ▲';
+        });
+    }
+    
     card.querySelectorAll('.remove-ingredient-btn').forEach(btn => {
         btn.addEventListener('click', function(e) {
             e.preventDefault();
@@ -342,7 +357,6 @@ function saveEditedItem(itemCard) {
     const category = editForm.querySelector('.edit-item-category').value;
     const name = editForm.querySelector('.edit-item-name').value.trim();
     const price = parseFloat(editForm.querySelector('.edit-item-price').value);
-    // Получаем значение видимости из переключателя в карточке
     const visible = itemCard.querySelector('.visibility-checkbox').checked;
     
     const ingredients = [];
@@ -398,7 +412,6 @@ function setupAdminPanelHandlers() {
                 menuItems[itemIndex].visible = this.checked;
                 updateMenuInFirebase()
                     .then(() => {
-                        // Обновляем подсказку
                         const toggle = this.closest('.visibility-toggle');
                         toggle.title = this.checked ? 'Скрыть' : 'Показать';
                     })
@@ -411,7 +424,7 @@ function setupAdminPanelHandlers() {
         });
     });
 
-    // Остальные обработчики остаются без изменений
+    // Остальные обработчики
     document.querySelectorAll('.edit-category-btn').forEach(btn => {
         btn.addEventListener('click', function() {
             const card = this.closest('.category-card');
