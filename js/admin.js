@@ -304,6 +304,60 @@ function createMenuItemCard(item) {
     return card;
 }
 
+function saveEditedItem(itemCard) {
+    const itemId = parseInt(itemCard.dataset.id);
+    const editForm = itemCard.querySelector('.edit-form');
+    
+    // Получаем новые значения
+    const category = editForm.querySelector('.edit-item-category').value;
+    const name = editForm.querySelector('.edit-item-name').value.trim();
+    const price = parseFloat(editForm.querySelector('.edit-item-price').value);
+    
+    // Получаем список ингредиентов
+    const ingredients = [];
+    let isValid = true;
+    
+    editForm.querySelectorAll('.ingredient-item').forEach(item => {
+        const ingName = item.querySelector('.ingredient-name').value.trim();
+        const ingQuantity = parseFloat(item.querySelector('.ingredient-quantity').value);
+        
+        if (!ingName || isNaN(ingQuantity) || ingQuantity < 0.1) {
+            isValid = false;
+            item.querySelector('.ingredient-quantity').style.borderColor = 'red';
+        } else {
+            ingredients.push(`${ingName} ${ingQuantity}`);
+        }
+    });
+    
+    if (!isValid || !name || isNaN(price) || !category || ingredients.length === 0) {
+        alert('Проверьте данные:\n- Все поля должны быть заполнены\n- Количество должно быть числом ≥ 0.1\n- Должен быть хотя бы один ингредиент');
+        return;
+    }
+    
+    // Обновляем данные
+    const itemIndex = menuItems.findIndex(item => item.id === itemId);
+    if (itemIndex !== -1) {
+        menuItems[itemIndex] = {
+            ...menuItems[itemIndex],
+            name,
+            price,
+            category,
+            ingredients
+        };
+        
+        // Сохраняем в Firebase
+        updateMenuInFirebase()
+            .then(() => {
+                editForm.classList.add('hidden');
+                renderMenuInterface();
+            })
+            .catch(error => {
+                console.error("Ошибка сохранения:", error);
+                alert("Не удалось сохранить изменения");
+            });
+    }
+}
+
 function setupAdminPanelHandlers() {
     document.querySelectorAll('.edit-category-btn').forEach(btn => {
         btn.addEventListener('click', function() {
@@ -389,8 +443,6 @@ function setupAdminPanelHandlers() {
             }
         });
     });
-
-    
 
     document.addEventListener('click', function(e) {
         if (e.target.classList.contains('add-edit-ingredient-btn')) {
