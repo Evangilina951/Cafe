@@ -276,6 +276,10 @@ function createMenuItemCard(item) {
         <div class="item-actions">
             <button class="edit-item-btn" title="Редактировать">✏️</button>
             <button class="delete-item-btn" title="Удалить">×</button>
+            <label class="visibility-toggle">
+            <input type="checkbox" class="visibility-checkbox" ${item.visible ? 'checked' : ''}>
+            Отображать
+            </label>
         </div>
         
         <div class="edit-form hidden">
@@ -286,6 +290,10 @@ function createMenuItemCard(item) {
                         `<option value="${cat}" ${cat === item.category ? 'selected' : ''}>${cat}</option>`
                     ).join('')}
                 </select>
+                <label>
+                <input type="checkbox" class="edit-item-visible" ${item.visible ? 'checked' : ''}>
+                Отображать в основном меню
+                </label>
             </div>
             
             <div class="form-group">
@@ -342,6 +350,7 @@ function saveEditedItem(itemCard) {
     const category = editForm.querySelector('.edit-item-category').value;
     const name = editForm.querySelector('.edit-item-name').value.trim();
     const price = parseFloat(editForm.querySelector('.edit-item-price').value);
+    const visible = editForm.querySelector('.edit-item-visible').checked;
     
     const ingredients = [];
     let isValid = true;
@@ -366,11 +375,12 @@ function saveEditedItem(itemCard) {
     const itemIndex = menuItems.findIndex(item => item.id === itemId);
     if (itemIndex !== -1) {
         menuItems[itemIndex] = {
-            ...menuItems[itemIndex],
+               ...menuItems[itemIndex],
             name,
             price,
             category,
-            ingredients: ingredients.filter(Boolean) // Фильтруем null/undefined
+            ingredients: [...ingredients],
+            visible // Добавляем состояние видимости
         };
         
         updateMenuInFirebase()
