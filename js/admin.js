@@ -102,6 +102,7 @@ function resetAddItemForm() {
     elements.newItemName.value = '';
     elements.newItemPrice.value = '';
     elements.ingredientsList.innerHTML = '';
+    // Добавляем только один пустой ингредиент вместо всех существующих
     elements.ingredientsList.appendChild(createIngredientElement());
     setupIngredientsHandlers();
 }
@@ -309,6 +310,14 @@ function createMenuItemCard(item) {
             </div>
         </div>
     `;
+    
+    // Добавляем обработчики для кнопок удаления ингредиентов в форме редактирования
+    card.querySelectorAll('.remove-ingredient-btn').forEach(btn => {
+        btn.addEventListener('click', function(e) {
+            e.preventDefault();
+            this.closest('.ingredient-item').remove();
+        });
+    });
     
     return card;
 }
