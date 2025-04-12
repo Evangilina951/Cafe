@@ -102,7 +102,7 @@ function resetAddItemForm() {
     elements.newItemName.value = '';
     elements.newItemPrice.value = '';
     elements.ingredientsList.innerHTML = '';
-    // Добавляем только один пустой ингредиент вместо всех существующих
+    // Добавляем только один пустой ингредиент
     elements.ingredientsList.appendChild(createIngredientElement());
     setupIngredientsHandlers();
 }
@@ -135,7 +135,7 @@ function addMenuItem() {
         name,
         price,
         category,
-        ingredients
+        ingredients: ingredients // Используем только указанные ингредиенты
     };
 
     menuItems.push(newItem);
@@ -357,7 +357,7 @@ function saveEditedItem(itemCard) {
             name,
             price,
             category,
-            ingredients
+            ingredients // Используем только указанные ингредиенты
         };
         
         updateMenuInFirebase()
