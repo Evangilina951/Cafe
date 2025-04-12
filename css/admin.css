@@ -432,10 +432,13 @@
 
 /* Стили для переключателя видимости в карточке товара */
 .visibility-toggle {
-    display: flex;
+    display: inline-flex;
     align-items: center;
-    gap: 8px;
+    justify-content: center;
+    width: 28px;
+    height: 28px;
     cursor: pointer;
+    position: relative;
 }
 
 .visibility-checkbox {
@@ -449,12 +452,9 @@
     position: relative;
     transition: background-color 0.3s;
     margin: 0;
-    display: flex;
-    align-items: center;
-    justify-content: center;
 }
 
-.visibility-checkbox:checked {
+..visibility-checkbox:checked {
     background-color: #4CAF50;
 }
 
@@ -463,6 +463,9 @@
     color: white;
     font-size: 16px;
     position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
     opacity: 0;
     transition: opacity 0.3s;
 }
@@ -476,7 +479,6 @@
     display: flex;
     align-items: center;
     gap: 10px;
-    margin-bottom: 15px;
 }
 
 .form-group.visibility-group label {
@@ -487,6 +489,18 @@
 
 .form-group.visibility-group .visibility-checkbox {
     order: 1;
+}
+
+.visibility-label {
+    cursor: pointer;
+    font-weight: bold;
+    color: #6d341f;
+    margin-bottom: 0;
+}
+
+/* Скрываем label в карточке товара */
+.menu-item-card .visibility-label {
+    display: none;
 }
 
 /* Обновленные стили для item-actions */
@@ -512,4 +526,33 @@
 
 #add-item-form .form-group.visibility-group .visibility-checkbox {
     order: 1;
+}
+
+/* Стили для иконок действий */
+.edit-item-btn,
+.delete-item-btn,
+.visibility-toggle {
+    width: 28px;
+    height: 28px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 50%;
+    cursor: pointer;
+    transition: all 0.3s;
+}
+
+.edit-item-btn {
+    background-color: #6d341f;
+    color: white;
+    border: none;
+    font-size: 14px;
+}
+
+.delete-item-btn {
+    background-color: #c62828;
+    color: white;
+    border: none;
+    font-size: 16px;
+    font-weight: bold;
 }
