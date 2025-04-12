@@ -454,7 +454,7 @@
     margin: 0;
 }
 
-..visibility-checkbox:checked {
+.visibility-checkbox:checked {
     background-color: #4CAF50;
 }
 
