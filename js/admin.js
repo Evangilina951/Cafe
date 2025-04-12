@@ -130,12 +130,13 @@ function addMenuItem() {
         return;
     }
 
+    // Создаем новый объект блюда с чистым списком ингредиентов
     const newItem = {
         id: Date.now(),
         name,
         price,
         category,
-        ingredients: [...ingredients] // Создаем копию массива ингредиентов
+        ingredients: ingredients.filter(Boolean) // Фильтруем null/undefined
     };
 
     menuItems.push(newItem);
@@ -154,13 +155,16 @@ function addMenuItem() {
 
 function getIngredientsList() {
     const ingredients = [];
-    document.querySelectorAll('.ingredient-item').forEach(item => {
+    const ingredientElements = document.querySelectorAll('#ingredients-list .ingredient-item');
+    
+    ingredientElements.forEach(item => {
         const name = item.querySelector('.ingredient-name')?.value.trim();
         const quantity = item.querySelector('.ingredient-quantity')?.value;
         if (name && quantity) {
             ingredients.push(`${name} ${quantity}`);
         }
     });
+    
     return ingredients;
 }
 
@@ -172,11 +176,11 @@ function updateMenuInFirebase() {
             name: item.name,
             price: item.price,
             category: item.category,
-            ingredients: [...item.ingredients] // Создаем копию массива ингредиентов
+            ingredients: item.ingredients.filter(Boolean) // Фильтруем null/undefined
         };
     });
 
-    return db.ref('menu').update({
+    return db.ref('menu').set({
         categories: menuCategories,
         items: itemsObj
     });
@@ -254,7 +258,7 @@ function createMenuItemCard(item) {
     card.className = 'menu-item-card';
     card.dataset.id = item.id;
     
-    const ingredients = [...item.ingredients] || []; // Создаем копию массива ингредиентов
+    const ingredients = item.ingredients || [];
     
     card.innerHTML = `
         <div class="item-main-info">
@@ -365,7 +369,7 @@ function saveEditedItem(itemCard) {
             name,
             price,
             category,
-            ingredients: [...ingredients] // Создаем копию массива ингредиентов
+            ingredients: ingredients.filter(Boolean) // Фильтруем null/undefined
         };
         
         updateMenuInFirebase()
