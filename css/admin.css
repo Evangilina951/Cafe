@@ -123,9 +123,30 @@
     align-items: center;
 }
 
-.category-card span {
+.category-name {
+    flex: 1;
     font-size: 16px;
     color: #6d341f;
+}
+
+.category-actions {
+    display: flex;
+    gap: 8px;
+}
+
+.edit-category-btn {
+    background-color: #6d341f;
+    color: white;
+    border: none;
+    border-radius: 50%;
+    padding: 5px;
+    cursor: pointer;
+    font-size: 14px;
+    width: 28px;
+    height: 28px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
 }
 
 .delete-category-btn {
@@ -225,14 +246,6 @@
     display: flex;
     gap: 10px;
     margin-top: 15px;
-}
-
-.edit-item-btn, .delete-item-btn {
-    padding: 8px 12px;
-    border: none;
-    border-radius: 6px;
-    cursor: pointer;
-    font-size: 14px;
 }
 
 .edit-item-btn {
@@ -367,46 +380,6 @@
     border: none;
 }
 
-.edit-category-btn, .edit-item-btn {
-    background-color: #6d341f;
-    color: white;
-    border: none;
-    border-radius: 50%;
-    padding: 5px 10px;
-    cursor: pointer;
-    font-size: 16px;
-    width: 28px;
-    height: 28px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    margin-left: 5px;
-}
-
-.edit-category-btn::before {
-    content: "✏️";
-}
-
-.delete-item-btn {
-    background-color: #c62828;
-    color: white;
-    border: none;
-    border-radius: 50%;
-    padding: 5px 10px;
-    cursor: pointer;
-    font-size: 16px;
-    width: 28px;
-    height: 28px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-}
-
-.category-actions {
-    display: flex;
-    gap: 8px;
-}
-
 .edit-category-form {
     display: flex;
     flex-direction: column;
@@ -424,77 +397,6 @@
     border: 1px solid #d7ccc8;
     border-radius: 6px;
     font-size: 16px;
-}
-
-.category-card {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    background-color: rgba(255, 255, 255, 0.7);
-    border: 1px solid #ddd;
-    border-radius: 12px;
-    padding: 15px;
-    margin-bottom: 15px;
-}
-
-.category-name {
-    flex: 1;
-    font-size: 16px;
-    color: #6d341f;
-}
-
-.category-actions {
-    display: flex;
-    gap: 8px;
-}
-
-.edit-category-btn, .delete-category-btn, .edit-item-btn, .delete-item-btn {
-    background-color: transparent;
-    border: none;
-    cursor: pointer;
-    font-size: 16px;
-    width: 28px;
-    height: 28px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    border-radius: 50%;
-    transition: background-color 0.2s;
-}
-
-.edit-category-btn {
-    background-color: #6d341f;
-    color: white;
-    border: none;
-    border-radius: 50%;
-    padding: 5px;
-    cursor: pointer;
-    font-size: 14px;
-    width: 28px;
-    height: 28px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-}
-
-.edit-category-btn:hover {
-    background-color: rgba(109, 52, 31, 0.1);
-}
-
-.delete-category-btn, .delete-item-btn {
-    color: #c62828;
-}
-
-.delete-category-btn:hover, .delete-item-btn:hover {
-    background-color: rgba(198, 40, 40, 0.1);
-}
-
-.edit-item-btn {
-    color: #6d341f;
-}
-
-.edit-item-btn:hover {
-    background-color: rgba(109, 52, 31, 0.1);
 }
 
 .category-form-actions {
@@ -520,5 +422,10 @@
     background-color: #c62828;
     color: white;
     border: none;
+    width: 28px;
+    height: 28px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 0;
 }
-
