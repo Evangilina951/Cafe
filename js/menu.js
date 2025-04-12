@@ -41,10 +41,10 @@ function initializeMenuData() {
     const initialData = {
         categories: ["Кофе", "Чай", "Десерты"],
         items: {
-            item1: { id: 1, name: "Кофе", price: 100, category: "Кофе", ingredients: ["Арабика 1", "Вода 2"] },
-            item2: { id: 2, name: "Чай", price: 50, category: "Чай", ingredients: ["Чайные листья 1", "Вода 2"] },
-            item3: { id: 3, name: "Капучино", price: 150, category: "Кофе", ingredients: ["Эспрессо 1", "Молоко 2", "Пена 1"] },
-            item4: { id: 4, name: "Латте", price: 200, category: "Кофе", ingredients: ["Эспрессо 1", "Молоко 3"] }
+            item1: { id: 1, name: "Кофе", price: 100, category: "Кофе", ingredients: ["Арабика 1", "Вода 2"], visible: true },
+            item2: { id: 2, name: "Чай", price: 50, category: "Чай", ingredients: ["Чайные листья 1", "Вода 2"], visible: true },
+            item3: { id: 3, name: "Капучино", price: 150, category: "Кофе", ingredients: ["Эспрессо 1", "Молоко 2", "Пена 1"], visible: true },
+            item4: { id: 4, name: "Латте", price: 200, category: "Кофе", ingredients: ["Эспрессо 1", "Молоко 3"], visible: true }
         }
     };
     
@@ -70,54 +70,55 @@ function updateMainMenu() {
         return;
     }
     
-    if (menuItems.length > 0) {
-        elements.menuColumns.innerHTML = '';
-
-        const visibleItems = menuItems.filter(item => item.visible !== false);
-    
-        if (visibleItems.length > 0) {
-            // Группируем блюда по категориям
-            const itemsByCategory = {};
-            visibleItems.forEach(item => {
-                if (!itemsByCategory[item.category]) {
-                    itemsByCategory[item.category] = [];
-                }
-                itemsByCategory[item.category].push(item);
-            });
-            
-            // Создаем колонки для каждой категории
-            Object.keys(itemsByCategory).forEach(category => {
-                const column = document.createElement('div');
-                column.className = 'menu-column';
-                
-                const title = document.createElement('h3');
-                title.className = 'category-title';
-                title.textContent = category;
-                column.appendChild(title);
-                
-                const buttonsContainer = document.createElement('div');
-                buttonsContainer.className = 'menu-buttons';
-                
-                itemsByCategory[category].forEach(item => {
-                    const btn = document.createElement('button');
-                    btn.className = 'menu-btn';
-                    btn.innerHTML = `
-                        <div class="item-name">${item.name}</div>
-                        <div class="item-price">${item.price} ₽</div>
-                    `;
-                    btn.onclick = () => addToOrder(item.name, item.price);
-                    buttonsContainer.appendChild(btn);
-                });
-                
-                column.appendChild(buttonsContainer);
-                elements.menuColumns.appendChild(column);
-            });
-        } else {
-            elements.menuColumns.innerHTML = '<div class="menu-error">Нет доступных блюд в меню</div>';
-        }
-    } else {
+    if (menuItems.length === 0) {
         elements.menuColumns.innerHTML = '<div class="menu-error">Ошибка: Меню не загружено</div>';
+        return;
     }
+
+    elements.menuColumns.innerHTML = '';
+    const visibleItems = menuItems.filter(item => item.visible !== false);
+    
+    if (visibleItems.length === 0) {
+        elements.menuColumns.innerHTML = '<div class="menu-error">Нет доступных блюд в меню</div>';
+        return;
+    }
+
+    // Группируем блюда по категориям
+    const itemsByCategory = {};
+    visibleItems.forEach(item => {
+        if (!itemsByCategory[item.category]) {
+            itemsByCategory[item.category] = [];
+        }
+        itemsByCategory[item.category].push(item);
+    });
+    
+    // Создаем колонки для каждой категории
+    Object.keys(itemsByCategory).forEach(category => {
+        const column = document.createElement('div');
+        column.className = 'menu-column';
+        
+        const title = document.createElement('h3');
+        title.className = 'category-title';
+        title.textContent = category;
+        column.appendChild(title);
+        
+        const buttonsContainer = document.createElement('div');
+        buttonsContainer.className = 'menu-buttons';
+        
+        itemsByCategory[category].forEach(item => {
+            const btn = document.createElement('button');
+            btn.className = 'menu-btn';
+            btn.innerHTML = `
+                <div class="item-name">${item.name}</div>
+                <div class="item-price">${item.price} ₽</div>
+            `;
+            btn.onclick = () => addToOrder(item.name, item.price);
+            buttonsContainer.appendChild(btn);
+        });
+        
+        column.appendChild(buttonsContainer);
+        elements.menuColumns.appendChild(column);
+    });
 }
 
 export { menuCategories, menuItems };
