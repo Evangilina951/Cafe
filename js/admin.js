@@ -36,7 +36,6 @@ function setupButton(selector, handler) {
     }
 }
 
-// Функция для создания элемента ингредиента
 function createIngredientElement(name = '', quantity = '1') {
     const div = document.createElement('div');
     div.className = 'ingredient-item';
@@ -102,7 +101,6 @@ function resetAddItemForm() {
     elements.newItemName.value = '';
     elements.newItemPrice.value = '';
     elements.ingredientsList.innerHTML = '';
-    // Добавляем только один пустой ингредиент
     elements.ingredientsList.appendChild(createIngredientElement());
     setupIngredientsHandlers();
 }
@@ -135,8 +133,8 @@ function addMenuItem() {
         name,
         price,
         category,
-        ingredients: ingredients.filter(Boolean), // Фильтруем null/undefined
-        visible: true // По умолчанию блюдо видимо
+        ingredients: ingredients.filter(Boolean),
+        visible: true // Явно устанавливаем true по умолчанию
     };
 
     menuItems.push(newItem);
@@ -171,13 +169,16 @@ function getIngredientsList() {
 function updateMenuInFirebase() {
     const itemsObj = {};
     menuItems.forEach(item => {
+        // Гарантируем, что visible всегда будет boolean
+        const visible = typeof item.visible === 'boolean' ? item.visible : true;
+        
         itemsObj[`item${item.id}`] = {
             id: item.id,
             name: item.name,
             price: item.price,
             category: item.category,
-            ingredients: item.ingredients.filter(Boolean), // Фильтруем null/undefined
-            visible: item.visible
+            ingredients: item.ingredients.filter(Boolean),
+            visible // Используем проверенное значение
         };
     });
 
@@ -335,7 +336,6 @@ function createMenuItemCard(item) {
         </div>
     `;
     
-    // Добавляем обработчики для кнопок удаления ингредиентов в форме редактирования
     card.querySelectorAll('.remove-ingredient-btn').forEach(btn => {
         btn.addEventListener('click', function(e) {
             e.preventDefault();
@@ -383,7 +383,7 @@ function saveEditedItem(itemCard) {
             price,
             category,
             ingredients: [...ingredients],
-            visible
+            visible // Здесь visible всегда будет boolean благодаря checked
         };
         
         updateMenuInFirebase()
@@ -405,18 +405,21 @@ function setupAdminPanelHandlers() {
             const itemId = parseInt(this.closest('.menu-item-card').dataset.id);
             const itemIndex = menuItems.findIndex(item => item.id === itemId);
             if (itemIndex !== -1) {
-                menuItems[itemIndex].visible = this.checked;
+                // Гарантируем, что visible будет boolean
+                menuItems[itemIndex].visible = !!this.checked;
                 updateMenuInFirebase()
                     .then(() => renderMenuInterface())
                     .catch(error => {
                         console.error("Ошибка сохранения:", error);
                         alert("Не удалось изменить видимость блюда");
+                        // Восстанавливаем предыдущее состояние чекбокса
+                        this.checked = !this.checked;
                     });
             }
         });
     });
 
-    // Обработчики для категорий
+    // Остальные обработчики остаются без изменений
     document.querySelectorAll('.edit-category-btn').forEach(btn => {
         btn.addEventListener('click', function() {
             const card = this.closest('.category-card');
@@ -489,7 +492,6 @@ function setupAdminPanelHandlers() {
         });
     });
 
-    // Обработчики для товаров
     document.querySelectorAll('.delete-item-btn').forEach(btn => {
         btn.addEventListener('click', () => {
             const itemId = parseInt(btn.closest('.menu-item-card')?.dataset.id);
@@ -503,7 +505,6 @@ function setupAdminPanelHandlers() {
         });
     });
 
-    // Обработчики для редактирования товаров
     document.querySelectorAll('.edit-item-btn').forEach(btn => {
         btn.addEventListener('click', function() {
             const itemCard = this.closest('.menu-item-card');
@@ -511,7 +512,6 @@ function setupAdminPanelHandlers() {
             
             editForm.classList.toggle('hidden');
             
-            // Очищаем старые обработчики
             const saveBtn = editForm.querySelector('.save-edit-btn');
             const cancelBtn = editForm.querySelector('.cancel-edit-btn');
             const addBtn = editForm.querySelector('.add-edit-ingredient-btn');
@@ -520,7 +520,6 @@ function setupAdminPanelHandlers() {
             if (cancelBtn) cancelBtn.replaceWith(cancelBtn.cloneNode(true));
             if (addBtn) addBtn.replaceWith(addBtn.cloneNode(true));
             
-            // Назначаем новые обработчики
             editForm.querySelector('.save-edit-btn')?.addEventListener('click', () => saveEditedItem(itemCard));
             editForm.querySelector('.cancel-edit-btn')?.addEventListener('click', () => editForm.classList.add('hidden'));
             
