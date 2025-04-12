@@ -196,7 +196,7 @@ body {
 
 .item-price {
     width: 80px;
-    text-align: right;
+    text-align: center;
     margin-right: 15px;
     font-size: 16px;
 }
