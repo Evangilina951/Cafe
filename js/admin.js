@@ -1,7 +1,6 @@
 import { db } from '/Cafe/js/firebase-config.js';
 import { currentUser } from '/Cafe/js/auth.js';
 
-// DOM элементы
 const elements = {
     adminPanel: document.getElementById('admin-panel'),
     backBtn: document.querySelector('.back-btn'),
@@ -17,32 +16,26 @@ const elements = {
     categoryFilter: document.getElementById('category-filter')
 };
 
-// Состояние приложения
 let menuCategories = [];
 let menuItems = [];
 let activeCategoryFilter = null;
 
-// Вспомогательные функции
 function showElement(element) {
     element?.classList.remove('hidden');
-    element?.style.removeProperty('display');
 }
 
 function hideElement(element) {
     element?.classList.add('hidden');
-    element?.style.setProperty('display', 'none', 'important');
 }
 
 function setupButton(selector, handler) {
     document.querySelector(selector)?.addEventListener('click', handler);
 }
 
-// Инициализация админ-панели
 export async function initAdmin() {
     if (!window.location.pathname.includes('admin.html')) return;
     if (!elements.adminPanel) return;
 
-    // Проверка прав администратора
     if (!currentUser || currentUser.email !== 'admin@dismail.com') {
         alert("Доступ разрешен только администратору");
         window.location.href = '/Cafe/index.html';
@@ -50,13 +43,8 @@ export async function initAdmin() {
     }
 
     try {
-        // Загрузка данных меню
         await loadMenuDataFromFirebase();
-        
-        // Настройка обработчиков
         setupEventListeners();
-        
-        // Первоначальная загрузка интерфейса
         renderMenuInterface();
     } catch (error) {
         console.error("Ошибка инициализации:", error);
@@ -68,11 +56,8 @@ async function loadMenuDataFromFirebase() {
     try {
         const snapshot = await db.ref('menu').once('value');
         const menuData = snapshot.val() || {};
-        
         menuCategories = menuData.categories || [];
         menuItems = menuData.items ? Object.values(menuData.items) : [];
-        
-        console.log("Данные загружены:", { menuCategories, menuItems });
     } catch (error) {
         console.error("Ошибка загрузки меню:", error);
         throw error;
@@ -95,7 +80,7 @@ function resetAddItemForm() {
     elements.newItemPrice.value = '';
     elements.ingredientsList.innerHTML = `
         <div class="ingredient-item">
-            <input type="text" class="ingredient-name" placeholder="Название (например: Говядина на кости)">
+            <input type="text" class="ingredient-name" placeholder="Название">
             <input type="number" class="ingredient-quantity" placeholder="Количество" min="0.1" step="0.1" value="1">
             <button class="remove-ingredient-btn">×</button>
         </div>
@@ -104,10 +89,7 @@ function resetAddItemForm() {
 }
 
 function setupIngredientsHandlers() {
-    // Добавление ингредиента
     document.getElementById('add-ingredient-btn')?.addEventListener('click', addIngredientField);
-    
-    // Удаление ингредиентов
     document.querySelectorAll('.remove-ingredient-btn').forEach(btn => {
         btn.addEventListener('click', () => btn.closest('.ingredient-item')?.remove());
     });
@@ -117,7 +99,7 @@ function addIngredientField() {
     const newIngredient = document.createElement('div');
     newIngredient.className = 'ingredient-item';
     newIngredient.innerHTML = `
-        <input type="text" class="ingredient-name" placeholder="Название (например: Говядина на кости)">
+        <input type="text" class="ingredient-name" placeholder="Название">
         <input type="number" class="ingredient-quantity" placeholder="Количество" min="0.1" step="0.1" value="1">
         <button class="remove-ingredient-btn">×</button>
     `;
@@ -133,7 +115,7 @@ function addMenuItem() {
     const ingredients = getIngredientsList();
 
     if (!name || isNaN(price) || !category || ingredients.length === 0) {
-        alert('Заполните все поля и добавьте ингредиенты!');
+        alert('Заполните все поля!');
         return;
     }
 
@@ -142,7 +124,7 @@ function addMenuItem() {
         name,
         price,
         category,
-        ingredients: ingredients
+        ingredients
     };
 
     menuItems.push(newItem);
@@ -184,13 +166,11 @@ function updateMenuInFirebase() {
 function renderMenuInterface() {
     if (!elements.categoriesList || !elements.menuItemsList) return;
 
-    // Очистка интерфейса
     elements.categoriesList.innerHTML = '<h3>Категории</h3>';
     elements.menuItemsList.innerHTML = '';
     elements.newItemCategory.innerHTML = '';
     elements.categoryFilter.innerHTML = '';
 
-    // Фильтр "Все категории"
     const allBtn = createFilterButton('Все', !activeCategoryFilter);
     allBtn.onclick = () => {
         activeCategoryFilter = null;
@@ -198,9 +178,7 @@ function renderMenuInterface() {
     };
     elements.categoryFilter.appendChild(allBtn);
 
-    // Отображение категорий
     menuCategories.forEach(category => {
-        // Кнопка фильтра
         const filterBtn = createFilterButton(category, activeCategoryFilter === category);
         filterBtn.onclick = () => {
             activeCategoryFilter = category;
@@ -208,7 +186,6 @@ function renderMenuInterface() {
         };
         elements.categoryFilter.appendChild(filterBtn);
 
-        // Карточка категории
         const categoryCard = document.createElement('div');
         categoryCard.className = 'category-card';
         categoryCard.innerHTML = `
@@ -221,18 +198,16 @@ function renderMenuInterface() {
                 <input type="text" class="edit-category-input" value="${category}">
                 <div class="category-form-actions">
                     <button class="save-category-btn">Сохранить</button>
-                    <button class="cancel-category-btn">Отмена</button>
+                    <button class="cancel-category-btn">×</button>
                 </div>
             </div>
         `;
         elements.categoriesList.appendChild(categoryCard);
 
-        // Опция в select
         const option = new Option(category, category);
         elements.newItemCategory.appendChild(option);
     });
 
-    // Отображение товаров
     const filteredItems = activeCategoryFilter
         ? menuItems.filter(item => item.category === activeCategoryFilter)
         : menuItems;
@@ -278,51 +253,8 @@ function createMenuItemCard(item) {
             <button class="edit-item-btn" title="Редактировать">✏️</button>
             <button class="delete-item-btn" title="Удалить">×</button>
         </div>
-        
         <div class="edit-form hidden">
-            <div class="form-group">
-                <label>Категория</label>
-                <select class="edit-item-category">
-                    ${menuCategories.map(cat => 
-                        `<option value="${cat}" ${cat === item.category ? 'selected' : ''}>${cat}</option>`
-                    ).join('')}
-                </select>
-            </div>
-            
-            <div class="form-group">
-                <label>Название</label>
-                <input type="text" class="edit-item-name" value="${item.name}">
-            </div>
-            
-            <div class="form-group">
-                <label>Цена</label>
-                <input type="number" class="edit-item-price" value="${item.price}">
-            </div>
-            
-            <div class="form-group">
-                <label>Состав:</label>
-                <div class="edit-ingredients-list">
-                    ${ingredients.map(ing => {
-                        const parts = ing.split(' ');
-                        const quantity = parts.pop();
-                        const name = parts.join(' ');
-                        
-                        return `
-                            <div class="ingredient-item">
-                                <input type="text" class="ingredient-name" value="${name}">
-                                <input type="number" class="ingredient-quantity" value="${quantity}" min="0.1" step="0.1">
-                                <button class="remove-ingredient-btn">×</button>
-                            </div>
-                        `;
-                    }).join('')}
-                </div>
-                <button class="add-edit-ingredient-btn">+ Добавить ингредиент</button>
-            </div>
-            
-            <div class="form-actions">
-                <button class="save-edit-btn">Сохранить</button>
-                <button class="cancel-edit-btn">Отмена</button>
-            </div>
+            <!-- Форма редактирования товара -->
         </div>
     `;
     
@@ -330,7 +262,6 @@ function createMenuItemCard(item) {
 }
 
 function setupAdminPanelHandlers() {
-    // Редактирование категории
     document.querySelectorAll('.edit-category-btn').forEach(btn => {
         btn.addEventListener('click', function() {
             const card = this.closest('.category-card');
@@ -340,7 +271,6 @@ function setupAdminPanelHandlers() {
         });
     });
 
-    // Сохранение изменений категории
     document.querySelectorAll('.save-category-btn').forEach(btn => {
         btn.addEventListener('click', function() {
             const card = this.closest('.category-card');
@@ -354,15 +284,13 @@ function setupAdminPanelHandlers() {
             
             if (newName !== oldName) {
                 if (menuCategories.includes(newName)) {
-                    alert('Категория с таким названием уже существует');
+                    alert('Категория уже существует');
                     return;
                 }
                 
-                // Обновляем название категории
                 const index = menuCategories.indexOf(oldName);
                 menuCategories[index] = newName;
                 
-                // Обновляем все товары этой категории
                 menuItems.forEach(item => {
                     if (item.category === oldName) {
                         item.category = newName;
@@ -370,15 +298,12 @@ function setupAdminPanelHandlers() {
                 });
                 
                 updateMenuInFirebase()
-                    .then(() => {
-                        renderMenuInterface();
-                    })
+                    .then(() => renderMenuInterface())
                     .catch(error => {
                         console.error("Ошибка сохранения:", error);
                         alert("Не удалось сохранить изменения");
                     });
             } else {
-                // Без изменений - просто скрываем форму
                 card.querySelector('.category-name').classList.remove('hidden');
                 card.querySelector('.category-actions').classList.remove('hidden');
                 card.querySelector('.edit-category-form').classList.add('hidden');
@@ -386,7 +311,6 @@ function setupAdminPanelHandlers() {
         });
     });
 
-    // Отмена редактирования категории
     document.querySelectorAll('.cancel-category-btn').forEach(btn => {
         btn.addEventListener('click', function() {
             const card = this.closest('.category-card');
@@ -396,7 +320,6 @@ function setupAdminPanelHandlers() {
         });
     });
 
-    // Удаление категории
     document.querySelectorAll('.delete-category-btn').forEach(btn => {
         btn.addEventListener('click', () => {
             const category = btn.closest('.category-card').querySelector('.category-name')?.textContent;
@@ -411,7 +334,6 @@ function setupAdminPanelHandlers() {
         });
     });
 
-    // Удаление товара
     document.querySelectorAll('.delete-item-btn').forEach(btn => {
         btn.addEventListener('click', () => {
             const itemId = parseInt(btn.closest('.menu-item-card')?.dataset.id);
@@ -425,9 +347,7 @@ function setupAdminPanelHandlers() {
         });
     });
 
-    // Делегирование событий для кнопок добавления/удаления ингредиентов
     document.addEventListener('click', function(e) {
-        // Добавление ингредиента
         if (e.target.classList.contains('add-edit-ingredient-btn')) {
             const editForm = e.target.closest('.edit-form');
             if (!editForm) return;
@@ -436,93 +356,25 @@ function setupAdminPanelHandlers() {
             const newIngredient = document.createElement('div');
             newIngredient.className = 'ingredient-item';
             newIngredient.innerHTML = `
-                <input type="text" class="ingredient-name" placeholder="Название (например: Говядина на кости)">
+                <input type="text" class="ingredient-name" placeholder="Название">
                 <input type="number" class="ingredient-quantity" placeholder="Количество" min="0.1" step="0.1" value="1">
                 <button class="remove-ingredient-btn">×</button>
             `;
             ingredientsList.appendChild(newIngredient);
         }
         
-        // Удаление ингредиента
         if (e.target.classList.contains('remove-ingredient-btn')) {
             e.target.closest('.ingredient-item')?.remove();
         }
     });
 
-    // Редактирование товара
     document.querySelectorAll('.edit-item-btn').forEach(btn => {
         btn.addEventListener('click', function() {
             const itemCard = this.closest('.menu-item-card');
             const editForm = itemCard.querySelector('.edit-form');
-            
-            // Переключаем видимость формы
             editForm.classList.toggle('hidden');
-            
-            // Сохранение изменений
-            editForm.querySelector('.save-edit-btn').addEventListener('click', () => {
-                saveEditedItem(itemCard);
-            });
-            
-            // Отмена редактирования
-            editForm.querySelector('.cancel-edit-btn').addEventListener('click', () => {
-                editForm.classList.add('hidden');
-            });
         });
     });
-}
-
-function saveEditedItem(itemCard) {
-    const itemId = parseInt(itemCard.dataset.id);
-    const editForm = itemCard.querySelector('.edit-form');
-    
-    // Получаем новые значения
-    const category = editForm.querySelector('.edit-item-category').value;
-    const name = editForm.querySelector('.edit-item-name').value.trim();
-    const price = parseInt(editForm.querySelector('.edit-item-price').value);
-    
-    // Получаем список ингредиентов
-    const ingredients = [];
-    let isValid = true;
-    
-    editForm.querySelectorAll('.ingredient-item').forEach(item => {
-        const ingName = item.querySelector('.ingredient-name').value.trim();
-        const ingQuantity = item.querySelector('.ingredient-quantity').value;
-        
-        if (!ingName || !ingQuantity || parseFloat(ingQuantity) < 0.1) {
-            isValid = false;
-            item.querySelector('.ingredient-quantity').style.borderColor = 'red';
-        } else {
-            ingredients.push(`${ingName} ${ingQuantity}`);
-        }
-    });
-    
-    if (!isValid || !name || isNaN(price) || !category || ingredients.length === 0) {
-        alert('Проверьте данные:\n- Все поля должны быть заполнены\n- Количество должно быть числом ≥ 0.1\n- Должен быть хотя бы один ингредиент');
-        return;
-    }
-    
-    // Обновляем данные
-    const itemIndex = menuItems.findIndex(item => item.id === itemId);
-    if (itemIndex !== -1) {
-        menuItems[itemIndex] = {
-            ...menuItems[itemIndex],
-            name,
-            price,
-            category,
-            ingredients
-        };
-        
-        // Сохраняем в Firebase
-        updateMenuInFirebase()
-            .then(() => {
-                editForm.classList.add('hidden');
-                renderMenuInterface();
-            })
-            .catch(error => {
-                console.error("Ошибка сохранения:", error);
-                alert("Не удалось сохранить изменения");
-            });
-    }
 }
 
 function addCategory() {
@@ -543,7 +395,6 @@ function addCategory() {
         });
 }
 
-// Инициализация при загрузке страницы
 if (window.location.pathname.includes('admin.html')) {
     document.addEventListener('DOMContentLoaded', async () => {
         try {
