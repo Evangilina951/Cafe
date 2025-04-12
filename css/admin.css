@@ -429,3 +429,87 @@
     justify-content: center;
     padding: 0;
 }
+
+/* Стили для переключателя видимости в карточке товара */
+.visibility-toggle {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    cursor: pointer;
+}
+
+.visibility-checkbox {
+    appearance: none;
+    -webkit-appearance: none;
+    width: 28px;
+    height: 28px;
+    border-radius: 50%;
+    background-color: #c62828;
+    cursor: pointer;
+    position: relative;
+    transition: background-color 0.3s;
+    margin: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.visibility-checkbox:checked {
+    background-color: #4CAF50;
+}
+
+.visibility-checkbox::after {
+    content: "✓";
+    color: white;
+    font-size: 16px;
+    position: absolute;
+    opacity: 0;
+    transition: opacity 0.3s;
+}
+
+.visibility-checkbox:checked::after {
+    opacity: 1;
+}
+
+/* Стили для формы добавления/редактирования */
+.form-group.visibility-group {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    margin-bottom: 15px;
+}
+
+.form-group.visibility-group label {
+    margin-bottom: 0;
+    order: 2;
+    cursor: pointer;
+}
+
+.form-group.visibility-group .visibility-checkbox {
+    order: 1;
+}
+
+/* Обновленные стили для item-actions */
+.item-actions {
+    display: flex;
+    gap: 10px;
+    margin-top: 15px;
+    align-items: center;
+}
+
+/* Обновленные стили для формы добавления */
+#add-item-form .form-group.visibility-group {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    margin-bottom: 15px;
+}
+
+#add-item-form .form-group.visibility-group label {
+    margin-bottom: 0;
+    order: 2;
+}
+
+#add-item-form .form-group.visibility-group .visibility-checkbox {
+    order: 1;
+}
