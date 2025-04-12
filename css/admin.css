@@ -475,6 +475,7 @@
 }
 
 /* Стили для формы добавления/редактирования */
+/*
 .form-group.visibility-group {
     display: flex;
     align-items: center;
@@ -497,6 +498,7 @@
     color: #6d341f;
     margin-bottom: 0;
 }
+*/
 
 /* Скрываем label в карточке товара */
 .menu-item-card .visibility-label {
