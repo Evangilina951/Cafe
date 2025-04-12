@@ -247,6 +247,7 @@ function renderMenuInterface() {
     setupAdminPanelHandlers();
 }
 
+
 function createFilterButton(text, isActive) {
     const btn = document.createElement('button');
     btn.className = `filter-btn ${isActive ? 'active' : ''}`;
@@ -396,6 +397,22 @@ function saveEditedItem(itemCard) {
 }
 
 function setupAdminPanelHandlers() {
+    document.querySelectorAll('.visibility-checkbox').forEach(checkbox => {
+    checkbox.addEventListener('change', function() {
+        const itemId = parseInt(this.closest('.menu-item-card').dataset.id);
+        const itemIndex = menuItems.findIndex(item => item.id === itemId);
+        if (itemIndex !== -1) {
+            menuItems[itemIndex].visible = this.checked;
+            updateMenuInFirebase()
+                .then(() => renderMenuInterface())
+                .catch(error => {
+                    console.error("Ошибка сохранения:", error);
+                    alert("Не удалось изменить видимость блюда");
+                });
+        }
+    });
+});
+    
     // Обработчики для категорий
     document.querySelectorAll('.edit-category-btn').forEach(btn => {
         btn.addEventListener('click', function() {
