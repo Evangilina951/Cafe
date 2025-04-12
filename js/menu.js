@@ -72,10 +72,15 @@ function updateMainMenu() {
     
     if (menuItems.length > 0) {
         elements.menuColumns.innerHTML = '';
+
+        const visibleItems = menuItems.filter(item => item.visible !== false);
+    
+        if (visibleItems.length > 0) {
+            elements.menuColumns.innerHTML = '';
         
         // Группируем блюда по категориям
         const itemsByCategory = {};
-        menuItems.forEach(item => {
+        visibleItems.forEach(item => {
             if (!itemsByCategory[item.category]) {
                 itemsByCategory[item.category] = [];
             }
@@ -109,9 +114,14 @@ function updateMainMenu() {
             column.appendChild(buttonsContainer);
             elements.menuColumns.appendChild(column);
         });
+              } else {
+        elements.menuColumns.innerHTML = '<div class="menu-error">Нет доступных блюд в меню</div>';
+    }
+}
     } else {
         elements.menuColumns.innerHTML = '<div class="menu-error">Ошибка: Меню не загружено</div>';
     }
+      
 }
 
 export { menuCategories, menuItems };
