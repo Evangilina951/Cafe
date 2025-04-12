@@ -130,13 +130,12 @@ function addMenuItem() {
         return;
     }
 
-    // Создаем новый объект блюда с чистым списком ингредиентов
     const newItem = {
         id: Date.now(),
         name,
         price,
         category,
-        ingredients: ingredients.filter(Boolean) // Фильтруем null/undefined
+        ingredients: ingredients.filter(Boolean), // Фильтруем null/undefined
         visible: true // По умолчанию блюдо видимо
     };
 
@@ -177,7 +176,8 @@ function updateMenuInFirebase() {
             name: item.name,
             price: item.price,
             category: item.category,
-            ingredients: item.ingredients.filter(Boolean) // Фильтруем null/undefined
+            ingredients: item.ingredients.filter(Boolean), // Фильтруем null/undefined
+            visible: item.visible
         };
     });
 
@@ -247,7 +247,6 @@ function renderMenuInterface() {
     setupAdminPanelHandlers();
 }
 
-
 function createFilterButton(text, isActive) {
     const btn = document.createElement('button');
     btn.className = `filter-btn ${isActive ? 'active' : ''}`;
@@ -278,8 +277,8 @@ function createMenuItemCard(item) {
             <button class="edit-item-btn" title="Редактировать">✏️</button>
             <button class="delete-item-btn" title="Удалить">×</button>
             <label class="visibility-toggle">
-            <input type="checkbox" class="visibility-checkbox" ${item.visible ? 'checked' : ''}>
-            Отображать
+                <input type="checkbox" class="visibility-checkbox" ${item.visible ? 'checked' : ''}>
+                Отображать
             </label>
         </div>
         
@@ -291,10 +290,6 @@ function createMenuItemCard(item) {
                         `<option value="${cat}" ${cat === item.category ? 'selected' : ''}>${cat}</option>`
                     ).join('')}
                 </select>
-                <label>
-                <input type="checkbox" class="edit-item-visible" ${item.visible ? 'checked' : ''}>
-                Отображать в основном меню
-                </label>
             </div>
             
             <div class="form-group">
@@ -305,6 +300,13 @@ function createMenuItemCard(item) {
             <div class="form-group">
                 <label>Цена</label>
                 <input type="number" class="edit-item-price" value="${item.price}">
+            </div>
+            
+            <div class="form-group">
+                <label>
+                    <input type="checkbox" class="edit-item-visible" ${item.visible ? 'checked' : ''}>
+                    Отображать в основном меню
+                </label>
             </div>
             
             <div class="form-group">
@@ -376,12 +378,12 @@ function saveEditedItem(itemCard) {
     const itemIndex = menuItems.findIndex(item => item.id === itemId);
     if (itemIndex !== -1) {
         menuItems[itemIndex] = {
-               ...menuItems[itemIndex],
+            ...menuItems[itemIndex],
             name,
             price,
             category,
             ingredients: [...ingredients],
-            visible // Добавляем состояние видимости
+            visible
         };
         
         updateMenuInFirebase()
@@ -397,22 +399,23 @@ function saveEditedItem(itemCard) {
 }
 
 function setupAdminPanelHandlers() {
+    // Обработчик переключателя видимости
     document.querySelectorAll('.visibility-checkbox').forEach(checkbox => {
-    checkbox.addEventListener('change', function() {
-        const itemId = parseInt(this.closest('.menu-item-card').dataset.id);
-        const itemIndex = menuItems.findIndex(item => item.id === itemId);
-        if (itemIndex !== -1) {
-            menuItems[itemIndex].visible = this.checked;
-            updateMenuInFirebase()
-                .then(() => renderMenuInterface())
-                .catch(error => {
-                    console.error("Ошибка сохранения:", error);
-                    alert("Не удалось изменить видимость блюда");
-                });
-        }
+        checkbox.addEventListener('change', function() {
+            const itemId = parseInt(this.closest('.menu-item-card').dataset.id);
+            const itemIndex = menuItems.findIndex(item => item.id === itemId);
+            if (itemIndex !== -1) {
+                menuItems[itemIndex].visible = this.checked;
+                updateMenuInFirebase()
+                    .then(() => renderMenuInterface())
+                    .catch(error => {
+                        console.error("Ошибка сохранения:", error);
+                        alert("Не удалось изменить видимость блюда");
+                    });
+            }
+        });
     });
-});
-    
+
     // Обработчики для категорий
     document.querySelectorAll('.edit-category-btn').forEach(btn => {
         btn.addEventListener('click', function() {
