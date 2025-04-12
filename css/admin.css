@@ -399,3 +399,63 @@
     border-radius: 8px;
     font-size: 14px;
 }
+
+.category-card {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    background-color: rgba(255, 255, 255, 0.7);
+    border: 1px solid #ddd;
+    border-radius: 12px;
+    padding: 15px;
+    margin-bottom: 15px;
+}
+
+.category-name {
+    flex: 1;
+    font-size: 16px;
+    color: #6d341f;
+}
+
+.category-actions {
+    display: flex;
+    gap: 8px;
+}
+
+.edit-category-btn, .delete-category-btn, .edit-item-btn, .delete-item-btn {
+    background-color: transparent;
+    border: none;
+    cursor: pointer;
+    font-size: 16px;
+    width: 28px;
+    height: 28px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 50%;
+    transition: background-color 0.2s;
+}
+
+.edit-category-btn {
+    color: #6d341f;
+}
+
+.edit-category-btn:hover {
+    background-color: rgba(109, 52, 31, 0.1);
+}
+
+.delete-category-btn, .delete-item-btn {
+    color: #c62828;
+}
+
+.delete-category-btn:hover, .delete-item-btn:hover {
+    background-color: rgba(198, 40, 40, 0.1);
+}
+
+.edit-item-btn {
+    color: #6d341f;
+}
+
+.edit-item-btn:hover {
+    background-color: rgba(109, 52, 31, 0.1);
+}
