@@ -253,8 +253,51 @@ function createMenuItemCard(item) {
             <button class="edit-item-btn" title="Редактировать">✏️</button>
             <button class="delete-item-btn" title="Удалить">×</button>
         </div>
+        
         <div class="edit-form hidden">
-            <!-- Форма редактирования товара -->
+            <div class="form-group">
+                <label>Категория</label>
+                <select class="edit-item-category">
+                    ${menuCategories.map(cat => 
+                        `<option value="${cat}" ${cat === item.category ? 'selected' : ''}>${cat}</option>`
+                    ).join('')}
+                </select>
+            </div>
+            
+            <div class="form-group">
+                <label>Название</label>
+                <input type="text" class="edit-item-name" value="${item.name}">
+            </div>
+            
+            <div class="form-group">
+                <label>Цена</label>
+                <input type="number" class="edit-item-price" value="${item.price}">
+            </div>
+            
+            <div class="form-group">
+                <label>Состав:</label>
+                <div class="edit-ingredients-list">
+                    ${ingredients.map(ing => {
+                        const parts = ing.split(' ');
+                        const quantity = parts.pop();
+                        const name = parts.join(' ');
+                        
+                        return `
+                            <div class="ingredient-item">
+                                <input type="text" class="ingredient-name" value="${name}">
+                                <input type="number" class="ingredient-quantity" value="${quantity}" min="0.1" step="0.1">
+                                <button class="remove-ingredient-btn">×</button>
+                            </div>
+                        `;
+                    }).join('')}
+                </div>
+                <button class="add-edit-ingredient-btn">+ Добавить ингредиент</button>
+            </div>
+            
+            <div class="form-actions">
+                <button class="save-edit-btn">Сохранить</button>
+                <button class="cancel-edit-btn">×</button>
+            </div>
         </div>
     `;
     
@@ -347,6 +390,8 @@ function setupAdminPanelHandlers() {
         });
     });
 
+    
+
     document.addEventListener('click', function(e) {
         if (e.target.classList.contains('add-edit-ingredient-btn')) {
             const editForm = e.target.closest('.edit-form');
@@ -372,7 +417,24 @@ function setupAdminPanelHandlers() {
         btn.addEventListener('click', function() {
             const itemCard = this.closest('.menu-item-card');
             const editForm = itemCard.querySelector('.edit-form');
+            
+            // Переключаем видимость формы
             editForm.classList.toggle('hidden');
+            
+            // Настройка обработчиков для этой конкретной формы
+            editForm.querySelector('.save-edit-btn').onclick = () => saveEditedItem(itemCard);
+            editForm.querySelector('.cancel-edit-btn').onclick = () => editForm.classList.add('hidden');
+            editForm.querySelector('.add-edit-ingredient-btn').onclick = () => {
+                const ingredientsList = editForm.querySelector('.edit-ingredients-list');
+                const newIngredient = document.createElement('div');
+                newIngredient.className = 'ingredient-item';
+                newIngredient.innerHTML = `
+                    <input type="text" class="ingredient-name" placeholder="Название">
+                    <input type="number" class="ingredient-quantity" placeholder="Количество" min="0.1" step="0.1" value="1">
+                    <button class="remove-ingredient-btn">×</button>
+                `;
+                ingredientsList.appendChild(newIngredient);
+            };
         });
     });
 }
