@@ -135,7 +135,7 @@ function addMenuItem() {
         name,
         price,
         category,
-        ingredients: ingredients // Используем только указанные ингредиенты
+        ingredients: [...ingredients] // Создаем копию массива ингредиентов
     };
 
     menuItems.push(newItem);
@@ -153,20 +153,28 @@ function addMenuItem() {
 }
 
 function getIngredientsList() {
-    return Array.from(document.querySelectorAll('.ingredient-item'))
-        .map(item => {
-            const name = item.querySelector('.ingredient-name')?.value.trim();
-            const quantity = item.querySelector('.ingredient-quantity')?.value;
-            return name && quantity ? `${name} ${quantity}` : null;
-        })
-        .filter(Boolean);
+    const ingredients = [];
+    document.querySelectorAll('.ingredient-item').forEach(item => {
+        const name = item.querySelector('.ingredient-name')?.value.trim();
+        const quantity = item.querySelector('.ingredient-quantity')?.value;
+        if (name && quantity) {
+            ingredients.push(`${name} ${quantity}`);
+        }
+    });
+    return ingredients;
 }
 
 function updateMenuInFirebase() {
-    const itemsObj = menuItems.reduce((acc, item) => {
-        acc[`item${item.id}`] = item;
-        return acc;
-    }, {});
+    const itemsObj = {};
+    menuItems.forEach(item => {
+        itemsObj[`item${item.id}`] = {
+            id: item.id,
+            name: item.name,
+            price: item.price,
+            category: item.category,
+            ingredients: [...item.ingredients] // Создаем копию массива ингредиентов
+        };
+    });
 
     return db.ref('menu').update({
         categories: menuCategories,
@@ -246,7 +254,7 @@ function createMenuItemCard(item) {
     card.className = 'menu-item-card';
     card.dataset.id = item.id;
     
-    const ingredients = item.ingredients || [];
+    const ingredients = [...item.ingredients] || []; // Создаем копию массива ингредиентов
     
     card.innerHTML = `
         <div class="item-main-info">
@@ -357,7 +365,7 @@ function saveEditedItem(itemCard) {
             name,
             price,
             category,
-            ingredients // Используем только указанные ингредиенты
+            ingredients: [...ingredients] // Создаем копию массива ингредиентов
         };
         
         updateMenuInFirebase()
