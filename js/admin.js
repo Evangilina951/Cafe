@@ -212,12 +212,10 @@ function renderMenuInterface() {
         const categoryCard = document.createElement('div');
         categoryCard.className = 'category-card';
         categoryCard.innerHTML = `
-            <div class="category-content">
-                <span class="category-name">${category}</span>
-                <div class="category-actions">
-                    <button class="edit-category-btn" title="Редактировать">✏️</button>
-                    <button class="delete-category-btn" title="Удалить">×</button>
-                </div>
+            <span class="category-name">${category}</span>
+            <div class="category-actions">
+                <button class="edit-category-btn" title="Редактировать">✏️</button>
+                <button class="delete-category-btn" title="Удалить">×</button>
             </div>
             <div class="edit-category-form hidden">
                 <input type="text" class="edit-category-input" value="${category}">
@@ -336,7 +334,8 @@ function setupAdminPanelHandlers() {
     document.querySelectorAll('.edit-category-btn').forEach(btn => {
         btn.addEventListener('click', function() {
             const card = this.closest('.category-card');
-            card.querySelector('.category-content').classList.add('hidden');
+            card.querySelector('.category-name').classList.add('hidden');
+            card.querySelector('.category-actions').classList.add('hidden');
             card.querySelector('.edit-category-form').classList.remove('hidden');
         });
     });
@@ -380,7 +379,8 @@ function setupAdminPanelHandlers() {
                     });
             } else {
                 // Без изменений - просто скрываем форму
-                card.querySelector('.category-content').classList.remove('hidden');
+                card.querySelector('.category-name').classList.remove('hidden');
+                card.querySelector('.category-actions').classList.remove('hidden');
                 card.querySelector('.edit-category-form').classList.add('hidden');
             }
         });
@@ -390,7 +390,8 @@ function setupAdminPanelHandlers() {
     document.querySelectorAll('.cancel-category-btn').forEach(btn => {
         btn.addEventListener('click', function() {
             const card = this.closest('.category-card');
-            card.querySelector('.category-content').classList.remove('hidden');
+            card.querySelector('.category-name').classList.remove('hidden');
+            card.querySelector('.category-actions').classList.remove('hidden');
             card.querySelector('.edit-category-form').classList.add('hidden');
         });
     });
@@ -398,7 +399,7 @@ function setupAdminPanelHandlers() {
     // Удаление категории
     document.querySelectorAll('.delete-category-btn').forEach(btn => {
         btn.addEventListener('click', () => {
-            const category = btn.closest('.category-content').querySelector('.category-name')?.textContent;
+            const category = btn.closest('.category-card').querySelector('.category-name')?.textContent;
             if (category && confirm(`Удалить категорию "${category}"?`)) {
                 const index = menuCategories.indexOf(category);
                 if (index !== -1) {
