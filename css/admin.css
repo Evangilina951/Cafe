@@ -1,5 +1,4 @@
-/* Основные стили админки */
-#admin-panel, #admin-container {
+#admin-panel {
     position: fixed;
     top: 0;
     left: 0;
@@ -16,8 +15,6 @@
     justify-content: space-between;
     align-items: center;
     margin-bottom: 25px;
-    padding-bottom: 15px;
-    border-bottom: 1px solid #6d341f;
 }
 
 .back-btn {
@@ -35,16 +32,13 @@
     background-color: #3e8e41;
 }
 
-.admin-actions, .promo-controls {
+.admin-actions {
     display: flex;
-    justify-content: space-between;
+    gap: 15px;
     margin-bottom: 25px;
-    gap: 20px;
 }
 
-.add-category-btn, 
-.add-item-btn,
-.action-btn {
+.add-category-btn, .add-item-btn {
     padding: 12px 24px;
     font-size: 16px;
     background-color: #6d341f;
@@ -55,30 +49,11 @@
     transition: background-color 0.3s;
 }
 
-.add-category-btn:hover, 
-.add-item-btn:hover,
-.action-btn:hover {
+.add-category-btn:hover, .add-item-btn:hover {
     background-color: #5a2b19;
 }
 
-.search-box {
-    flex: 1;
-    max-width: 400px;
-}
-
-.search-box input,
-#promo-search {
-    width: 100%;
-    padding: 12px 15px;
-    border: 1px solid #6d341f;
-    border-radius: 8px;
-    font-size: 16px;
-}
-
-/* Формы */
-#add-category-form, 
-#add-item-form,
-#promo-form {
+#add-category-form, #add-item-form {
     display: flex;
     flex-direction: column;
     gap: 20px;
@@ -91,9 +66,7 @@
 
 #add-category-form input,
 #add-item-form input,
-#add-item-form select,
-#promo-form input,
-#promo-form select {
+#add-item-form select {
     padding: 12px 15px;
     border: 1px solid #d7ccc8;
     border-radius: 8px;
@@ -102,8 +75,7 @@
 }
 
 #add-category-form button,
-#add-item-form button,
-#promo-form button {
+#add-item-form button {
     padding: 12px;
     border: none;
     border-radius: 8px;
@@ -112,7 +84,11 @@
     margin-top: 10px;
 }
 
-/* Списки элементов */
+#add-category-btn {
+    background-color: #6d341f;
+    color: white;
+}
+
 .menu-management {
     display: grid;
     grid-template-columns: 300px 1fr;
@@ -136,66 +112,15 @@
     font-size: 18px;
 }
 
-/* Карточки элементов */
-.category-card,
-.promo-card {
+.category-card {
     background-color: rgba(255, 255, 255, 0.7);
     border: 1px solid #ddd;
     border-radius: 12px;
     padding: 15px;
     margin-bottom: 15px;
-}
-
-.promo-card {
-    display: flex;
-    flex-direction: column;
-    gap: 15px;
-    box-shadow: 0 2px 10px rgba(0,0,0,0.1);
-}
-
-.promo-card-header {
     display: flex;
     justify-content: space-between;
-    margin-bottom: 15px;
-    padding-bottom: 10px;
-    border-bottom: 1px solid #eee;
-}
-
-.promo-name {
-    font-weight: bold;
-    font-size: 18px;
-    color: #6d341f;
-}
-
-.promo-status {
-    padding: 3px 8px;
-    border-radius: 4px;
-    font-size: 12px;
-}
-
-.promo-status.active {
-    background: #e8f5e9;
-    color: #2e7d32;
-}
-
-.promo-status.inactive {
-    background: #ffebee;
-    color: #c62828;
-}
-
-.promo-details {
-    margin-bottom: 15px;
-}
-
-.promo-detail {
-    display: flex;
-    margin-bottom: 8px;
-}
-
-.promo-detail-label {
-    font-weight: bold;
-    min-width: 120px;
-    color: #6d341f;
+    align-items: center;
 }
 
 .category-name {
@@ -204,22 +129,12 @@
     color: #6d341f;
 }
 
-/* Действия */
-.category-actions,
-.promo-actions,
-.item-actions {
+.category-actions {
     display: flex;
-    gap: 10px;
-    align-items: center;
+    gap: 8px;
 }
 
-.promo-actions {
-    justify-content: flex-end;
-}
-
-.edit-category-btn,
-.edit-item-btn,
-.edit-btn {
+.edit-category-btn {
     background-color: #6d341f;
     color: white;
     border: none;
@@ -234,7 +149,120 @@
     justify-content: center;
 }
 
-.delete-category-btn,
+.delete-category-btn {
+    background-color: #c62828;
+    color: white;
+    border: none;
+    border-radius: 50%;
+    padding: 5px;
+    cursor: pointer;
+    font-size: 16px;
+    width: 28px;
+    height: 28px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-weight: bold;
+}
+
+.menu-items-container {
+    display: flex;
+    flex-direction: column;
+    gap: 15px;
+}
+
+.category-filter {
+    display: flex;
+    gap: 10px;
+    margin-bottom: 15px;
+    flex-wrap: wrap;
+}
+
+.filter-btn {
+    padding: 8px 12px;
+    background-color: #6d341f;
+    color: white;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+    font-size: 14px;
+}
+
+.filter-btn.active {
+    background-color: #4CAF50;
+}
+
+.menu-items-grid {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 20px;
+    align-content: start;
+}
+
+.menu-item-card {
+    background-color: rgba(255, 255, 255, 0.7);
+    border: 1px solid #ddd;
+    border-radius: 12px;
+    padding: 20px;
+    margin-bottom: 15px;
+}
+
+.item-category {
+    color: #6d341f;
+    font-size: 14px;
+    margin-bottom: 5px;
+}
+
+.item-name {
+    font-size: 16px;
+    font-weight: bold;
+    color: #6d341f;
+    margin-bottom: 5px;
+}
+
+.item-price {
+    color: #2E7D32;
+    font-weight: bold;
+    margin-bottom: 10px;
+    text-align: left;
+}
+
+.item-ingredients {
+    margin-top: 10px;
+}
+
+.item-ingredients ul {
+    list-style-type: none;
+    padding-left: 0;
+    margin-top: 5px;
+}
+
+.item-ingredients li {
+    padding: 2px 0;
+    font-size: 14px;
+}
+
+.item-actions {
+    display: flex;
+    gap: 10px;
+    margin-top: 15px;
+}
+
+.edit-item-btn {
+    background-color: #6d341f;
+    color: white;
+    border: none;
+    border-radius: 50%;
+    padding: 5px;
+    cursor: pointer;
+    font-size: 14px;
+    width: 28px;
+    height: 28px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
 .delete-item-btn {
     background-color: #c62828;
     color: white;
@@ -251,124 +279,158 @@
     font-weight: bold;
 }
 
-.copy-btn {
-    background-color: #2196F3;
-    color: white;
-    border: none;
-    border-radius: 4px;
-    padding: 6px 12px;
-    cursor: pointer;
-    font-size: 14px;
-}
-
-/* Модальное окно */
-.modal {
-    position: fixed;
-    top: 0;
-    left: 0;
+.edit-form {
     width: 100%;
-    height: 100%;
-    background: rgba(0,0,0,0.5);
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    z-index: 1000;
+    margin-top: 20px;
+    padding: 20px;
+    background-color: rgba(255, 255, 255, 0.8);
+    border-radius: 8px;
+    border: 1px solid #ddd;
 }
 
-.modal-content {
-    background: white;
-    padding: 30px;
-    border-radius: 10px;
-    width: 100%;
-    max-width: 600px;
-    max-height: 90vh;
-    overflow-y: auto;
-    position: relative;
-}
-
-.close-btn {
-    position: absolute;
-    top: 15px;
-    right: 15px;
-    font-size: 24px;
-    cursor: pointer;
-    color: #6d341f;
-}
-
-/* Группы форм */
 .form-group {
-    margin-bottom: 20px;
+    margin-bottom: 15px;
 }
 
 .form-group label {
     display: block;
-    margin-bottom: 8px;
+    margin-bottom: 5px;
     font-weight: bold;
     color: #6d341f;
 }
 
-.radio-group, 
-.checkbox-group {
+.form-group input, 
+.form-group select {
+    width: 100%;
+    padding: 8px 12px;
+    border: 1px solid #ddd;
+    border-radius: 4px;
+    font-size: 14px;
+}
+
+.edit-ingredients-list {
+    margin-top: 10px;
+}
+
+.ingredient-item {
+    display: flex;
+    gap: 10px;
+    margin-bottom: 12px;
+    align-items: center;
+}
+
+.ingredient-name, 
+.ingredient-quantity {
+    flex: 1;
+    padding: 10px 12px;
+    border: 1px solid #ddd;
+    border-radius: 6px;
+    font-size: 16px;
+}
+
+.remove-ingredient-btn {
+    background-color: #c62828;
+    color: white;
+    border: none;
+    border-radius: 6px;
+    padding: 10px;
+    cursor: pointer;
+    width: 36px;
+    height: 36px;
     display: flex;
     align-items: center;
-    gap: 15px;
-    margin-bottom: 10px;
+    justify-content: center;
+    font-size: 18px;
 }
 
-.checkbox-group input[type="number"],
-.checkbox-group input[type="date"] {
-    width: auto;
-    margin-left: 10px;
-}
-
-.discount-fields {
-    padding: 15px;
-    background: #f5f5f5;
+.add-edit-ingredient-btn {
+    background-color: #6d341f;
+    color: white;
+    border: none;
+    padding: 10px 15px;
     border-radius: 6px;
-    margin-bottom: 20px;
+    cursor: pointer;
+    margin-top: 15px;
+    font-size: 16px;
 }
 
-/* Кнопки действий */
-.form-actions,
-.category-form-actions {
+.form-actions {
     display: flex;
-    justify-content: flex-end;
     gap: 15px;
-    margin-top: 30px;
+    margin-top: 20px;
 }
 
-.save-edit-btn,
-.save-category-btn,
-.pay-btn {
+.save-edit-btn, 
+.cancel-edit-btn {
+    padding: 10px 20px;
+    border-radius: 6px;
+    cursor: pointer;
+    font-size: 16px;
+}
+
+.save-edit-btn {
     background-color: #4CAF50;
     color: white;
     border: none;
 }
 
-.cancel-edit-btn,
-.cancel-category-btn,
-.clear-btn {
+.cancel-edit-btn {
     background-color: #c62828;
     color: white;
     border: none;
 }
 
-/* Сетки */
-.menu-items-grid,
-.promo-list {
-    display: grid;
-    gap: 20px;
+.edit-category-form {
+    display: flex;
+    flex-direction: column;
+    gap: 15px;
+    width: 100%;
+    padding: 15px;
+    background-color: rgba(255, 255, 255, 0.8);
+    border-radius: 8px;
+    margin-top: 10px;
 }
 
-.menu-items-grid {
-    grid-template-columns: repeat(2, 1fr);
+.edit-category-input {
+    width: 100%;
+    padding: 10px;
+    border: 1px solid #d7ccc8;
+    border-radius: 6px;
+    font-size: 16px;
 }
 
-.promo-list {
-    grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+.category-form-actions {
+    display: flex;
+    gap: 10px;
+    justify-content: flex-end;
 }
 
-/* Переключатель видимости */
+.save-category-btn, .cancel-category-btn {
+    padding: 8px 16px;
+    border-radius: 6px;
+    cursor: pointer;
+    font-size: 14px;
+}
+
+.save-category-btn {
+    background-color: #4CAF50;
+    color: white;
+    border: none;
+}
+
+.cancel-category-btn {
+    background-color: #c62828;
+    color: white;
+    border: none;
+    width: 28px;
+    height: 28px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 0;
+}
+
+/* Стили для переключателя видимости в карточке товара */
 .visibility-toggle {
     display: inline-flex;
     align-items: center;
@@ -381,6 +443,7 @@
 
 .visibility-checkbox {
     appearance: none;
+    -webkit-appearance: none;
     width: 28px;
     height: 28px;
     border-radius: 50%;
@@ -411,42 +474,112 @@
     opacity: 1;
 }
 
-/* Адаптивность */
-@media (max-width: 900px) {
-    .menu-management {
-        grid-template-columns: 1fr;
-    }
-    
-    .categories-list {
-        border-right: none;
-        padding-right: 0;
-        border-bottom: 1px solid #d7ccc8;
-        padding-bottom: 20px;
-    }
-    
-    .menu-items-container {
-        padding-left: 0;
-    }
-    
-    .menu-items-grid {
-        grid-template-columns: 1fr;
-    }
+/* Стили для формы добавления/редактирования */
+/*
+.form-group.visibility-group {
+    display: flex;
+    align-items: center;
+    gap: 10px;
 }
 
-@media (max-width: 600px) {
-    #admin-panel, #admin-container {
-        padding: 15px;
-    }
-    
-    .admin-actions, .promo-controls {
-        flex-direction: column;
-    }
-    
-    .search-box {
-        max-width: 100%;
-    }
-    
-    .modal-content {
-        padding: 20px;
-    }
+.form-group.visibility-group label {
+    margin-bottom: 0;
+    order: 2;
+    cursor: pointer;
+}
+
+.form-group.visibility-group .visibility-checkbox {
+    order: 1;
+}
+
+.visibility-label {
+    cursor: pointer;
+    font-weight: bold;
+    color: #6d341f;
+    margin-bottom: 0;
+}
+*/
+
+/* Скрываем label в карточке товара */
+.menu-item-card .visibility-label {
+    display: none;
+}
+
+/* Обновленные стили для item-actions */
+.item-actions {
+    display: flex;
+    gap: 10px;
+    margin-top: 15px;
+    align-items: center;
+}
+
+/* Обновленные стили для формы добавления */
+#add-item-form .form-group.visibility-group {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    margin-bottom: 15px;
+}
+
+#add-item-form .form-group.visibility-group label {
+    margin-bottom: 0;
+    order: 2;
+}
+
+#add-item-form .form-group.visibility-group .visibility-checkbox {
+    order: 1;
+}
+
+/* Стили для иконок действий */
+.edit-item-btn,
+.delete-item-btn,
+.visibility-toggle {
+    width: 28px;
+    height: 28px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 50%;
+    cursor: pointer;
+    transition: all 0.3s;
+}
+
+.edit-item-btn {
+    background-color: #6d341f;
+    color: white;
+    border: none;
+    font-size: 14px;
+}
+
+.delete-item-btn {
+    background-color: #c62828;
+    color: white;
+    border: none;
+    font-size: 16px;
+    font-weight: bold;
+}
+
+.ingredients-toggle {
+    margin-top: 10px;
+}
+
+.toggle-ingredients-btn {
+    background: none;
+    border: none;
+    color: #6d341f;
+    cursor: pointer;
+    font-size: 14px;
+    padding: 0;
+    text-decoration: underline;
+}
+
+.item-ingredients ul {
+    list-style-type: none;
+    padding-left: 0;
+    margin-top: 5px;
+}
+
+.item-ingredients li {
+    padding: 2px 0;
+    font-size: 14px;
 }
