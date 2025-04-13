@@ -6,12 +6,31 @@ let menuCategories = [];
 let menuItems = [];
 let isLoadingMenu = true;
 let activeCategoryFilter = null;
+let searchQuery = '';
 
 // DOM элементы
 const elements = {
     menuColumns: document.getElementById('menu-columns'),
-    categoryFilter: document.getElementById('category-filter')
+    categoryFilter: document.getElementById('category-filter'),
+    searchInput: document.getElementById('menu-search-input'),
+    clearSearchBtn: document.getElementById('clear-search-btn')
 };
+
+// Инициализация поиска
+function initSearch() {
+    if (elements.searchInput && elements.clearSearchBtn) {
+        elements.searchInput.addEventListener('input', (e) => {
+            searchQuery = e.target.value.toLowerCase();
+            updateMainMenu();
+        });
+
+        elements.clearSearchBtn.addEventListener('click', () => {
+            elements.searchInput.value = '';
+            searchQuery = '';
+            updateMainMenu();
+        });
+    }
+}
 
 // Загрузка меню из Firebase
 export function loadMenuFromFirebase() {
@@ -76,10 +95,19 @@ function updateMainMenu() {
     }
 
     elements.menuColumns.innerHTML = '';
-    const visibleItems = menuItems.filter(item => item.visible !== false);
+    let visibleItems = menuItems.filter(item => item.visible !== false);
     
+    // Фильтрация по поисковому запросу
+    if (searchQuery) {
+        visibleItems = visibleItems.filter(item => 
+            item.name.toLowerCase().includes(searchQuery) || 
+            (item.category && item.category.toLowerCase().includes(searchQuery)) ||
+            (item.ingredients && item.ingredients.some(ing => ing.toLowerCase().includes(searchQuery)))
+        );
+    }
+
     if (visibleItems.length === 0) {
-        elements.menuColumns.innerHTML = '<div class="menu-error">Нет доступных блюд в меню</div>';
+        elements.menuColumns.innerHTML = '<div class="menu-error">Ничего не найдено</div>';
         return;
     }
 
@@ -120,8 +148,17 @@ function updateMainMenu() {
                 itemsByCategory[category].forEach(item => {
                     const btn = document.createElement('button');
                     btn.className = 'menu-btn';
+                    
+                    // Подсветка совпадений в названии
+                    let highlightedName = item.name;
+                    if (searchQuery) {
+                        const regex = new RegExp(searchQuery, 'gi');
+                        highlightedName = item.name.replace(regex, 
+                            match => `<span class="highlight">${match}</span>`);
+                    }
+                    
                     btn.innerHTML = `
-                        <div class="item-name">${item.name}</div>
+                        <div class="item-name">${highlightedName}</div>
                         <div class="item-price">${item.price} ₽</div>
                     `;
                     btn.onclick = () => addToOrder(item.name, item.price);
@@ -140,6 +177,9 @@ function updateMainMenu() {
         elements.menuColumns.appendChild(row);
     }
 }
+
+// Инициализация при загрузке
+initSearch();
 
 export { menuCategories, menuItems };
 
