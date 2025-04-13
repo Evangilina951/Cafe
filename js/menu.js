@@ -99,6 +99,10 @@ function updateMainMenu() {
     for (let i = 0; i < categories.length; i += 5) {
         const rowCategories = categories.slice(i, i + 5);
         
+        // Создаем контейнер для строки
+        const row = document.createElement('div');
+        row.className = 'menu-row';
+        
         // Создаем колонки для каждой категории в строке
         rowCategories.forEach(category => {
             const column = document.createElement('div');
@@ -124,8 +128,10 @@ function updateMainMenu() {
             });
             
             column.appendChild(buttonsContainer);
-            elements.menuColumns.appendChild(column);
+            row.appendChild(column);
         });
+        
+        elements.menuColumns.appendChild(row);
     }
 }
 
