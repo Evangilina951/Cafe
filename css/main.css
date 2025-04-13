@@ -353,13 +353,6 @@ body {
     .menu-section {
         padding: 15px;
     }
-
-    .menu-search {
-    position: relative;
-    margin-bottom: 20px;
-    display: flex;
-    align-items: center;
-}
     
 /* Стили для поиска по меню*/
 .menu-search {
