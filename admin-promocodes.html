@@ -1,0 +1,98 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Управление промокодами</title>
+    <link rel="stylesheet" href="/Cafe/css/main.css">
+    <link rel="stylesheet" href="/Cafe/css/admin.css">
+</head>
+<body>
+    <div id="admin-container" class="hidden">
+        <header class="admin-header">
+            <h1>Управление промокодами</h1>
+            <button id="logout-btn" class="logout-btn">Выйти</button>
+        </header>
+
+        <div class="admin-content">
+            <div class="promo-controls">
+                <button id="add-promo-btn" class="action-btn">+ Создать промокод</button>
+                <div class="search-box">
+                    <input type="text" id="promo-search" placeholder="Поиск промокодов...">
+                </div>
+            </div>
+
+            <div id="promo-list" class="promo-list"></div>
+        </div>
+
+        <!-- Модальное окно создания промокода -->
+        <div id="promo-modal" class="modal hidden">
+            <div class="modal-content">
+                <span class="close-btn">&times;</span>
+                <h2 id="modal-title">Новый промокод</h2>
+                
+                <form id="promo-form">
+                    <div class="form-group">
+                        <label for="promo-name">Название промокода*</label>
+                        <input type="text" id="promo-name" required 
+                               pattern="[A-Za-z0-9]{3,20}" 
+                               title="Только латинские буквы и цифры (3-20 символов)">
+                    </div>
+
+                    <div class="form-group">
+                        <label>Тип скидки*</label>
+                        <div class="radio-group">
+                            <label><input type="radio" name="discount-type" value="percent" checked> % скидки</label>
+                            <label><input type="radio" name="discount-type" value="item"> Бесплатное блюдо</label>
+                        </div>
+                    </div>
+
+                    <div id="percent-fields" class="discount-fields">
+                        <div class="form-group">
+                            <label for="discount-value">Размер скидки (%)</label>
+                            <input type="number" id="discount-value" min="0" max="100" value="10">
+                        </div>
+                    </div>
+
+                    <div id="item-fields" class="discount-fields hidden">
+                        <div class="form-group">
+                            <label for="free-item">Выберите блюдо</label>
+                            <select id="free-item">
+                                <!-- Заполнится динамически -->
+                            </select>
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="min-order">Минимальная сумма заказа (руб)</label>
+                        <input type="number" id="min-order" min="0" value="0">
+                    </div>
+
+                    <div class="form-group">
+                        <label>Ограничения по использованию</label>
+                        <div class="checkbox-group">
+                            <label><input type="checkbox" id="use-limit-check"> Ограничить количество</label>
+                            <input type="number" id="use-limit" min="1" value="100" disabled>
+                        </div>
+                        <div class="checkbox-group">
+                            <label><input type="checkbox" id="use-date-check"> Срок действия</label>
+                            <input type="date" id="expiry-date" disabled>
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <label><input type="checkbox" id="is-active" checked> Активный промокод</label>
+                    </div>
+
+                    <div class="form-actions">
+                        <button type="button" id="cancel-btn" class="clear-btn">Отмена</button>
+                        <button type="submit" id="save-btn" class="pay-btn">Сохранить</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <script type="module" src="/Cafe/js/admin-promocodes.js"></script>
+</body>
+</html>
