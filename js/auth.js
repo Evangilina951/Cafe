@@ -114,4 +114,17 @@ export function initAuth() {
     }
 }
 
+export function onAuthStateChanged(auth, callback) {
+    firebase.auth().onAuthStateChanged((user) => {
+        if (user) {
+            // Показываем кнопку промокодов только для админа
+            const promoBtn = document.getElementById('promo-management-btn');
+            if (promoBtn) {
+                promoBtn.style.display = user.email === 'admin@dismail.com' ? 'block' : 'none';
+            }
+        }
+        callback(user);
+    });
+}
+
 export { currentUser };
