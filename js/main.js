@@ -27,6 +27,10 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     });
 
+    document.getElementById('promo-management-btn')?.addEventListener('click', () => {
+    window.location.href = '/Cafe/admin-promocodes.html';
+});
+
     // Стили для формы добавления напитка (если есть на странице)
     const addItemForm = document.getElementById('add-item-form');
     if (addItemForm) {
