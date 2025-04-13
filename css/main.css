@@ -423,3 +423,21 @@ body {
         padding: 15px;
     }
 }
+
+/* Стили для кнопки управления промокодами */
+#promo-management-btn {
+    display: none; /* По умолчанию скрыта */
+    background-color: #6d341f;
+    color: white;
+    border: none;
+    padding: 10px 20px;
+    border-radius: 8px;
+    cursor: pointer;
+    transition: background-color 0.3s;
+    font-size: 16px;
+    margin-left: 10px;
+}
+
+#promo-management-btn:hover {
+    background-color: #5a2b19;
+}
