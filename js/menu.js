@@ -19,16 +19,31 @@ const elements = {
 // Инициализация поиска
 function initSearch() {
     if (elements.searchInput && elements.clearSearchBtn) {
+        // Обработчик ввода в поле поиска
         elements.searchInput.addEventListener('input', (e) => {
             searchQuery = e.target.value.toLowerCase();
+            
+            // Показываем/скрываем кнопку очистки
+            if (searchQuery.length > 0) {
+                elements.clearSearchBtn.classList.remove('hidden');
+            } else {
+                elements.clearSearchBtn.classList.add('hidden');
+            }
+            
             updateMainMenu();
         });
 
+        // Обработчик клика по кнопке очистки
         elements.clearSearchBtn.addEventListener('click', () => {
             elements.searchInput.value = '';
             searchQuery = '';
+            elements.clearSearchBtn.classList.add('hidden');
             updateMainMenu();
+            elements.searchInput.focus();
         });
+
+        // Скрываем кнопку очистки при загрузке
+        elements.clearSearchBtn.classList.add('hidden');
     }
 }
 
@@ -56,6 +71,7 @@ export function loadMenuFromFirebase() {
     });
 }
 
+// Инициализация данных меню
 function initializeMenuData() {
     const initialData = {
         categories: ["Кофе", "Чай", "Десерты"],
@@ -81,14 +97,17 @@ function initializeMenuData() {
         });
 }
 
+// Обновление основного меню
 function updateMainMenu() {
     if (!elements.menuColumns) return;
     
+    // Показываем состояние загрузки
     if (isLoadingMenu) {
         elements.menuColumns.innerHTML = '<div class="menu-loading">Загрузка меню...</div>';
         return;
     }
     
+    // Проверка на ошибку загрузки
     if (menuItems.length === 0) {
         elements.menuColumns.innerHTML = '<div class="menu-error">Ошибка: Меню не загружено</div>';
         return;
@@ -106,8 +125,17 @@ function updateMainMenu() {
         );
     }
 
+    // Сообщение, если ничего не найдено
     if (visibleItems.length === 0) {
-        elements.menuColumns.innerHTML = '<div class="menu-error">Ничего не найдено</div>';
+        elements.menuColumns.innerHTML = `
+            <div class="menu-error">
+                Ничего не найдено по запросу: "${searchQuery}"
+                <button class="action-btn clear-btn" onclick="document.getElementById('menu-search-input').value=''; 
+                document.getElementById('clear-search-btn').click();" style="margin-top: 10px;">
+                    Сбросить поиск
+                </button>
+            </div>
+        `;
         return;
     }
 
@@ -179,9 +207,13 @@ function updateMainMenu() {
 }
 
 // Инициализация при загрузке
-initSearch();
+document.addEventListener('DOMContentLoaded', () => {
+    initSearch();
+    loadMenuFromFirebase();
+});
 
-export { menuCategories, menuItems };
+export { menuCategories, menuItems, loadMenuFromFirebase };
 
 window.menuCategories = menuCategories;
 window.menuItems = menuItems;
+window.loadMenuFromFirebase = loadMenuFromFirebase;
