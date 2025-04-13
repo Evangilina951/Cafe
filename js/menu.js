@@ -1,33 +1,22 @@
 import { db } from '/Cafe/js/firebase-config.js';
-import { currentUser } from '/Cafe/js/auth.js';
 import { addToOrder } from '/Cafe/js/order.js';
 
 let menuCategories = [];
 let menuItems = [];
 let isLoadingMenu = true;
-let activeCategoryFilter = null;
 let searchQuery = '';
 
-// DOM элементы
 const elements = {
     menuColumns: document.getElementById('menu-columns'),
-    categoryFilter: document.getElementById('category-filter'),
     searchInput: document.getElementById('menu-search-input'),
     clearSearchBtn: document.getElementById('clear-search-btn')
 };
 
-// Инициализация поиска
 function initSearch() {
     if (elements.searchInput && elements.clearSearchBtn) {
         elements.searchInput.addEventListener('input', (e) => {
             searchQuery = e.target.value.toLowerCase();
-            
-            if (searchQuery.length > 0) {
-                elements.clearSearchBtn.classList.remove('hidden');
-            } else {
-                elements.clearSearchBtn.classList.add('hidden');
-            }
-            
+            elements.clearSearchBtn.classList.toggle('hidden', !searchQuery);
             updateMainMenu();
         });
 
@@ -36,15 +25,11 @@ function initSearch() {
             searchQuery = '';
             elements.clearSearchBtn.classList.add('hidden');
             updateMainMenu();
-            elements.searchInput.focus();
         });
-
-        elements.clearSearchBtn.classList.add('hidden');
     }
 }
 
-// Загрузка меню из Firebase
-function loadMenuFromFirebase() {
+export function loadMenuFromFirebase() {
     isLoadingMenu = true;
     updateMainMenu();
     
@@ -140,64 +125,55 @@ function updateMainMenu() {
     const categories = Object.keys(itemsByCategory);
     
     for (let i = 0; i < categories.length; i += 5) {
-        const rowCategories = categories.slice(i, i + 5);
-        
         const row = document.createElement('div');
         row.className = 'menu-row';
         
-        for (let j = 0; j < 5; j++) {
+        categories.slice(i, i + 5).forEach(category => {
             const column = document.createElement('div');
             column.className = 'menu-column';
             
-            if (j < rowCategories.length) {
-                const category = rowCategories[j];
-                const title = document.createElement('h3');
-                title.className = 'category-title';
-                title.textContent = category;
-                column.appendChild(title);
-                
-                const buttonsContainer = document.createElement('div');
-                buttonsContainer.className = 'menu-buttons';
-                
-                itemsByCategory[category].forEach(item => {
-                    const btn = document.createElement('button');
-                    btn.className = 'menu-btn';
-                    
-                    let highlightedName = item.name;
-                    if (searchQuery) {
-                        const regex = new RegExp(searchQuery, 'gi');
-                        highlightedName = item.name.replace(regex, 
-                            match => `<span class="highlight">${match}</span>`);
-                    }
-                    
-                    btn.innerHTML = `
-                        <div class="item-name">${highlightedName}</div>
-                        <div class="item-price">${item.price} ₽</div>
-                    `;
-                    btn.onclick = () => addToOrder(item.name, item.price);
-                    buttonsContainer.appendChild(btn);
-                });
-                
-                column.appendChild(buttonsContainer);
-            } else {
-                column.style.visibility = 'hidden';
-            }
+            const title = document.createElement('h3');
+            title.className = 'category-title';
+            title.textContent = category;
+            column.appendChild(title);
             
+            const buttonsContainer = document.createElement('div');
+            buttonsContainer.className = 'menu-buttons';
+            
+            itemsByCategory[category].forEach(item => {
+                const btn = document.createElement('button');
+                btn.className = 'menu-btn';
+                
+                let highlightedName = item.name;
+                if (searchQuery) {
+                    const regex = new RegExp(searchQuery, 'gi');
+                    highlightedName = item.name.replace(regex, 
+                        match => `<span class="highlight">${match}</span>`);
+                }
+                
+                btn.innerHTML = `
+                    <div class="item-name">${highlightedName}</div>
+                    <div class="item-price">${item.price} ₽</div>
+                `;
+                btn.onclick = () => addToOrder(item.name, item.price);
+                buttonsContainer.appendChild(btn);
+            });
+            
+            column.appendChild(buttonsContainer);
             row.appendChild(column);
-        }
+        });
         
         elements.menuColumns.appendChild(row);
     }
 }
 
-// Инициализация при загрузке
+// Инициализация
 document.addEventListener('DOMContentLoaded', () => {
     initSearch();
     loadMenuFromFirebase();
 });
 
-// Экспортируем только нужные функции и переменные
-export { menuCategories, menuItems };
+export { loadMenuFromFirebase, menuCategories, menuItems };
 
 // Для глобального доступа (если нужно)
 window.menuCategories = menuCategories;
