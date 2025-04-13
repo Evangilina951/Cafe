@@ -54,6 +54,7 @@ body {
     display: none !important;
 }
 
+/* Основные стили меню */
 .menu-columns {
     display: flex;
     flex-direction: column;
@@ -63,16 +64,33 @@ body {
 
 .menu-row {
     display: flex;
-    flex-wrap: wrap;
+    flex-wrap: nowrap;
     gap: 15px;
     width: 100%;
     position: relative;
+    padding-bottom: 20px;
+    overflow-x: auto;
+    scrollbar-width: thin;
+    scrollbar-color: #6d341f #ffefdc;
+}
+
+.menu-row::-webkit-scrollbar {
+    height: 8px;
+}
+
+.menu-row::-webkit-scrollbar-track {
+    background: #ffefdc;
+}
+
+.menu-row::-webkit-scrollbar-thumb {
+    background-color: #6d341f;
+    border-radius: 4px;
 }
 
 .menu-row:not(:last-child)::after {
     content: "";
     position: absolute;
-    bottom: -15px;
+    bottom: 0;
     left: 0;
     right: 0;
     height: 1px;
@@ -81,8 +99,8 @@ body {
 }
 
 .menu-column {
-    flex: 1;
-    min-width: calc(20% - 15px);
+    flex: 0 0 calc(20% - 12px);
+    min-width: 180px;
     padding: 15px;
     position: relative;
 }
@@ -150,6 +168,7 @@ body {
     width: 100%;
 }
 
+/* Стили для элементов заказа */
 .item-controls {
     display: flex;
     align-items: center;
@@ -250,6 +269,7 @@ body {
     font-size: 16px;
 }
 
+/* Стили пользовательской информации */
 .user-info {
     display: flex;
     align-items: center;
@@ -297,25 +317,28 @@ body {
 /* Адаптивные стили */
 @media (max-width: 1200px) {
     .menu-column {
-        min-width: calc(25% - 15px);
+        flex: 0 0 calc(25% - 12px);
+        min-width: 160px;
     }
 }
 
 @media (max-width: 900px) {
     .menu-column {
-        min-width: calc(33.333% - 15px);
+        flex: 0 0 calc(33.333% - 12px);
+        min-width: 140px;
     }
 }
 
 @media (max-width: 600px) {
     .menu-column {
-        min-width: calc(50% - 15px);
+        flex: 0 0 calc(50% - 12px);
+        min-width: 120px;
     }
 }
 
 @media (max-width: 400px) {
     .menu-column {
-        min-width: 100%;
+        flex: 0 0 100%;
     }
     
     .menu-row {
@@ -325,5 +348,13 @@ body {
     .menu-btn {
         min-height: 80px;
         padding: 10px;
+    }
+    
+    .menu-section {
+        padding: 15px;
+    }
+    
+    .order-section {
+        padding: 15px;
     }
 }
