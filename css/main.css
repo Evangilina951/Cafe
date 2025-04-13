@@ -250,3 +250,52 @@ body {
     font-size: 20px;
     color: #6d341f;
 }
+
+.menu-columns {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 30px;
+    justify-content: flex-start;
+}
+
+.menu-column {
+    flex: 0 0 calc(20% - 24px); /* 5 колонок с учетом gap */
+    max-width: calc(20% - 24px);
+}
+
+.menu-btn {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    padding: 15px 10px;
+    min-height: 100px;
+}
+
+.menu-btn .item-name,
+.menu-btn .item-price {
+    width: 100%;
+    text-align: center;
+}
+
+/* Для мобильных устройств можно добавить адаптивность */
+@media (max-width: 1200px) {
+    .menu-column {
+        flex: 0 0 calc(25% - 24px);
+        max-width: calc(25% - 24px);
+    }
+}
+
+@media (max-width: 900px) {
+    .menu-column {
+        flex: 0 0 calc(33.333% - 24px);
+        max-width: calc(33.333% - 24px);
+    }
+}
+
+@media (max-width: 600px) {
+    .menu-column {
+        flex: 0 0 calc(50% - 24px);
+        max-width: calc(50% - 24px);
+    }
+}
