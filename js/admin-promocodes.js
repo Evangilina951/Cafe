@@ -4,7 +4,7 @@ import { auth, onAuthStateChanged, signOut } from '/Cafe/js/auth.js';
 // Проверка прав администратора
 onAuthStateChanged(auth, (user) => {
     if (user && user.email === 'admin@dismail.com') {
-        document.getElementById('admin-container').classList.remove('hidden');
+        document.getElementById('admin-promocodes').classList.remove('hidden');
         initPromoPage();
     } else {
         window.location.href = '/Cafe/404.html';
@@ -13,17 +13,12 @@ onAuthStateChanged(auth, (user) => {
 
 // Инициализация страницы
 function initPromoPage() {
-    // Загрузка списка промокодов
     loadPromoCodes();
-    
-    // Загрузка списка блюд для выпадающего списка
     loadMenuItems();
-    
-    // Настройка обработчиков событий
     setupEventListeners();
 }
 
-// Загрузка промокодов из Firebase
+// Загрузка промокодов
 function loadPromoCodes() {
     const promoList = document.getElementById('promo-list');
     promoList.innerHTML = '<div class="loading">Загрузка промокодов...</div>';
@@ -38,8 +33,7 @@ function loadPromoCodes() {
         }
         
         Object.entries(promos).forEach(([code, promo]) => {
-            const promoCard = createPromoCard(code, promo);
-            promoList.appendChild(promoCard);
+            promoList.appendChild(createPromoCard(code, promo));
         });
     });
 }
@@ -84,8 +78,8 @@ function createPromoCard(code, promo) {
             </div>
         </div>
         <div class="promo-actions">
-            <button class="edit-btn" data-code="${code}">Изменить</button>
-            <button class="copy-btn" data-code="${code}">Копировать</button>
+            <button class="admin-btn" data-code="${code}">Изменить</button>
+            <button class="admin-btn primary" data-code="${code}">Копировать</button>
         </div>
     `;
     
@@ -117,40 +111,36 @@ function setupEventListeners() {
         radio.addEventListener('change', toggleDiscountFields);
     });
     
-    // Ограничение использования
+    // Ограничения
     document.getElementById('use-limit-check').addEventListener('change', (e) => {
         document.getElementById('use-limit').disabled = !e.target.checked;
     });
     
-    // Срок действия
     document.getElementById('use-date-check').addEventListener('change', (e) => {
         document.getElementById('expiry-date').disabled = !e.target.checked;
     });
     
-    // Открытие модального окна
+    // Модальное окно
     document.getElementById('add-promo-btn').addEventListener('click', () => {
         document.getElementById('promo-modal').classList.remove('hidden');
         document.getElementById('promo-form').reset();
-        document.getElementById('modal-title').textContent = 'Новый промокод';
     });
     
-    // Закрытие модального окна
     document.querySelector('.close-btn').addEventListener('click', closeModal);
     document.getElementById('cancel-btn').addEventListener('click', closeModal);
     
-    // Сохранение промокода
+    // Сохранение
     document.getElementById('promo-form').addEventListener('submit', savePromoCode);
     
-    // Выход из системы
+    // Выход
     document.getElementById('logout-btn').addEventListener('click', () => {
         signOut(auth).then(() => window.location.href = '/Cafe/');
     });
 }
 
-// Переключение полей в зависимости от типа скидки
+// Переключение полей скидки
 function toggleDiscountFields() {
     const type = document.querySelector('input[name="discount-type"]:checked').value;
-    
     document.getElementById('percent-fields').classList.toggle('hidden', type !== 'percent');
     document.getElementById('item-fields').classList.toggle('hidden', type !== 'item');
 }
@@ -168,7 +158,6 @@ function savePromoCode(e) {
     const code = form['promo-name'].value.trim().toUpperCase();
     const type = form['discount-type'].value;
     
-    // Подготовка данных промокода
     const promoData = {
         type,
         isActive: form['is-active'].checked,
@@ -176,55 +165,41 @@ function savePromoCode(e) {
         created: new Date().toISOString()
     };
     
-    // Добавляем параметры в зависимости от типа скидки
     if (type === 'percent') {
         promoData.value = parseInt(form['discount-value'].value);
     } else if (type === 'item') {
         promoData.itemId = form['free-item'].value;
     }
     
-    // Добавляем ограничения
     if (form['use-limit-check'].checked) {
         promoData.maxUses = parseInt(form['use-limit'].value);
-        promoData.usedCount = 0; // Инициализируем счетчик
+        promoData.usedCount = 0;
     }
     
     if (form['use-date-check'].checked) {
         promoData.expires = form['expiry-date'].value;
     }
     
-    // Сохраняем в Firebase
     db.ref(`promocodes/${code}`).set(promoData)
         .then(() => {
             alert('Промокод успешно сохранен!');
             closeModal();
         })
         .catch(error => {
-            console.error('Ошибка сохранения промокода:', error);
-            alert('Произошла ошибка при сохранении промокода');
+            console.error('Ошибка сохранения:', error);
+            alert('Ошибка при сохранении промокода');
         });
 }
 
-// Экспортируем функции для использования в других модулях
+// Валидация промокода (для использования в order.js)
 export function validatePromoCode(code, orderTotal, orderItems) {
     return db.ref(`promocodes/${code}`).once('value').then(snapshot => {
         const promo = snapshot.val();
         
-        if (!promo || !promo.isActive) {
-            throw new Error('Промокод недействителен');
-        }
-        
-        if (promo.expires && new Date(promo.expires) < new Date()) {
-            throw new Error('Срок действия промокода истек');
-        }
-        
-        if (promo.minOrder && orderTotal < promo.minOrder) {
-            throw new Error(`Минимальная сумма заказа для этого промокода: ${promo.minOrder} ₽`);
-        }
-        
-        if (promo.maxUses && promo.usedCount >= promo.maxUses) {
-            throw new Error('Лимит использований промокода исчерпан');
-        }
+        if (!promo || !promo.isActive) throw new Error('Промокод недействителен');
+        if (promo.expires && new Date(promo.expires) < new Date()) throw new Error('Промокод истек');
+        if (promo.minOrder && orderTotal < promo.minOrder) throw new Error(`Минимальная сумма: ${promo.minOrder} ₽`);
+        if (promo.maxUses && promo.usedCount >= promo.maxUses) throw new Error('Лимит использований исчерпан');
         
         return promo;
     });
