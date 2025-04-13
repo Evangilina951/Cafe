@@ -353,6 +353,75 @@ body {
     .menu-section {
         padding: 15px;
     }
+
+    .menu-search {
+    position: relative;
+    margin-bottom: 20px;
+    display: flex;
+    align-items: center;
+}
+    
+/* Стили для поиска по меню */
+#menu-search-input {
+    width: 100%;
+    padding: 12px 40px 12px 15px;
+    border: 1px solid #6d341f;
+    border-radius: 8px;
+    background-color: #fff;
+    font-size: 16px;
+    color: #6d341f;
+    outline: none;
+    transition: border-color 0.3s;
+}
+
+#menu-search-input:focus {
+    border-color: #8d5a3b;
+}
+
+#menu-search-input::placeholder {
+    color: rgba(109, 52, 31, 0.5);
+}
+
+#clear-search-btn {
+    position: absolute;
+    right: 10px;
+    background: none;
+    border: none;
+    font-size: 20px;
+    cursor: pointer;
+    color: #6d341f;
+    opacity: 0.5;
+    transition: opacity 0.3s;
+    display: none;
+}
+
+#clear-search-btn:hover {
+    opacity: 1;
+}
+
+#clear-search-btn.visible {
+    display: block;
+}
+
+.highlight {
+    background-color: #f8d56b;
+    color: #6d341f;
+    padding: 0 2px;
+    border-radius: 2px;
+}
+
+/* Адаптивность для поиска */
+@media (max-width: 600px) {
+    #menu-search-input {
+        padding: 10px 35px 10px 12px;
+        font-size: 14px;
+    }
+    
+    #clear-search-btn {
+        right: 8px;
+        font-size: 18px;
+    }
+}
     
     .order-section {
         padding: 15px;
