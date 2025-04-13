@@ -98,13 +98,11 @@ function updateMainMenu() {
     let visibleItems = menuItems.filter(item => item.visible !== false);
     
     // Фильтрация по поисковому запросу
-    if (searchQuery) {
-        visibleItems = visibleItems.filter(item => 
-            item.name.toLowerCase().includes(searchQuery) || 
-            (item.category && item.category.toLowerCase().includes(searchQuery)) ||
-            (item.ingredients && item.ingredients.some(ing => ing.toLowerCase().includes(searchQuery)))
-        );
-    }
+  if (searchQuery) {
+    visibleItems = visibleItems.filter(item => 
+        item.name.toLowerCase().includes(searchQuery)
+    );
+}
 
     if (visibleItems.length === 0) {
         elements.menuColumns.innerHTML = '<div class="menu-error">Ничего не найдено</div>';
