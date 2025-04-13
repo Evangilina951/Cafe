@@ -107,6 +107,7 @@ function updateMainMenu() {
         rowCategories.forEach(category => {
             const column = document.createElement('div');
             column.className = 'menu-column';
+            column.style.flex = '1 1 auto';
             
             const title = document.createElement('h3');
             title.className = 'category-title';
