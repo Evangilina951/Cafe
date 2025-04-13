@@ -19,11 +19,9 @@ const elements = {
 // Инициализация поиска
 function initSearch() {
     if (elements.searchInput && elements.clearSearchBtn) {
-        // Обработчик ввода в поле поиска
         elements.searchInput.addEventListener('input', (e) => {
             searchQuery = e.target.value.toLowerCase();
             
-            // Показываем/скрываем кнопку очистки
             if (searchQuery.length > 0) {
                 elements.clearSearchBtn.classList.remove('hidden');
             } else {
@@ -33,7 +31,6 @@ function initSearch() {
             updateMainMenu();
         });
 
-        // Обработчик клика по кнопке очистки
         elements.clearSearchBtn.addEventListener('click', () => {
             elements.searchInput.value = '';
             searchQuery = '';
@@ -42,13 +39,12 @@ function initSearch() {
             elements.searchInput.focus();
         });
 
-        // Скрываем кнопку очистки при загрузке
         elements.clearSearchBtn.classList.add('hidden');
     }
 }
 
 // Загрузка меню из Firebase
-export function loadMenuFromFirebase() {
+function loadMenuFromFirebase() {
     isLoadingMenu = true;
     updateMainMenu();
     
@@ -71,7 +67,6 @@ export function loadMenuFromFirebase() {
     });
 }
 
-// Инициализация данных меню
 function initializeMenuData() {
     const initialData = {
         categories: ["Кофе", "Чай", "Десерты"],
@@ -97,17 +92,14 @@ function initializeMenuData() {
         });
 }
 
-// Обновление основного меню
 function updateMainMenu() {
     if (!elements.menuColumns) return;
     
-    // Показываем состояние загрузки
     if (isLoadingMenu) {
         elements.menuColumns.innerHTML = '<div class="menu-loading">Загрузка меню...</div>';
         return;
     }
     
-    // Проверка на ошибку загрузки
     if (menuItems.length === 0) {
         elements.menuColumns.innerHTML = '<div class="menu-error">Ошибка: Меню не загружено</div>';
         return;
@@ -116,7 +108,6 @@ function updateMainMenu() {
     elements.menuColumns.innerHTML = '';
     let visibleItems = menuItems.filter(item => item.visible !== false);
     
-    // Фильтрация по поисковому запросу
     if (searchQuery) {
         visibleItems = visibleItems.filter(item => 
             item.name.toLowerCase().includes(searchQuery) || 
@@ -125,7 +116,6 @@ function updateMainMenu() {
         );
     }
 
-    // Сообщение, если ничего не найдено
     if (visibleItems.length === 0) {
         elements.menuColumns.innerHTML = `
             <div class="menu-error">
@@ -139,7 +129,6 @@ function updateMainMenu() {
         return;
     }
 
-    // Группируем блюда по категориям
     const itemsByCategory = {};
     visibleItems.forEach(item => {
         if (!itemsByCategory[item.category]) {
@@ -148,17 +137,14 @@ function updateMainMenu() {
         itemsByCategory[item.category].push(item);
     });
     
-    // Получаем уникальные категории
     const categories = Object.keys(itemsByCategory);
     
-    // Создаем строки по 5 категорий в каждой
     for (let i = 0; i < categories.length; i += 5) {
         const rowCategories = categories.slice(i, i + 5);
         
         const row = document.createElement('div');
         row.className = 'menu-row';
         
-        // Создаем ровно 5 колонок в каждой строке
         for (let j = 0; j < 5; j++) {
             const column = document.createElement('div');
             column.className = 'menu-column';
@@ -177,7 +163,6 @@ function updateMainMenu() {
                     const btn = document.createElement('button');
                     btn.className = 'menu-btn';
                     
-                    // Подсветка совпадений в названии
                     let highlightedName = item.name;
                     if (searchQuery) {
                         const regex = new RegExp(searchQuery, 'gi');
@@ -195,7 +180,6 @@ function updateMainMenu() {
                 
                 column.appendChild(buttonsContainer);
             } else {
-                // Пустая колонка для выравнивания
                 column.style.visibility = 'hidden';
             }
             
@@ -212,8 +196,10 @@ document.addEventListener('DOMContentLoaded', () => {
     loadMenuFromFirebase();
 });
 
-export { menuCategories, menuItems, loadMenuFromFirebase };
+// Экспортируем только нужные функции и переменные
+export { menuCategories, menuItems };
 
+// Для глобального доступа (если нужно)
 window.menuCategories = menuCategories;
 window.menuItems = menuItems;
 window.loadMenuFromFirebase = loadMenuFromFirebase;
