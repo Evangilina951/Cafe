@@ -1,0 +1,70 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Страница не найдена | Кофейня</title>
+    <link rel="stylesheet" href="/Cafe/css/main.css">
+    <style>
+        /* Дополнительные стили для страницы 404 */
+        .error-container {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            height: 100vh;
+            text-align: center;
+            padding: 20px;
+            background-color: #ffefdc;
+        }
+
+        .error-code {
+            font-size: 120px;
+            font-weight: bold;
+            color: #6d341f;
+            margin-bottom: 20px;
+        }
+
+        .error-message {
+            font-size: 24px;
+            color: #6d341f;
+            margin-bottom: 30px;
+            max-width: 600px;
+        }
+
+        .home-link {
+            display: inline-block;
+            padding: 12px 24px;
+            background-color: #6d341f;
+            color: white;
+            text-decoration: none;
+            border-radius: 8px;
+            font-size: 18px;
+            transition: background-color 0.3s;
+        }
+
+        .home-link:hover {
+            background-color: #5a2b19;
+        }
+
+        @media (max-width: 600px) {
+            .error-code {
+                font-size: 80px;
+            }
+            
+            .error-message {
+                font-size: 20px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="error-container">
+        <div class="error-code">404</div>
+        <div class="error-message">
+            Страница не найдена или у вас нет доступа к этой части приложения.
+        </div>
+        <a href="/Cafe/" class="home-link">Вернуться на главную</a>
+    </div>
+</body>
+</html>
