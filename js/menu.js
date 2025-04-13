@@ -99,38 +99,43 @@ function updateMainMenu() {
     for (let i = 0; i < categories.length; i += 5) {
         const rowCategories = categories.slice(i, i + 5);
         
-        // Создаем контейнер для строки
         const row = document.createElement('div');
         row.className = 'menu-row';
         
-        // Создаем колонки для каждой категории в строке
-        rowCategories.forEach(category => {
+        // Создаем ровно 5 колонок в каждой строке
+        for (let j = 0; j < 5; j++) {
             const column = document.createElement('div');
             column.className = 'menu-column';
-            column.style.flex = '1 1 auto';
             
-            const title = document.createElement('h3');
-            title.className = 'category-title';
-            title.textContent = category;
-            column.appendChild(title);
+            if (j < rowCategories.length) {
+                const category = rowCategories[j];
+                const title = document.createElement('h3');
+                title.className = 'category-title';
+                title.textContent = category;
+                column.appendChild(title);
+                
+                const buttonsContainer = document.createElement('div');
+                buttonsContainer.className = 'menu-buttons';
+                
+                itemsByCategory[category].forEach(item => {
+                    const btn = document.createElement('button');
+                    btn.className = 'menu-btn';
+                    btn.innerHTML = `
+                        <div class="item-name">${item.name}</div>
+                        <div class="item-price">${item.price} ₽</div>
+                    `;
+                    btn.onclick = () => addToOrder(item.name, item.price);
+                    buttonsContainer.appendChild(btn);
+                });
+                
+                column.appendChild(buttonsContainer);
+            } else {
+                // Пустая колонка для выравнивания
+                column.style.visibility = 'hidden';
+            }
             
-            const buttonsContainer = document.createElement('div');
-            buttonsContainer.className = 'menu-buttons';
-            
-            itemsByCategory[category].forEach(item => {
-                const btn = document.createElement('button');
-                btn.className = 'menu-btn';
-                btn.innerHTML = `
-                    <div class="item-name">${item.name}</div>
-                    <div class="item-price">${item.price} ₽</div>
-                `;
-                btn.onclick = () => addToOrder(item.name, item.price);
-                buttonsContainer.appendChild(btn);
-            });
-            
-            column.appendChild(buttonsContainer);
             row.appendChild(column);
-        });
+        }
         
         elements.menuColumns.appendChild(row);
     }
