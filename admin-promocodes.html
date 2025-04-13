@@ -5,18 +5,18 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Управление промокодами</title>
     <link rel="stylesheet" href="/Cafe/css/main.css">
-    <link rel="stylesheet" href="/Cafe/css/admin.css">
+    <link rel="stylesheet" href="/Cafe/css/admin-promocodes.css">
 </head>
 <body>
-    <div id="admin-container" class="hidden">
+    <div id="admin-promocodes" class="hidden">
         <header class="admin-header">
             <h1>Управление промокодами</h1>
-            <button id="logout-btn" class="logout-btn">Выйти</button>
+            <button id="logout-btn" class="admin-btn">Выйти</button>
         </header>
 
         <div class="admin-content">
             <div class="promo-controls">
-                <button id="add-promo-btn" class="action-btn">+ Создать промокод</button>
+                <button id="add-promo-btn" class="admin-btn primary">+ Создать промокод</button>
                 <div class="search-box">
                     <input type="text" id="promo-search" placeholder="Поиск промокодов...">
                 </div>
@@ -29,7 +29,7 @@
         <div id="promo-modal" class="modal hidden">
             <div class="modal-content">
                 <span class="close-btn">&times;</span>
-                <h2 id="modal-title">Новый промокод</h2>
+                <h2>Новый промокод</h2>
                 
                 <form id="promo-form">
                     <div class="form-group">
@@ -69,7 +69,7 @@
                     </div>
 
                     <div class="form-group">
-                        <label>Ограничения по использованию</label>
+                        <label>Ограничения</label>
                         <div class="checkbox-group">
                             <label><input type="checkbox" id="use-limit-check"> Ограничить количество</label>
                             <input type="number" id="use-limit" min="1" value="100" disabled>
@@ -85,8 +85,8 @@
                     </div>
 
                     <div class="form-actions">
-                        <button type="button" id="cancel-btn" class="clear-btn">Отмена</button>
-                        <button type="submit" id="save-btn" class="pay-btn">Сохранить</button>
+                        <button type="button" id="cancel-btn" class="admin-btn">Отмена</button>
+                        <button type="submit" id="save-btn" class="admin-btn primary">Сохранить</button>
                     </div>
                 </form>
             </div>
