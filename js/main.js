@@ -1,41 +1,37 @@
-import { initAuth, currentUser } from '/Cafe/js/auth.js';
+import { initAuth } from '/Cafe/js/auth.js';
 import { loadMenuFromFirebase } from '/Cafe/js/menu.js';
 import { initOrder } from '/Cafe/js/order.js';
-import { initAdmin } from '/Cafe/js/admin.js';
-import { auth } from '/Cafe/js/firebase-config.js'; // Явный импорт auth
-
-// Функция для показа админ-панели (добавлена, так как она используется)
-function showAdminPanel() {
-    const adminPanel = document.getElementById('admin-panel');
-    const orderInterface = document.getElementById('order-interface');
-    if (adminPanel && orderInterface) {
-        adminPanel.style.display = 'block';
-        adminPanel.classList.remove('hidden');
-        orderInterface.style.display = 'none';
-    }
-}
+import { auth } from '/Cafe/js/firebase-config.js';
 
 document.addEventListener('DOMContentLoaded', () => {
     // Инициализация модулей
     initAuth();
     initOrder();
-    initAdmin();
-    
+
     // Проверка авторизации и загрузка меню
     auth.onAuthStateChanged(user => {
         if (user) {
             loadMenuFromFirebase();
-            if (window.location.hash === '#admin' && user.email === 'admin@dismail.com') {
-                showAdminPanel();
+            
+            // Настройка кнопки админ-панели
+            const adminBtn = document.querySelector('.admin-btn');
+            if (adminBtn) {
+                adminBtn.addEventListener('click', () => {
+                    if (user.email === 'admin@dismail.com') {
+                        window.location.href = '/Cafe/admin.html';
+                    } else {
+                        alert("Доступ разрешен только администратору");
+                    }
+                });
             }
         }
     });
 
-    // Стили для формы добавления напитка
+    // Стили для формы добавления напитка (если есть на странице)
     const addItemForm = document.getElementById('add-item-form');
     if (addItemForm) {
         addItemForm.style.display = 'flex';
         addItemForm.style.flexDirection = 'column';
         addItemForm.style.gap = '10px';
     }
-}); 
+});
