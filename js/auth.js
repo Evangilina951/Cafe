@@ -23,6 +23,11 @@ function handleAuthStateChanged(user) {
     if (user) {
         console.log('User logged in:', user.email);
         // Убедимся, что элементы существуют
+        if (elements.authForm) elements.authForm.style.display = 'none';
+        if (elements.orderInterface) {
+            elements.orderInterface.style.display = 'flex';
+            setTimeout(() => loadMenuFromFirebase(), 100);
+        }
         const authForm = document.getElementById('auth-form');
         const orderInterface = document.getElementById('order-interface');
         
