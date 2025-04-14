@@ -35,7 +35,9 @@ function showAdminPanel() {
 function hideAdminPanel() {
     if (adminPanel && orderInterface) {
         adminPanel.style.display = 'none';
+        adminPanel.classList.add('hidden');
         orderInterface.style.display = 'block';
+        window.location.hash = '';
     }
 }
 
@@ -60,13 +62,6 @@ const elements = {
     addIngredientBtn: document.getElementById('add-ingredient-btn'),
     categoryFilter: document.getElementById('category-filter')
 };
-
-function hideAdminPanel() {
-    adminPanel.style.display = 'none';
-    adminPanel.classList.add('hidden');
-    document.getElementById('order-interface').style.display = 'block';
-    window.location.hash = '';
-}
 
 function resetAddItemForm() {
     elements.newItemName.value = '';
