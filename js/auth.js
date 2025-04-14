@@ -5,18 +5,15 @@ let currentUser = null;
 const elements = {
     authForm: document.getElementById('auth-form'),
     orderInterface: document.getElementById('order-interface'),
-    adminPanel: document.getElementById('admin-panel'),
     userEmail: document.getElementById('user-email'),
     emailInput: document.getElementById('email'),
     passwordInput: document.getElementById('password'),
     errorMessage: document.getElementById('error-message'),
     loginBtn: document.getElementById('login-btn'),
-    logoutBtn: document.querySelector('.logout-btn'),
-    adminBtn: document.querySelector('.admin-btn'),
-    promoManagementBtn: document.getElementById('promo-management-btn'),
-    menuManagementBtn: document.getElementById('menu-management-btn')
+    logoutBtn: document.querySelector('.logout-btn')
 };
 
+// Показываем/скрываем элементы интерфейса
 function showElement(element) {
     if (element) {
         element.style.display = 'block';
@@ -31,6 +28,7 @@ function hideElement(element) {
     }
 }
 
+// Основной обработчик авторизации
 function handleAuthStateChanged(user) {
     if (user) {
         currentUser = user;
@@ -40,32 +38,23 @@ function handleAuthStateChanged(user) {
         if (elements.userEmail) {
             elements.userEmail.textContent = user.email;
         }
-        
-        const isAdmin = user.email === 'admin@dismail.com';
-        
-        [elements.adminBtn, elements.promoManagementBtn, elements.menuManagementBtn].forEach(btn => {
-            if (btn) btn.style.display = isAdmin ? 'block' : 'none';
+
+        // Всегда показываем кнопки админа, проверка будет при клике
+        document.querySelectorAll('.admin-btn').forEach(btn => {
+            btn.style.display = 'block';
         });
 
-        if (isAdmin && window.location.hash === '#admin') {
-            showElement(elements.adminPanel);
-            hideElement(elements.orderInterface);
-        }
+        console.log('Авторизован пользователь:', user.email); // Отладочная информация
     } else {
         currentUser = null;
         showElement(elements.authForm);
         hideElement(elements.orderInterface);
-        hideElement(elements.adminPanel);
-        
-        [elements.adminBtn, elements.promoManagementBtn, elements.menuManagementBtn].forEach(btn => {
-            if (btn) btn.style.display = 'none';
-        });
     }
 }
 
+// Функция входа
 function login(e) {
     e.preventDefault();
-    
     const email = elements.emailInput.value;
     const password = elements.passwordInput.value;
     
@@ -76,27 +65,26 @@ function login(e) {
         return;
     }
     
-    if (elements.errorMessage) {
-        elements.errorMessage.textContent = '';
-    }
-    
     auth.signInWithEmailAndPassword(email, password)
         .catch(error => {
-            console.error("Login error:", error);
+            console.error("Ошибка входа:", error);
             if (elements.errorMessage) {
                 elements.errorMessage.textContent = error.message;
             }
         });
 }
 
+// Функция выхода
 export function signOut() {
-    return auth.signOut()
-        .catch(error => {
-            console.error("Logout error:", error);
-            throw error;
-        });
+    return auth.signOut();
 }
 
+// Проверка прав администратора (простая и надежная)
+export function isAdmin() {
+    return currentUser && currentUser.email === 'admin@dismail.com';
+}
+
+// Инициализация модуля авторизации
 export function initAuth() {
     auth.onAuthStateChanged(handleAuthStateChanged);
     
@@ -113,22 +101,6 @@ export function initAuth() {
             if (e.key === 'Enter') login(e);
         });
     }
-}
-
-export function checkAdminAccess() {
-    return currentUser && currentUser.email === 'admin@dismail.com';
-}
-
-export function onAuthStateChanged(callback) {
-    return auth.onAuthStateChanged(user => {
-        if (user && user.email === 'admin@dismail.com') {
-            console.log("Администратор авторизован");
-            document.querySelectorAll('.admin-btn').forEach(btn => {
-                btn.style.display = 'block';
-            });
-        }
-        callback(user);
-    });
 }
 
 export { currentUser };
