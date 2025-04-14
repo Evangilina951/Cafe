@@ -41,10 +41,10 @@ function initializeMenuData() {
     const initialData = {
         categories: ["Кофе", "Чай", "Десерты"],
         items: {
-            item1: { id: 1, name: "Кофе", price: 100, category: "Кофе", ingredients: ["Арабика 1", "Вода 2"] },
-            item2: { id: 2, name: "Чай", price: 50, category: "Чай", ingredients: ["Чайные листья 1", "Вода 2"] },
-            item3: { id: 3, name: "Капучино", price: 150, category: "Кофе", ingredients: ["Эспрессо 1", "Молоко 2", "Пена 1"] },
-            item4: { id: 4, name: "Латте", price: 200, category: "Кофе", ingredients: ["Эспрессо 1", "Молоко 3"] }
+            item1: { id: 1, name: "Кофе", price: 100, category: "Кофе", ingredients: ["Арабика 1", "Вода 2"], visible: true },
+            item2: { id: 2, name: "Чай", price: 50, category: "Чай", ingredients: ["Чайные листья 1", "Вода 2"], visible: true },
+            item3: { id: 3, name: "Капучино", price: 150, category: "Кофе", ingredients: ["Эспрессо 1", "Молоко 2", "Пена 1"], visible: true },
+            item4: { id: 4, name: "Латте", price: 200, category: "Кофе", ingredients: ["Эспрессо 1", "Молоко 3"], visible: true }
         }
     };
     
@@ -70,20 +70,37 @@ function updateMainMenu() {
         return;
     }
     
-    if (menuItems.length > 0) {
-        elements.menuColumns.innerHTML = '';
+    if (menuItems.length === 0) {
+        elements.menuColumns.innerHTML = '<div class="menu-error">Ошибка: Меню не загружено</div>';
+        return;
+    }
+
+    elements.menuColumns.innerHTML = '';
+    const visibleItems = menuItems.filter(item => item.visible !== false);
+    
+    if (visibleItems.length === 0) {
+        elements.menuColumns.innerHTML = '<div class="menu-error">Нет доступных блюд в меню</div>';
+        return;
+    }
+
+    // Группируем блюда по категориям
+    const itemsByCategory = {};
+    visibleItems.forEach(item => {
+        if (!itemsByCategory[item.category]) {
+            itemsByCategory[item.category] = [];
+        }
+        itemsByCategory[item.category].push(item);
+    });
+    
+    // Получаем уникальные категории
+    const categories = Object.keys(itemsByCategory);
+    
+    // Создаем строки по 5 категорий в каждой
+    for (let i = 0; i < categories.length; i += 5) {
+        const rowCategories = categories.slice(i, i + 5);
         
-        // Группируем блюда по категориям
-        const itemsByCategory = {};
-        menuItems.forEach(item => {
-            if (!itemsByCategory[item.category]) {
-                itemsByCategory[item.category] = [];
-            }
-            itemsByCategory[item.category].push(item);
-        });
-        
-        // Создаем колонки для каждой категории
-        Object.keys(itemsByCategory).forEach(category => {
+        // Создаем колонки для каждой категории в строке
+        rowCategories.forEach(category => {
             const column = document.createElement('div');
             column.className = 'menu-column';
             
@@ -109,9 +126,10 @@ function updateMainMenu() {
             column.appendChild(buttonsContainer);
             elements.menuColumns.appendChild(column);
         });
-    } else {
-        elements.menuColumns.innerHTML = '<div class="menu-error">Ошибка: Меню не загружено</div>';
     }
 }
 
 export { menuCategories, menuItems };
+
+window.menuCategories = menuCategories;
+window.menuItems = menuItems;
