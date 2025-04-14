@@ -1,5 +1,6 @@
 import { db } from '/Cafe/js/firebase-config.js';
 import { currentUser } from '/Cafe/js/auth.js';
+import { db, auth } from '/Cafe/js/firebase-config.js';
 
 const elements = {
     adminPanel: document.getElementById('admin-panel'),
