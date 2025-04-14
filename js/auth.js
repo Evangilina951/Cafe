@@ -121,15 +121,14 @@ export function checkAdminAccess() {
 
 export function onAuthStateChanged(callback) {
     return auth.onAuthStateChanged(user => {
-        if (user) {
-        if (user.email === 'admin@dismail.com') {
-            console.log("Администратор авторизован"); // Для отладки
-            // Показываем все админ-элементы
+        if (user && user.email === 'admin@dismail.com') {
+            console.log("Администратор авторизован");
             document.querySelectorAll('.admin-btn').forEach(btn => {
                 btn.style.display = 'block';
             });
         }
-    }
-});
+        callback(user);
+    });
+}
 
-export { currentUser, checkAdminAccess };
+export { currentUser };
