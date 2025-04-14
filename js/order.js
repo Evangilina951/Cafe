@@ -1,5 +1,6 @@
 import { getCurrentUser } from '/Cafe/js/auth.js';
 
+// Состояние заказа
 let order = [];
 
 // DOM элементы
