@@ -1,46 +1,75 @@
-import { initAuth } from '/Cafe/js/auth.js';
+import { initAuth, checkAdminAccess, currentUser } from '/Cafe/js/auth.js';
 import { loadMenuFromFirebase } from '/Cafe/js/menu.js';
 import { initOrder } from '/Cafe/js/order.js';
 import { auth } from '/Cafe/js/firebase-config.js';
-import { checkAdminAccess } from '/Cafe/js/auth.js';
 
+// Инициализация приложения
 document.addEventListener('DOMContentLoaded', () => {
+    // Инициализация модулей
     initAuth();
     initOrder();
-
+    
+    // Обработка авторизации
     auth.onAuthStateChanged(user => {
-        if (user) {
-            loadMenuFromFirebase();
-            
-            const isAdmin = user.email === 'admin@dismail.com';
-            
-            // Обработчик кнопки управления меню
-            const menuManagementBtn = document.getElementById('menu-management-btn');
-            if (menuManagementBtn) {
-                menuManagementBtn.style.display = isAdmin ? 'block' : 'none';
-                menuManagementBtn.addEventListener('click', () => {
-                    if (isAdmin) {
-                        window.location.href = '/Cafe/admin.html';
-                    } else {
-                        alert("Доступ разрешен только администратору");
-                        window.location.href = '/Cafe/404.html';
-                    }
-                });
-            }
-
-            // Обработчик кнопки управления промокодами
-            const promoManagementBtn = document.getElementById('promo-management-btn');
-            if (promoManagementBtn) {
-                promoManagementBtn.style.display = isAdmin ? 'block' : 'none';
-                promoManagementBtn.addEventListener('click', () => {
-                    if (isAdmin) {
-                        window.location.href = '/Cafe/admin-promocodes.html';
-                    } else {
-                        alert("Доступ разрешен только администратору");
-                        window.location.href = '/Cafe/404.html';
-                    }
-                });
-            }
-        }
+        if (!user) return;
+        
+        loadMenuFromFirebase();
+        
+        // Проверка и обработка административного доступа
+        handleAdminAccess(user);
     });
 });
+
+// Обработка административного доступа
+function handleAdminAccess(user) {
+    const isAdmin = checkAdminAccess();
+    console.log(`Пользователь ${user.email} - администратор: ${isAdmin}`); // Логирование
+    
+    // Управление кнопками админ-панели
+    const adminButtons = [
+        'menu-management-btn',
+        'promo-management-btn'
+    ];
+    
+    adminButtons.forEach(btnId => {
+        const button = document.getElementById(btnId);
+        if (!button) return;
+        
+        button.style.display = isAdmin ? 'block' : 'none';
+        
+        // Удаляем старые обработчики перед добавлением новых
+        button.replaceWith(button.cloneNode(true));
+        const newButton = document.getElementById(btnId);
+        
+        newButton.addEventListener('click', (e) => {
+            e.preventDefault();
+            handleAdminButtonClick(btnId, isAdmin);
+        });
+    });
+}
+
+// Обработка клика по кнопкам админ-панели
+function handleAdminButtonClick(buttonId, isAdmin) {
+    if (!isAdmin) {
+        alert("Доступ разрешен только администратору");
+        window.location.href = '/Cafe/404.html';
+        return;
+    }
+    
+    const adminPages = {
+        'menu-management-btn': '/Cafe/admin.html',
+        'promo-management-btn': '/Cafe/admin-promocodes.html'
+    };
+    
+    if (adminPages[buttonId]) {
+        window.location.href = adminPages[buttonId];
+    } else {
+        console.error('Неизвестная кнопка админ-панели:', buttonId);
+    }
+}
+
+// Глобально доступные функции для отладки
+window.debugAuth = () => {
+    console.log('Текущий пользователь:', currentUser);
+    console.log('Это админ?', checkAdminAccess());
+};
