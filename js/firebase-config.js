@@ -1,7 +1,4 @@
-import firebase from 'https://www.gstatic.com/firebasejs/8.10.0/firebase-app.js';
-import 'https://www.gstatic.com/firebasejs/8.10.0/firebase-auth.js';
-import 'https://www.gstatic.com/firebasejs/8.10.0/firebase-database.js';
-
+// Импортируем Firebase через CDN (без ES6 модулей)
 const firebaseConfig = {
     apiKey: "AIzaSyDB8Vtxg3SjVyHRJ3ZOXT8osnHYrO_uw4A",
     authDomain: "cafe-90de8.firebaseapp.com",
@@ -16,7 +13,6 @@ const firebaseConfig = {
 // Инициализация Firebase
 firebase.initializeApp(firebaseConfig);
 
-const auth = firebase.auth();
-const db = firebase.database();
-
-export { db, auth, firebase as default };
+// Экспортируем нужные сервисы
+export const auth = firebase.auth();
+export const db = firebase.database();
