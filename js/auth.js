@@ -1,6 +1,7 @@
 import { auth } from '/Cafe/js/firebase-config.js';
 
-let currentUser = null; // Текущий авторизованный пользователь
+// Добавляем экспорт currentUser
+export let currentUser = null;
 
 // Получение DOM-элементов
 const elements = {
