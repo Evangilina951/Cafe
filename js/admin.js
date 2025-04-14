@@ -58,6 +58,14 @@ export async function initAdmin() {
     if (!window.location.pathname.includes('admin.html')) return;
     if (!elements.adminPanel) return;
 
+    // Ждем завершения аутентификации
+    await new Promise(resolve => {
+        const unsubscribe = auth.onAuthStateChanged(user => {
+            unsubscribe(); // Отписываемся после первого вызова
+            resolve(user);
+        });
+    });
+
     if (!currentUser || currentUser.email !== 'admin@dismail.com') {
         alert("Доступ разрешен только администратору");
         window.location.href = '/Cafe/index.html';
