@@ -1,47 +1,41 @@
-import { initAuth, isAdmin } from '/Cafe/js/auth.js';
+import { initAuth, currentUser } from '/Cafe/js/auth.js';
 import { loadMenuFromFirebase } from '/Cafe/js/menu.js';
 import { initOrder } from '/Cafe/js/order.js';
-import { auth } from '/Cafe/js/firebase-config.js';
+import { initAdmin } from '/Cafe/js/admin.js';
+import { auth } from '/Cafe/js/firebase-config.js'; // Явный импорт auth
+
+// Функция для показа админ-панели (добавлена, так как она используется)
+function showAdminPanel() {
+    const adminPanel = document.getElementById('admin-panel');
+    const orderInterface = document.getElementById('order-interface');
+    if (adminPanel && orderInterface) {
+        adminPanel.style.display = 'block';
+        adminPanel.classList.remove('hidden');
+        orderInterface.style.display = 'none';
+    }
+}
 
 document.addEventListener('DOMContentLoaded', () => {
     // Инициализация модулей
     initAuth();
     initOrder();
-
-    // Обработчик кнопки управления меню
-    document.getElementById('menu-management-btn')?.addEventListener('click', (e) => {
-        e.preventDefault();
-        
-        if (!isAdmin()) {
-            alert("Доступ разрешен только администратору");
-            return;
-        }
-        window.location.href = '/Cafe/admin.html';
-    });
-
-    // Обработчик кнопки управления промокодами
-    document.getElementById('promo-management-btn')?.addEventListener('click', (e) => {
-        e.preventDefault();
-        
-        if (!isAdmin()) {
-            alert("Доступ разрешен только администратору");
-            return;
-        }
-        window.location.href = '/Cafe/admin-promocodes.html';
-    });
-
-    // Загрузка меню при изменении состояния аутентификации
+    initAdmin();
+    
+    // Проверка авторизации и загрузка меню
     auth.onAuthStateChanged(user => {
-        console.log('Auth state changed:', user);
         if (user) {
-            console.log('User logged in, loading menu...');
-            loadMenuFromFirebase()
-                .then(() => console.log('Menu loaded successfully'))
-                .catch(error => {
-                    console.error('Menu loading error:', error);
-                    // Попробуем загрузить снова через 1 секунду
-                    setTimeout(() => loadMenuFromFirebase(), 1000);
-                });
+            loadMenuFromFirebase();
+            if (window.location.hash === '#admin' && user.email === 'admin@dismail.com') {
+                showAdminPanel();
+            }
         }
     });
-});
+
+    // Стили для формы добавления напитка
+    const addItemForm = document.getElementById('add-item-form');
+    if (addItemForm) {
+        addItemForm.style.display = 'flex';
+        addItemForm.style.flexDirection = 'column';
+        addItemForm.style.gap = '10px';
+    }
+}); 
