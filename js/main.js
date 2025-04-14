@@ -20,6 +20,7 @@ document.addEventListener('DOMContentLoaded', () => {
     });
 
     if (!isAdmin()) {
+        e.preventDefault(); // Блокируем переход
         alert("Доступ разрешен только администратору");
         return;
     }
