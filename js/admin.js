@@ -66,8 +66,8 @@ export async function initAdmin() {
         });
     });
 
-    if (!currentUser || currentUser.email !== 'admin@dismail.com') {
-        alert("Доступ разрешен только администратору");
+       if (!currentUser || currentUser.email !== 'admin@dismail.com') {
+         alert("Доступ разрешен только администратору");
         window.location.href = '/Cafe/index.html';
         return;
     }
@@ -565,13 +565,14 @@ function addCategory() {
 
 if (window.location.pathname.includes('admin.html')) {
     document.addEventListener('DOMContentLoaded', () => {
-        // Используем уже импортированный auth из firebase-config.js
-        auth.onAuthStateChanged(user => {
-            if (user?.email === 'admin@dismail.com') {
-                initAdmin();
-            } else {
-                window.location.href = '/Cafe/index.html';
-            }
-        });
+    auth.onAuthStateChanged(user => {
+        console.log("Admin Panel Auth State:", user?.email); // Для отладки
+        if (user?.email === 'admin@dismail.com') {
+            initAdmin();
+        } else {
+            alert("Доступ разрешен только администратору");
+            window.location.href = '/Cafe/index.html';
+        }
     });
+});
 }
