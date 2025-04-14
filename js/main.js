@@ -32,11 +32,12 @@ document.addEventListener('DOMContentLoaded', () => {
 
     // Загрузка меню при изменении состояния аутентификации
     auth.onAuthStateChanged(user => {
-    console.log('Auth state changed:', user);
-    if (user) {
-        console.log('User logged in, loading menu...');
-        loadMenuFromFirebase().catch(error => {
-            console.error('Menu loading error:', error);
-        });
-    }
-});
+        console.log('Auth state changed:', user);
+        if (user) {
+            console.log('User logged in, loading menu...');
+            loadMenuFromFirebase().catch(error => {
+                console.error('Menu loading error:', error);
+            });
+        }
+    });
+}); 
