@@ -2,6 +2,7 @@ import { initAuth } from '/Cafe/js/auth.js';
 import { loadMenuFromFirebase } from '/Cafe/js/menu.js';
 import { initOrder } from '/Cafe/js/order.js';
 import { auth } from '/Cafe/js/firebase-config.js';
+import { checkAdminAccess } from '/Cafe/js/auth.js';
 
 document.addEventListener('DOMContentLoaded', () => {
     initAuth();
