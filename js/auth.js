@@ -18,24 +18,42 @@ export function isAdmin() {
 }
 
 function handleAuthStateChanged(user) {
-    console.log('Auth state changed:', user);
     currentUser = user;
     
     if (user) {
         console.log('User logged in:', user.email);
-        if (elements.authForm) elements.authForm.style.display = 'none';
-        if (elements.orderInterface) {
-            elements.orderInterface.style.display = 'flex';
+        // Убедимся, что элементы существуют
+        const authForm = document.getElementById('auth-form');
+        const orderInterface = document.getElementById('order-interface');
+        
+        if (authForm) authForm.style.display = 'none';
+        if (orderInterface) {
+            orderInterface.style.display = 'flex'; // Важно: используем flex или block
+            orderInterface.classList.remove('hidden'); // Дополнительная гарантия
         }
-        if (elements.userEmail) elements.userEmail.textContent = user.email;
+        
+        const userEmail = document.getElementById('user-email');
+        if (userEmail) userEmail.textContent = user.email;
 
+        // Показываем кнопки админа только для админа
         document.querySelectorAll('.admin-btn').forEach(btn => {
             btn.style.display = isAdmin() ? 'block' : 'none';
         });
+        
+        // Принудительно запускаем загрузку меню
+        if (typeof loadMenuFromFirebase === 'function') {
+            loadMenuFromFirebase();
+        }
     } else {
         console.log('User logged out');
-        if (elements.authForm) elements.authForm.style.display = 'block';
-        if (elements.orderInterface) elements.orderInterface.style.display = 'none';
+        const authForm = document.getElementById('auth-form');
+        const orderInterface = document.getElementById('order-interface');
+        
+        if (authForm) authForm.style.display = 'block';
+        if (orderInterface) {
+            orderInterface.style.display = 'none';
+            orderInterface.classList.add('hidden');
+        }
     }
 }
 
