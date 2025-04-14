@@ -1,12 +1,14 @@
 import { initAuth, isAdmin } from '/Cafe/js/auth.js';
 import { loadMenuFromFirebase } from '/Cafe/js/menu.js';
 import { initOrder } from '/Cafe/js/order.js';
-import { auth } from '/Cafe/js/firebase-config.js'; // Добавлен импорт auth
+import { auth } from '/Cafe/js/firebase-config.js'; // Импортируем auth
 
 document.addEventListener('DOMContentLoaded', () => {
+    // Инициализация модулей
     initAuth();
     initOrder();
 
+    // Обработчик кнопки управления меню
     document.getElementById('menu-management-btn')?.addEventListener('click', (e) => {
         e.preventDefault();
         
@@ -14,10 +16,10 @@ document.addEventListener('DOMContentLoaded', () => {
             alert("Доступ разрешен только администратору");
             return;
         }
-        
         window.location.href = '/Cafe/admin.html';
     });
 
+    // Обработчик кнопки управления промокодами
     document.getElementById('promo-management-btn')?.addEventListener('click', (e) => {
         e.preventDefault();
         
@@ -25,15 +27,13 @@ document.addEventListener('DOMContentLoaded', () => {
             alert("Доступ разрешен только администратору");
             return;
         }
-        
         window.location.href = '/Cafe/admin-promocodes.html';
     });
 
-    // Исправленный обработчик с использованием импортированного auth
+    // Загрузка меню при изменении состояния аутентификации
     auth.onAuthStateChanged(user => {
         if (user) {
             loadMenuFromFirebase();
-            console.log('User:', user.email, 'Admin:', isAdmin());
         }
     });
 });
