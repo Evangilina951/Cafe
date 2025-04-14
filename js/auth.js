@@ -115,14 +115,21 @@ export function initAuth() {
     }
 }
 
-export function onAuthStateChanged(callback) {
-    return auth.onAuthStateChanged(user => {
-        if (user && elements.promoManagementBtn) {
-            elements.promoManagementBtn.style.display = 
-                user.email === 'admin@dismail.com' ? 'block' : 'none';
-        }
-        callback(user);
-    });
+export function checkAdminAccess() {
+    return currentUser && currentUser.email === 'admin@dismail.com';
 }
 
-export { currentUser };
+export function onAuthStateChanged(callback) {
+    return auth.onAuthStateChanged(user => {
+        if (user) {
+        if (user.email === 'admin@dismail.com') {
+            console.log("Администратор авторизован"); // Для отладки
+            // Показываем все админ-элементы
+            document.querySelectorAll('.admin-btn').forEach(btn => {
+                btn.style.display = 'block';
+            });
+        }
+    }
+});
+
+export { currentUser, checkAdminAccess };
