@@ -1,4 +1,7 @@
-// Инициализация Firebase
+import firebase from 'firebase/app';
+import 'firebase/auth';
+import 'firebase/database';
+
 const firebaseConfig = {
     apiKey: "AIzaSyDB8Vtxg3SjVyHRJ3ZOXT8osnHYrO_uw4A",
     authDomain: "cafe-90de8.firebaseapp.com",
@@ -10,15 +13,8 @@ const firebaseConfig = {
     measurementId: "G-2FVD2KRF16"
 };
 
-// Инициализируем Firebase только один раз
-if (!firebase.apps.length) {
-    firebase.initializeApp(firebaseConfig);
-    console.log('Firebase initialized');
-}
-
-// Получаем сервисы Firebase
+const app = firebase.initializeApp(firebaseConfig);
 const auth = firebase.auth();
 const db = firebase.database();
 
-// Экспортируем для использования в других модулях
-export { db, auth };
+export { auth, db };
