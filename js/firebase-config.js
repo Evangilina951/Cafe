@@ -1,4 +1,4 @@
-// Импортируем Firebase через CDN (без ES6 модулей)
+// Инициализация Firebase
 const firebaseConfig = {
     apiKey: "AIzaSyDB8Vtxg3SjVyHRJ3ZOXT8osnHYrO_uw4A",
     authDomain: "cafe-90de8.firebaseapp.com",
@@ -10,8 +10,10 @@ const firebaseConfig = {
     measurementId: "G-2FVD2KRF16"
 };
 
-// Инициализация Firebase
 firebase.initializeApp(firebaseConfig);
+
+const auth = firebase.auth();
+const db = firebase.database();
 
 // Экспортируем нужные сервисы
 export const auth = firebase.auth();
