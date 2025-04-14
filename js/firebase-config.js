@@ -13,6 +13,7 @@ const firebaseConfig = {
 // Инициализируем Firebase только один раз
 if (!firebase.apps.length) {
     firebase.initializeApp(firebaseConfig);
+    console.log('Firebase initialized');
 }
 
 // Получаем сервисы Firebase
