@@ -441,3 +441,11 @@ body {
 #promo-management-btn:hover {
     background-color: #5a2b19;
 }
+
+#auth-form {
+    display: block; /* По умолчанию видима */
+}
+
+#order-interface:not(.hidden) {
+    display: flex !important;
+}
