@@ -556,18 +556,14 @@ function addCategory() {
 }
 
 if (window.location.pathname.includes('admin.html')) {
-    document.addEventListener('DOMContentLoaded', async () => {
-        try {
-            const { auth } = await import('/Cafe/js/firebase-config.js');
-            auth.onAuthStateChanged(user => {
-                if (user?.email === 'admin@dismail.com') {
-                    initAdmin();
-                } else {
-                    window.location.href = '/Cafe/index.html';
-                }
-            });
-        } catch (error) {
-            console.error("Ошибка инициализации Firebase:", error);
-        }
+    document.addEventListener('DOMContentLoaded', () => {
+        // Используем уже импортированный auth из firebase-config.js
+        auth.onAuthStateChanged(user => {
+            if (user?.email === 'admin@dismail.com') {
+                initAdmin();
+            } else {
+                window.location.href = '/Cafe/index.html';
+            }
+        });
     });
 }
