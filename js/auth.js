@@ -1,7 +1,8 @@
 import { auth } from '/Cafe/js/firebase-config.js';
 
-let currentUser = null;
+let currentUser = null; // Текущий авторизованный пользователь
 
+// Получение DOM-элементов
 const elements = {
     authForm: document.getElementById('auth-form'),
     orderInterface: document.getElementById('order-interface'),
@@ -13,89 +14,68 @@ const elements = {
     logoutBtn: document.querySelector('.logout-btn')
 };
 
-function showElement(element) {
-    if (element) {
-        element.style.display = 'block';
-        element.classList.remove('hidden');
-    }
-}
-
-function hideElement(element) {
-    if (element) {
-        element.style.display = 'none';
-        element.classList.add('hidden');
-    }
-}
-
-function handleAuthStateChanged(user) {
-    currentUser = user;
-    
-    if (user) {
-        hideElement(elements.authForm);
-        showElement(elements.orderInterface);
-        
-        if (elements.userEmail) {
-            elements.userEmail.textContent = user.email;
-        }
-
-        // Показываем кнопки админа только для админа
-        const adminBtns = document.querySelectorAll('.admin-btn');
-        adminBtns.forEach(btn => {
-            btn.style.display = user.email === 'admin@dismail.com' ? 'block' : 'none';
-        });
-    } else {
-        showElement(elements.authForm);
-        hideElement(elements.orderInterface);
-    }
-}
-
-function login(e) {
-    e.preventDefault();
-    const email = elements.emailInput.value;
-    const password = elements.passwordInput.value;
-    
-    if (!email || !password) {
-        if (elements.errorMessage) {
-            elements.errorMessage.textContent = 'Заполните все поля';
-        }
-        return;
-    }
-    
-    auth.signInWithEmailAndPassword(email, password)
-        .catch(error => {
-            console.error("Ошибка входа:", error);
-            if (elements.errorMessage) {
-                elements.errorMessage.textContent = error.message;
-            }
-        });
-}
-
-export function signOut() {
-    return auth.signOut();
-}
-
+// Функция для проверки авторизации
 export function isAdmin() {
     return currentUser?.email === 'admin@dismail.com';
 }
 
-export function initAuth() {
-    auth.onAuthStateChanged(handleAuthStateChanged);
+// Обработчик изменения состояния авторизации
+function handleAuthStateChanged(user) {
+    currentUser = user;
     
-    if (elements.loginBtn) {
-        elements.loginBtn.addEventListener('click', login);
-    }
-    
-    if (elements.logoutBtn) {
-        elements.logoutBtn.addEventListener('click', signOut);
-    }
+    if (user) {
+        // Показываем интерфейс заказа
+        elements.authForm.style.display = 'none';
+        elements.orderInterface.style.display = 'block';
+        elements.userEmail.textContent = user.email;
 
-    if (elements.authForm) {
-        elements.authForm.addEventListener('keypress', (e) => {
-            if (e.key === 'Enter') login(e);
+        // Показываем/скрываем кнопки админа
+        document.querySelectorAll('.admin-btn').forEach(btn => {
+            btn.style.display = isAdmin() ? 'block' : 'none';
         });
+    } else {
+        // Показываем форму авторизации
+        elements.authForm.style.display = 'block';
+        elements.orderInterface.style.display = 'none';
     }
 }
 
+// Функция входа
+function login(e) {
+    e.preventDefault();
+    const email = elements.emailInput.value;
+    const password = elements.passwordInput.value;
+
+    if (!email || !password) {
+        elements.errorMessage.textContent = 'Заполните все поля';
+        return;
+    }
+
+    auth.signInWithEmailAndPassword(email, password)
+        .catch(error => {
+            elements.errorMessage.textContent = error.message;
+        });
+}
+
+// Функция выхода
+export function signOut() {
+    return auth.signOut();
+}
+
+// Инициализация модуля авторизации
+export function initAuth() {
+    // Подписываемся на изменения состояния авторизации
+    auth.onAuthStateChanged(handleAuthStateChanged);
+
+    // Назначаем обработчики событий
+    elements.loginBtn.addEventListener('click', login);
+    elements.logoutBtn.addEventListener('click', signOut);
+    elements.authForm.addEventListener('keypress', (e) => {
+        if (e.key === 'Enter') login(e);
+    });
+}
+
+// Экспортируем функцию для получения текущего пользователя
 export function getCurrentUser() {
     return currentUser;
 }
