@@ -1,4 +1,4 @@
-import { currentUser } from '/Cafe/js/auth.js';
+import { getCurrentUser } from '/Cafe/js/auth.js';
 import { db, auth } from '/Cafe/js/firebase-config.js';
 
 const elements = {
@@ -52,6 +52,38 @@ function createIngredientElement(name = '', quantity = '1') {
     
     return div;
 }
+
+async function waitForAuth() {
+    return new Promise((resolve) => {
+        const unsubscribe = auth.onAuthStateChanged(user => {
+            unsubscribe();
+            resolve(user);
+        });
+    });
+}
+
+export async function initAdmin() {
+    if (!window.location.pathname.includes('admin.html')) return;
+    
+    const user = await waitForAuth();
+    
+    if (!user || user.email !== 'admin@dismail.com') {
+        alert("Доступ разрешен только администратору");
+        window.location.href = '/Cafe/index.html';
+        return;
+    }
+
+    try {
+        await loadMenuDataFromFirebase();
+        setupEventListeners();
+        renderMenuInterface();
+    } catch (error) {
+        console.error("Ошибка инициализации:", error);
+        alert("Ошибка загрузки данных меню");
+        window.location.href = '/Cafe/index.html';
+    }
+}
+
 
 // Инициализация админ-панели
 export async function initAdmin() {
@@ -565,14 +597,6 @@ function addCategory() {
 
 if (window.location.pathname.includes('admin.html')) {
     document.addEventListener('DOMContentLoaded', () => {
-    auth.onAuthStateChanged(user => {
-        console.log("Admin Panel Auth State:", user?.email); // Для отладки
-        if (user?.email === 'admin@dismail.com') {
-            initAdmin();
-        } else {
-            alert("Доступ разрешен только администратору");
-            window.location.href = '/Cafe/index.html';
-        }
+        initAdmin().catch(console.error);
     });
-});
 }
