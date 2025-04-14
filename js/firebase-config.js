@@ -10,11 +10,14 @@ const firebaseConfig = {
     measurementId: "G-2FVD2KRF16"
 };
 
-firebase.initializeApp(firebaseConfig);
+// Инициализируем Firebase только если еще не инициализирован
+if (!firebase.apps.length) {
+    firebase.initializeApp(firebaseConfig);
+}
 
+// Получаем сервисы Firebase
 const auth = firebase.auth();
 const db = firebase.database();
 
-// Экспортируем нужные сервисы
-export const auth = firebase.auth();
-export const db = firebase.database();
+// Экспортируем сервисы
+export { db, auth };
