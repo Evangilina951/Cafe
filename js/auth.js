@@ -1,90 +1,92 @@
 import { auth } from '/Cafe/js/firebase-config.js';
 
-export let currentUser = null;
+let currentUser = null;
 
+// DOM элементы
 const elements = {
     authForm: document.getElementById('auth-form'),
     orderInterface: document.getElementById('order-interface'),
+    adminPanel: document.getElementById('admin-panel'),
     userEmail: document.getElementById('user-email'),
     emailInput: document.getElementById('email'),
     passwordInput: document.getElementById('password'),
     errorMessage: document.getElementById('error-message'),
     loginBtn: document.getElementById('login-btn'),
-    logoutBtn: document.querySelector('.logout-btn')
+    logoutBtn: document.querySelector('.logout-btn'),
+    adminBtn: document.querySelector('.admin-btn')
 };
 
-export function isAdmin() {
-    return currentUser?.email === 'admin@dismail.com';
+// Функции для работы с DOM
+function showElement(element) {
+    if (!element) return;
+    element.style.display = 'block';
+    element.classList.remove('hidden');
 }
 
-function handleAuthStateChanged(user) {
-    currentUser = user;
-    
+function hideElement(element) {
+    if (!element) return;
+    element.style.display = 'none';
+    element.classList.add('hidden');
+}
+
+// Обработчик состояния авторизации
+auth.onAuthStateChanged(user => {
     if (user) {
-        console.log('User logged in:', user.email);
-        if (elements.authForm) elements.authForm.style.display = 'none';
-        if (elements.orderInterface) {
-            elements.orderInterface.style.display = 'flex';
-            elements.orderInterface.classList.remove('hidden');
+        currentUser = user;
+        hideElement(elements.authForm);
+        showElement(elements.orderInterface);
+        
+        if (elements.userEmail) {
+            elements.userEmail.textContent = user.email;
         }
-        if (elements.userEmail) elements.userEmail.textContent = user.email;
-
-        document.querySelectorAll('.admin-btn').forEach(btn => {
-            if (btn) btn.style.display = isAdmin() ? 'block' : 'none';
-        });
+        
+        if (user.email === 'admin@dismail.com') {
+            if (elements.adminBtn) elements.adminBtn.style.display = 'block';
+        } else if (elements.adminBtn) {
+            elements.adminBtn.style.display = 'none';
+        }
     } else {
-        console.log('User logged out');
-        if (elements.authForm) elements.authForm.style.display = 'block';
-        if (elements.orderInterface) {
-            elements.orderInterface.style.display = 'none';
-            elements.orderInterface.classList.add('hidden');
-        }
+        currentUser = null;
+        showElement(elements.authForm);
+        hideElement(elements.orderInterface);
+        hideElement(elements.adminPanel);
+        if (elements.adminBtn) elements.adminBtn.style.display = 'none';
     }
-}
+});
 
-function login(e) {
-    e.preventDefault();
+function login() {
     const email = elements.emailInput.value;
     const password = elements.passwordInput.value;
-
-    if (!email || !password) {
-        if (elements.errorMessage) elements.errorMessage.textContent = 'Заполните все поля';
-        return;
-    }
-
+    
+    elements.errorMessage.textContent = '';
+    
     auth.signInWithEmailAndPassword(email, password)
         .then(() => {
-            if (elements.errorMessage) elements.errorMessage.textContent = '';
+            console.log("Login successful");
         })
         .catch(error => {
-            console.error('Login error:', error);
-            if (elements.errorMessage) elements.errorMessage.textContent = error.message;
+            console.error("Login error:", error);
+            elements.errorMessage.textContent = error.message;
         });
 }
 
-export function signOut() {
-    return auth.signOut();
+function logout() {
+    auth.signOut()
+        .then(() => {
+            console.log("User logged out");
+        })
+        .catch(error => console.error("Logout error:", error));
 }
 
+// Инициализация обработчиков событий
 export function initAuth() {
-    console.log('Initializing auth...');
+    if (elements.loginBtn) {
+        elements.loginBtn.addEventListener('click', login);
+    }
     
-    if (!elements.authForm || !elements.orderInterface) {
-        console.error('Critical elements not found!');
-        return;
-    }
-
-    auth.onAuthStateChanged(handleAuthStateChanged);
-
-    if (elements.loginBtn) elements.loginBtn.addEventListener('click', login);
-    if (elements.logoutBtn) elements.logoutBtn.addEventListener('click', signOut);
-    if (elements.authForm) {
-        elements.authForm.addEventListener('keypress', (e) => {
-            if (e.key === 'Enter') login(e);
-        });
+    if (elements.logoutBtn) {
+        elements.logoutBtn.addEventListener('click', logout);
     }
 }
 
-export function getCurrentUser() {
-    return currentUser;
-}
+export { currentUser };
