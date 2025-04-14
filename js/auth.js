@@ -84,6 +84,10 @@ export function isAdmin() {
     return currentUser && currentUser.email === 'admin@dismail.com';
 }
 
+console.log('User object:', user);
+console.log('Email verified:', user.emailVerified);
+console.log('Provider data:', user.providerData);
+
 // Инициализация модуля авторизации
 export function initAuth() {
     auth.onAuthStateChanged(handleAuthStateChanged);
