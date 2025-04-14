@@ -17,7 +17,7 @@ const elements = {
     promoManagementBtn: document.getElementById('promo-management-btn')
 };
 
-// Функции для работы с DOM
+// Показать элемент
 function showElement(element) {
     if (element) {
         element.style.display = 'block';
@@ -25,6 +25,7 @@ function showElement(element) {
     }
 }
 
+// Скрыть элемент
 function hideElement(element) {
     if (element) {
         element.style.display = 'none';
@@ -32,7 +33,7 @@ function hideElement(element) {
     }
 }
 
-// Обработчик состояния авторизации
+// Обработчик изменения состояния авторизации
 function handleAuthStateChanged(user) {
     if (user) {
         currentUser = user;
@@ -45,6 +46,7 @@ function handleAuthStateChanged(user) {
         
         const isAdmin = user.email === 'admin@dismail.com';
         
+        // Управление видимостью кнопок админ-панели
         if (elements.adminBtn) {
             elements.adminBtn.style.display = isAdmin ? 'block' : 'none';
         }
@@ -53,20 +55,25 @@ function handleAuthStateChanged(user) {
             elements.promoManagementBtn.style.display = isAdmin ? 'block' : 'none';
         }
 
+        // Показать админ-панель если в URL есть #admin
         if (isAdmin && window.location.hash === '#admin') {
             showElement(elements.adminPanel);
             hideElement(elements.orderInterface);
         }
     } else {
+        // Пользователь не авторизован
         currentUser = null;
         showElement(elements.authForm);
         hideElement(elements.orderInterface);
         hideElement(elements.adminPanel);
+        
+        // Скрыть все админ-кнопки
         if (elements.adminBtn) elements.adminBtn.style.display = 'none';
         if (elements.promoManagementBtn) elements.promoManagementBtn.style.display = 'none';
     }
 }
 
+// Вход в систему
 function login(e) {
     e.preventDefault();
     
@@ -80,29 +87,34 @@ function login(e) {
         return;
     }
     
+    // Очистить предыдущие ошибки
     if (elements.errorMessage) {
         elements.errorMessage.textContent = '';
     }
     
+    // Выполнить вход
     auth.signInWithEmailAndPassword(email, password)
         .catch(error => {
-            console.error("Login error:", error);
+            console.error("Ошибка входа:", error);
             if (elements.errorMessage) {
                 elements.errorMessage.textContent = error.message;
             }
         });
 }
 
+// Выход из системы
 function logout() {
     auth.signOut().catch(error => {
-        console.error("Logout error:", error);
+        console.error("Ошибка выхода:", error);
     });
 }
 
-// Инициализация обработчиков событий
+// Инициализация модуля авторизации
 export function initAuth() {
+    // Подписаться на изменения состояния авторизации
     auth.onAuthStateChanged(handleAuthStateChanged);
     
+    // Назначить обработчики событий
     if (elements.loginBtn) {
         elements.loginBtn.addEventListener('click', login);
     }
@@ -111,6 +123,7 @@ export function initAuth() {
         elements.logoutBtn.addEventListener('click', logout);
     }
 
+    // Обработка входа по нажатию Enter
     if (elements.authForm) {
         elements.authForm.addEventListener('keypress', (e) => {
             if (e.key === 'Enter') login(e);
@@ -118,4 +131,16 @@ export function initAuth() {
     }
 }
 
-export { currentUser, auth };
+// Функция для подписки на изменения авторизации
+export function onAuthStateChanged(callback) {
+    return auth.onAuthStateChanged(user => {
+        if (user && elements.promoManagementBtn) {
+            elements.promoManagementBtn.style.display = 
+                user.email === 'admin@dismail.com' ? 'block' : 'none';
+        }
+        callback(user);
+    });
+}
+
+// Экспорт текущего пользователя
+export { currentUser };
