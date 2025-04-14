@@ -1,4 +1,3 @@
-// Инициализация Firebase
 const firebaseConfig = {
     apiKey: "AIzaSyDB8Vtxg3SjVyHRJ3ZOXT8osnHYrO_uw4A",
     authDomain: "cafe-90de8.firebaseapp.com",
@@ -10,14 +9,11 @@ const firebaseConfig = {
     measurementId: "G-2FVD2KRF16"
 };
 
-// Инициализируем Firebase только если еще не инициализирован
 if (!firebase.apps.length) {
     firebase.initializeApp(firebaseConfig);
 }
 
-// Получаем сервисы Firebase
 const auth = firebase.auth();
 const db = firebase.database();
 
-// Экспортируем сервисы
 export { db, auth };
