@@ -8,14 +8,24 @@ document.addEventListener('DOMContentLoaded', () => {
     initOrder();
 
     // Обработчик для кнопки управления меню
-    document.getElementById('menu-management-btn')?.addEventListener('click', (e) => {
-        if (!isAdmin()) {
-            alert("Доступ разрешен только администратору");
-            e.preventDefault();
-            return;
-        }
-        window.location.href = '/Cafe/admin.html';
+    document.getElementById('menu-management-btn')?.addEventListener('click', async (e) => {
+    e.preventDefault();
+    
+    // Ждем завершения проверки аутентификации
+    await new Promise(resolve => {
+        const unsubscribe = auth.onAuthStateChanged(user => {
+            unsubscribe();
+            resolve(user);
+        });
     });
+
+    if (!isAdmin()) {
+        alert("Доступ разрешен только администратору");
+        return;
+    }
+    
+    window.location.href = '/Cafe/admin.html';
+});
 
     // Обработчик для кнопки управления промокодами
     document.getElementById('promo-management-btn')?.addEventListener('click', (e) => {
