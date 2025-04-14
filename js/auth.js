@@ -13,7 +13,6 @@ const elements = {
     logoutBtn: document.querySelector('.logout-btn')
 };
 
-// Показываем/скрываем элементы
 function showElement(element) {
     if (element) {
         element.style.display = 'block';
@@ -28,7 +27,6 @@ function hideElement(element) {
     }
 }
 
-// Обработчик изменения состояния авторизации
 function handleAuthStateChanged(user) {
     currentUser = user;
     
@@ -40,19 +38,17 @@ function handleAuthStateChanged(user) {
             elements.userEmail.textContent = user.email;
         }
 
-        // Показываем кнопки админа (проверка прав будет при клике)
-        document.querySelectorAll('.admin-btn').forEach(btn => {
-            btn.style.display = 'block';
+        // Показываем кнопки админа только для админа
+        const adminBtns = document.querySelectorAll('.admin-btn');
+        adminBtns.forEach(btn => {
+            btn.style.display = user.email === 'admin@dismail.com' ? 'block' : 'none';
         });
-
-        console.log('Авторизован:', user.email); // Отладочная информация
     } else {
         showElement(elements.authForm);
         hideElement(elements.orderInterface);
     }
 }
 
-// Функция входа
 function login(e) {
     e.preventDefault();
     const email = elements.emailInput.value;
@@ -74,22 +70,17 @@ function login(e) {
         });
 }
 
-// Функция выхода
 export function signOut() {
     return auth.signOut();
 }
 
-// Проверка прав администратора
 export function isAdmin() {
-    return currentUser && currentUser.email === 'admin@dismail.com';
+    return currentUser?.email === 'admin@dismail.com';
 }
 
-// Инициализация модуля авторизации
 export function initAuth() {
-    // Подписываемся на изменения состояния авторизации
     auth.onAuthStateChanged(handleAuthStateChanged);
     
-    // Назначаем обработчики событий
     if (elements.loginBtn) {
         elements.loginBtn.addEventListener('click', login);
     }
@@ -98,7 +89,6 @@ export function initAuth() {
         elements.logoutBtn.addEventListener('click', signOut);
     }
 
-    // Обработка входа по нажатию Enter
     if (elements.authForm) {
         elements.authForm.addEventListener('keypress', (e) => {
             if (e.key === 'Enter') login(e);
@@ -106,5 +96,6 @@ export function initAuth() {
     }
 }
 
-// Экспортируем текущего пользователя
-export { currentUser };
+export function getCurrentUser() {
+    return currentUser;
+}
