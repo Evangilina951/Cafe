@@ -61,8 +61,6 @@ const elements = {
     categoryFilter: document.getElementById('category-filter')
 };
 
-let activeCategoryFilter = null;
-
 function hideAdminPanel() {
     adminPanel.style.display = 'none';
     adminPanel.classList.add('hidden');
