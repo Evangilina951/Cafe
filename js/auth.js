@@ -13,7 +13,7 @@ const elements = {
     logoutBtn: document.querySelector('.logout-btn')
 };
 
-// Показываем/скрываем элементы интерфейса
+// Показываем/скрываем элементы
 function showElement(element) {
     if (element) {
         element.style.display = 'block';
@@ -28,10 +28,11 @@ function hideElement(element) {
     }
 }
 
-// Основной обработчик авторизации
+// Обработчик изменения состояния авторизации
 function handleAuthStateChanged(user) {
+    currentUser = user;
+    
     if (user) {
-        currentUser = user;
         hideElement(elements.authForm);
         showElement(elements.orderInterface);
         
@@ -39,14 +40,13 @@ function handleAuthStateChanged(user) {
             elements.userEmail.textContent = user.email;
         }
 
-        // Всегда показываем кнопки админа, проверка будет при клике
+        // Показываем кнопки админа (проверка прав будет при клике)
         document.querySelectorAll('.admin-btn').forEach(btn => {
             btn.style.display = 'block';
         });
 
-        console.log('Авторизован пользователь:', user.email); // Отладочная информация
+        console.log('Авторизован:', user.email); // Отладочная информация
     } else {
-        currentUser = null;
         showElement(elements.authForm);
         hideElement(elements.orderInterface);
     }
@@ -79,19 +79,17 @@ export function signOut() {
     return auth.signOut();
 }
 
-// Проверка прав администратора (простая и надежная)
+// Проверка прав администратора
 export function isAdmin() {
     return currentUser && currentUser.email === 'admin@dismail.com';
 }
 
-console.log('User object:', user);
-console.log('Email verified:', user.emailVerified);
-console.log('Provider data:', user.providerData);
-
 // Инициализация модуля авторизации
 export function initAuth() {
+    // Подписываемся на изменения состояния авторизации
     auth.onAuthStateChanged(handleAuthStateChanged);
     
+    // Назначаем обработчики событий
     if (elements.loginBtn) {
         elements.loginBtn.addEventListener('click', login);
     }
@@ -100,6 +98,7 @@ export function initAuth() {
         elements.logoutBtn.addEventListener('click', signOut);
     }
 
+    // Обработка входа по нажатию Enter
     if (elements.authForm) {
         elements.authForm.addEventListener('keypress', (e) => {
             if (e.key === 'Enter') login(e);
@@ -107,4 +106,5 @@ export function initAuth() {
     }
 }
 
+// Экспортируем текущего пользователя
 export { currentUser };
