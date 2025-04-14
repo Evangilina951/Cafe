@@ -13,23 +13,30 @@ document.addEventListener('DOMContentLoaded', () => {
         if (user) {
             loadMenuFromFirebase();
             
-            // Настройка кнопки админ-панели
-            const adminBtn = document.querySelector('.admin-btn');
-            if (adminBtn) {
-                adminBtn.addEventListener('click', () => {
-                    if (user.email === 'admin@dismail.com') {
-                        window.location.href = '/Cafe/admin.html';
-                    } else {
-                        alert("Доступ разрешен только администратору");
-                    }
+            // Настройка кнопок админ-панели
+            const adminButtons = document.querySelectorAll('.admin-btn');
+            if (adminButtons.length > 0 && user.email === 'admin@dismail.com') {
+                adminButtons.forEach(btn => {
+                    btn.style.display = 'block';
+                });
+
+                // Обработчик для кнопки управления меню
+                document.getElementById('menu-management-btn')?.addEventListener('click', () => {
+                    window.location.href = '/Cafe/admin.html';
+                });
+
+                // Обработчик для кнопки управления промокодами
+                document.getElementById('promo-management-btn')?.addEventListener('click', () => {
+                    window.location.href = '/Cafe/admin-promocodes.html';
+                });
+            } else {
+                // Скрываем кнопки, если пользователь не админ
+                adminButtons.forEach(btn => {
+                    btn.style.display = 'none';
                 });
             }
         }
     });
-
-    document.getElementById('promo-management-btn')?.addEventListener('click', () => {
-    window.location.href = '/Cafe/admin-promocodes.html';
-});
 
     // Стили для формы добавления напитка (если есть на странице)
     const addItemForm = document.getElementById('add-item-form');
