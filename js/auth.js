@@ -41,7 +41,14 @@ auth.onAuthStateChanged(user => {
         }
         
         if (user.email === 'admin@dismail.com') {
-            if (elements.adminBtn) elements.adminBtn.style.display = 'block';
+            if (elements.adminBtn) {
+                elements.adminBtn.style.display = 'block';
+                // Показываем админ-панель если в URL есть #admin
+                if (window.location.hash === '#admin') {
+                    showElement(elements.adminPanel);
+                    hideElement(elements.orderInterface);
+                }
+            }
         } else if (elements.adminBtn) {
             elements.adminBtn.style.display = 'none';
         }
@@ -54,28 +61,37 @@ auth.onAuthStateChanged(user => {
     }
 });
 
-function login() {
+function login(e) {
+    e.preventDefault();
+    
     const email = elements.emailInput.value;
     const password = elements.passwordInput.value;
     
-    elements.errorMessage.textContent = '';
+    if (!email || !password) {
+        if (elements.errorMessage) {
+            elements.errorMessage.textContent = 'Заполните все поля';
+        }
+        return;
+    }
+    
+    if (elements.errorMessage) {
+        elements.errorMessage.textContent = '';
+    }
     
     auth.signInWithEmailAndPassword(email, password)
-        .then(() => {
-            console.log("Login successful");
-        })
         .catch(error => {
             console.error("Login error:", error);
-            elements.errorMessage.textContent = error.message;
+            if (elements.errorMessage) {
+                elements.errorMessage.textContent = error.message;
+            }
         });
 }
 
 function logout() {
     auth.signOut()
-        .then(() => {
-            console.log("User logged out");
-        })
-        .catch(error => console.error("Logout error:", error));
+        .catch(error => {
+            console.error("Logout error:", error);
+        });
 }
 
 // Инициализация обработчиков событий
@@ -86,6 +102,15 @@ export function initAuth() {
     
     if (elements.logoutBtn) {
         elements.logoutBtn.addEventListener('click', logout);
+    }
+
+    // Обработка формы по нажатию Enter
+    if (elements.authForm) {
+        elements.authForm.addEventListener('keypress', (e) => {
+            if (e.key === 'Enter') {
+                login(e);
+            }
+        });
     }
 }
 
