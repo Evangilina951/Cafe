@@ -1,4 +1,4 @@
-import { currentUser } from '/Cafe/js/auth.js';
+import { getCurrentUser } from '/Cafe/js/auth.js';
 
 let order = [];
 
@@ -11,7 +11,7 @@ const elements = {
 };
 
 export function addToOrder(name, price) {
-    if (!currentUser) {
+    if (!getCurrentUser()) {
         alert("Сначала войдите в систему!");
         return;
     }
