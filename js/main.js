@@ -1,7 +1,7 @@
 import { initAuth, isAdmin } from '/Cafe/js/auth.js';
 import { loadMenuFromFirebase } from '/Cafe/js/menu.js';
 import { initOrder } from '/Cafe/js/order.js';
-import { auth } from '/Cafe/js/firebase-config.js'; // Импортируем auth
+import { auth } from '/Cafe/js/firebase-config.js';
 
 document.addEventListener('DOMContentLoaded', () => {
     // Инициализация модулей
@@ -31,13 +31,17 @@ document.addEventListener('DOMContentLoaded', () => {
     });
 
     // Загрузка меню при изменении состояния аутентификации
-        auth.onAuthStateChanged(user => {
+    auth.onAuthStateChanged(user => {
         console.log('Auth state changed:', user);
         if (user) {
             console.log('User logged in, loading menu...');
             loadMenuFromFirebase()
                 .then(() => console.log('Menu loaded successfully'))
-                .catch(error => console.error('Menu loading failed:', error));
+                .catch(error => {
+                    console.error('Menu loading error:', error);
+                    // Попробуем загрузить снова через 1 секунду
+                    setTimeout(() => loadMenuFromFirebase(), 1000);
+                });
         }
     });
-}); 
+});
