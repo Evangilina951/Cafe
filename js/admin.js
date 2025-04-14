@@ -1,4 +1,4 @@
-import { getCurrentUser } from '/Cafe/js/auth.js';
+import { getCurrentUser, currentUser, isAdmin } from '/Cafe/js/auth.js';
 import { db, auth } from '/Cafe/js/firebase-config.js';
 
 const elements = {
@@ -13,7 +13,9 @@ const elements = {
     ingredientsList: document.getElementById('ingredients-list'),
     categoriesList: document.getElementById('categories-list'),
     menuItemsList: document.getElementById('menu-items-list'),
-    categoryFilter: document.getElementById('category-filter')
+    categoryFilter: document.getElementById('category-filter'),
+    newItemVisible: document.getElementById('new-item-visible'),
+    addIngredientBtn: document.getElementById('add-ingredient-btn')
 };
 
 let menuCategories = [];
@@ -67,7 +69,7 @@ export async function initAdmin() {
     
     const user = await waitForAuth();
     
-    if (!user || user.email !== 'admin@dismail.com') {
+    if (!user || !isAdmin()) {
         alert("Доступ разрешен только администратору");
         window.location.href = '/Cafe/index.html';
         return;
@@ -81,36 +83,6 @@ export async function initAdmin() {
         console.error("Ошибка инициализации:", error);
         alert("Ошибка загрузки данных меню");
         window.location.href = '/Cafe/index.html';
-    }
-}
-
-
-// Инициализация админ-панели
-export async function initAdmin() {
-    if (!window.location.pathname.includes('admin.html')) return;
-    if (!elements.adminPanel) return;
-
-    // Ждем завершения аутентификации
-    await new Promise(resolve => {
-        const unsubscribe = auth.onAuthStateChanged(user => {
-            unsubscribe(); // Отписываемся после первого вызова
-            resolve(user);
-        });
-    });
-
-       if (!currentUser || currentUser.email !== 'admin@dismail.com') {
-         alert("Доступ разрешен только администратору");
-        window.location.href = '/Cafe/index.html';
-        return;
-    }
-
-    try {
-        await loadMenuDataFromFirebase();
-        setupEventListeners();
-        renderMenuInterface();
-    } catch (error) {
-        console.error("Ошибка инициализации:", error);
-        alert("Ошибка загрузки данных меню");
     }
 }
 
@@ -135,32 +107,62 @@ function setupEventListeners() {
     });
     setupButton('#add-category-btn', addCategory);
     setupButton('#add-menu-item-btn', addMenuItem);
+    setupButton('#add-ingredient-btn', addNewIngredient);
 }
 
 function resetAddItemForm() {
     elements.newItemName.value = '';
     elements.newItemPrice.value = '';
+    elements.newItemVisible.checked = true;
     elements.ingredientsList.innerHTML = '';
     elements.ingredientsList.appendChild(createIngredientElement());
-    setupIngredientsHandlers();
+    populateCategorySelect();
 }
 
-function setupIngredientsHandlers() {
-    const addBtn = document.getElementById('add-ingredient-btn');
-    if (addBtn) {
-        addBtn.replaceWith(addBtn.cloneNode(true));
+function populateCategorySelect() {
+    elements.newItemCategory.innerHTML = '';
+    menuCategories.forEach(category => {
+        const option = document.createElement('option');
+        option.value = category;
+        option.textContent = category;
+        elements.newItemCategory.appendChild(option);
+    });
+}
+
+function addNewIngredient(e) {
+    e.preventDefault();
+    elements.ingredientsList.appendChild(createIngredientElement());
+}
+
+function addCategory() {
+    const name = elements.newCategoryName.value.trim();
+    if (!name) {
+        alert('Введите название категории');
+        return;
+    }
+    if (menuCategories.includes(name)) {
+        alert('Категория уже существует');
+        return;
     }
 
-    document.getElementById('add-ingredient-btn')?.addEventListener('click', function(e) {
-        e.preventDefault();
-        elements.ingredientsList.appendChild(createIngredientElement());
-    });
+    menuCategories.push(name);
+    updateMenuInFirebase()
+        .then(() => {
+            elements.newCategoryName.value = '';
+            hideElement(elements.addCategoryForm);
+            renderMenuInterface();
+        })
+        .catch(error => {
+            console.error("Ошибка сохранения:", error);
+            alert("Не удалось сохранить категорию");
+        });
 }
 
 function addMenuItem() {
     const name = elements.newItemName.value.trim();
-    const price = parseInt(elements.newItemPrice.value);
+    const price = parseFloat(elements.newItemPrice.value);
     const category = elements.newItemCategory.value;
+    const visible = elements.newItemVisible.checked;
     const ingredients = getIngredientsList();
 
     if (!name || isNaN(price) || !category || ingredients.length === 0) {
@@ -173,8 +175,8 @@ function addMenuItem() {
         name,
         price,
         category,
-        ingredients: ingredients.filter(Boolean),
-        visible: true
+        ingredients,
+        visible
     };
 
     menuItems.push(newItem);
@@ -214,8 +216,8 @@ function updateMenuInFirebase() {
             name: item.name,
             price: item.price,
             category: item.category,
-            ingredients: item.ingredients.filter(Boolean),
-            visible: !!item.visible
+            ingredients: item.ingredients,
+            visible: item.visible
         };
     });
 
@@ -228,11 +230,13 @@ function updateMenuInFirebase() {
 function renderMenuInterface() {
     if (!elements.categoriesList || !elements.menuItemsList) return;
 
+    // Очищаем контейнеры
     elements.categoriesList.innerHTML = '<h3>Категории</h3>';
     elements.menuItemsList.innerHTML = '';
     elements.newItemCategory.innerHTML = '';
     elements.categoryFilter.innerHTML = '';
 
+    // Добавляем кнопку "Все"
     const allBtn = createFilterButton('Все', !activeCategoryFilter);
     allBtn.onclick = () => {
         activeCategoryFilter = null;
@@ -240,7 +244,9 @@ function renderMenuInterface() {
     };
     elements.categoryFilter.appendChild(allBtn);
 
+    // Обрабатываем каждую категорию
     menuCategories.forEach(category => {
+        // Кнопка фильтра
         const filterBtn = createFilterButton(category, activeCategoryFilter === category);
         filterBtn.onclick = () => {
             activeCategoryFilter = category;
@@ -248,6 +254,7 @@ function renderMenuInterface() {
         };
         elements.categoryFilter.appendChild(filterBtn);
 
+        // Карточка категории
         const categoryCard = document.createElement('div');
         categoryCard.className = 'category-card';
         categoryCard.innerHTML = `
@@ -266,14 +273,17 @@ function renderMenuInterface() {
         `;
         elements.categoriesList.appendChild(categoryCard);
 
+        // Опция в выпадающем списке
         const option = new Option(category, category);
         elements.newItemCategory.appendChild(option);
     });
 
+    // Фильтрация товаров
     const filteredItems = activeCategoryFilter
         ? menuItems.filter(item => item.category === activeCategoryFilter)
         : menuItems;
 
+    // Отображение товаров
     if (filteredItems.length === 0) {
         elements.menuItemsList.innerHTML = '<p>Нет товаров в выбранной категории</p>';
     } else {
@@ -282,6 +292,7 @@ function renderMenuInterface() {
         });
     }
 
+    // Настройка обработчиков событий
     setupAdminPanelHandlers();
 }
 
@@ -367,7 +378,7 @@ function createMenuItemCard(item) {
         </div>
     `;
     
-    // Добавляем обработчик для кнопки состава
+    // Обработчик кнопки состава
     if (ingredients.length) {
         const toggleBtn = card.querySelector('.toggle-ingredients-btn');
         const ingredientsBlock = card.querySelector('.item-ingredients');
@@ -380,66 +391,7 @@ function createMenuItemCard(item) {
         });
     }
     
-    card.querySelectorAll('.remove-ingredient-btn').forEach(btn => {
-        btn.addEventListener('click', function(e) {
-            e.preventDefault();
-            this.closest('.ingredient-item').remove();
-        });
-    });
-    
     return card;
-}
-
-function saveEditedItem(itemCard) {
-    const itemId = parseInt(itemCard.dataset.id);
-    const editForm = itemCard.querySelector('.edit-form');
-    
-    const category = editForm.querySelector('.edit-item-category').value;
-    const name = editForm.querySelector('.edit-item-name').value.trim();
-    const price = parseFloat(editForm.querySelector('.edit-item-price').value);
-    const visible = itemCard.querySelector('.visibility-checkbox').checked;
-    
-    const ingredients = [];
-    let isValid = true;
-    
-    editForm.querySelectorAll('.ingredient-item').forEach(item => {
-        const ingName = item.querySelector('.ingredient-name').value.trim();
-        const ingQuantity = parseFloat(item.querySelector('.ingredient-quantity').value);
-        
-        if (!ingName || isNaN(ingQuantity) || ingQuantity < 0.1) {
-            isValid = false;
-            item.querySelector('.ingredient-quantity').style.borderColor = 'red';
-        } else {
-            ingredients.push(`${ingName} ${ingQuantity}`);
-        }
-    });
-    
-    if (!isValid || !name || isNaN(price) || !category || ingredients.length === 0) {
-        alert('Проверьте данные:\n- Все поля должны быть заполнены\n- Количество должно быть числом ≥ 0.1\n- Должен быть хотя бы один ингредиент');
-        return;
-    }
-    
-    const itemIndex = menuItems.findIndex(item => item.id === itemId);
-    if (itemIndex !== -1) {
-        menuItems[itemIndex] = {
-            ...menuItems[itemIndex],
-            name,
-            price,
-            category,
-            ingredients: [...ingredients],
-            visible
-        };
-        
-        updateMenuInFirebase()
-            .then(() => {
-                editForm.classList.add('hidden');
-                renderMenuInterface();
-            })
-            .catch(error => {
-                console.error("Ошибка сохранения:", error);
-                alert("Не удалось сохранить изменения");
-            });
-    }
 }
 
 function setupAdminPanelHandlers() {
@@ -464,7 +416,7 @@ function setupAdminPanelHandlers() {
         });
     });
 
-    // Остальные обработчики
+    // Обработчики редактирования категорий
     document.querySelectorAll('.edit-category-btn').forEach(btn => {
         btn.addEventListener('click', function() {
             const card = this.closest('.category-card');
@@ -524,8 +476,8 @@ function setupAdminPanelHandlers() {
     });
 
     document.querySelectorAll('.delete-category-btn').forEach(btn => {
-        btn.addEventListener('click', () => {
-            const category = btn.closest('.category-card').querySelector('.category-name')?.textContent;
+        btn.addEventListener('click', function() {
+            const category = this.closest('.category-card').querySelector('.category-name')?.textContent;
             if (category && confirm(`Удалить категорию "${category}"?`)) {
                 const index = menuCategories.indexOf(category);
                 if (index !== -1) {
@@ -537,9 +489,10 @@ function setupAdminPanelHandlers() {
         });
     });
 
+    // Обработчики товаров
     document.querySelectorAll('.delete-item-btn').forEach(btn => {
-        btn.addEventListener('click', () => {
-            const itemId = parseInt(btn.closest('.menu-item-card')?.dataset.id);
+        btn.addEventListener('click', function() {
+            const itemId = parseInt(this.closest('.menu-item-card')?.dataset.id);
             if (!isNaN(itemId)) {
                 const index = menuItems.findIndex(item => item.id === itemId);
                 if (index !== -1 && confirm('Удалить этот товар?')) {
@@ -557,6 +510,7 @@ function setupAdminPanelHandlers() {
             
             editForm.classList.toggle('hidden');
             
+            // Обновляем обработчики кнопок
             const saveBtn = editForm.querySelector('.save-edit-btn');
             const cancelBtn = editForm.querySelector('.cancel-edit-btn');
             const addBtn = editForm.querySelector('.add-edit-ingredient-btn');
@@ -565,6 +519,7 @@ function setupAdminPanelHandlers() {
             if (cancelBtn) cancelBtn.replaceWith(cancelBtn.cloneNode(true));
             if (addBtn) addBtn.replaceWith(addBtn.cloneNode(true));
             
+            // Назначаем новые обработчики
             editForm.querySelector('.save-edit-btn')?.addEventListener('click', () => saveEditedItem(itemCard));
             editForm.querySelector('.cancel-edit-btn')?.addEventListener('click', () => editForm.classList.add('hidden'));
             
@@ -577,22 +532,56 @@ function setupAdminPanelHandlers() {
     });
 }
 
-function addCategory() {
-    const name = elements.newCategoryName.value.trim();
-    if (!name) return alert('Введите название категории');
-    if (menuCategories.includes(name)) return alert('Категория уже существует');
-
-    menuCategories.push(name);
-    db.ref('menu/categories').set(menuCategories)
-        .then(() => {
-            elements.newCategoryName.value = '';
-            hideElement(elements.addCategoryForm);
-            renderMenuInterface();
-        })
-        .catch(error => {
-            console.error("Ошибка сохранения:", error);
-            alert("Не удалось сохранить категорию");
-        });
+function saveEditedItem(itemCard) {
+    const itemId = parseInt(itemCard.dataset.id);
+    const editForm = itemCard.querySelector('.edit-form');
+    
+    const category = editForm.querySelector('.edit-item-category').value;
+    const name = editForm.querySelector('.edit-item-name').value.trim();
+    const price = parseFloat(editForm.querySelector('.edit-item-price').value);
+    const visible = itemCard.querySelector('.visibility-checkbox').checked;
+    
+    const ingredients = [];
+    let isValid = true;
+    
+    editForm.querySelectorAll('.ingredient-item').forEach(item => {
+        const ingName = item.querySelector('.ingredient-name').value.trim();
+        const ingQuantity = parseFloat(item.querySelector('.ingredient-quantity').value);
+        
+        if (!ingName || isNaN(ingQuantity) || ingQuantity < 0.1) {
+            isValid = false;
+            item.querySelector('.ingredient-quantity').style.borderColor = 'red';
+        } else {
+            ingredients.push(`${ingName} ${ingQuantity}`);
+        }
+    });
+    
+    if (!isValid || !name || isNaN(price) || !category || ingredients.length === 0) {
+        alert('Проверьте данные:\n- Все поля должны быть заполнены\n- Количество должно быть числом ≥ 0.1\n- Должен быть хотя бы один ингредиент');
+        return;
+    }
+    
+    const itemIndex = menuItems.findIndex(item => item.id === itemId);
+    if (itemIndex !== -1) {
+        menuItems[itemIndex] = {
+            ...menuItems[itemIndex],
+            name,
+            price,
+            category,
+            ingredients,
+            visible
+        };
+        
+        updateMenuInFirebase()
+            .then(() => {
+                editForm.classList.add('hidden');
+                renderMenuInterface();
+            })
+            .catch(error => {
+                console.error("Ошибка сохранения:", error);
+                alert("Не удалось сохранить изменения");
+            });
+    }
 }
 
 if (window.location.pathname.includes('admin.html')) {
