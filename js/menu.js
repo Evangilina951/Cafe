@@ -34,15 +34,25 @@ function initSearch() {
 
 // Загрузка меню из Firebase
 export function loadMenuFromFirebase() {
-    const menuRef = db.ref('menu');
-    
-    menuRef.on('value', (snapshot) => {
-        const data = snapshot.val() || {};
-        menuCategories = data.categories || [];
-        menuItems = data.items ? Object.values(data.items) : [];
-        updateMainMenu();
-    }, (error) => {
-        console.error("Ошибка загрузки меню:", error);
+    return new Promise((resolve, reject) => {
+        const menuRef = db.ref('menu');
+        
+        menuRef.once('value').then((snapshot) => {
+            const data = snapshot.val();
+            if (!data) {
+                console.log("No menu data found, initializing default menu");
+                initializeMenuData();
+                return;
+            }
+            
+            menuCategories = data.categories || [];
+            menuItems = data.items ? Object.values(data.items) : [];
+            updateMainMenu();
+            resolve();
+        }).catch((error) => {
+            console.error("Ошибка загрузки меню:", error);
+            reject(error);
+        });
     });
 }
 
@@ -50,23 +60,17 @@ function initializeMenuData() {
     const initialData = {
         categories: ["Кофе", "Чай", "Десерты"],
         items: {
-            item1: { id: 1, name: "Кофе", price: 100, category: "Кофе", ingredients: ["Арабика 1", "Вода 2"], visible: true },
-            item2: { id: 2, name: "Чай", price: 50, category: "Чай", ingredients: ["Чайные листья 1", "Вода 2"], visible: true },
+            item1: { id: 1, name: "Эспрессо", price: 100, category: "Кофе", ingredients: ["Арабика 1", "Вода 2"], visible: true },
+            item2: { id: 2, name: "Чёрный чай", price: 50, category: "Чай", ingredients: ["Чайные листья 1", "Вода 2"], visible: true },
             item3: { id: 3, name: "Капучино", price: 150, category: "Кофе", ingredients: ["Эспрессо 1", "Молоко 2", "Пена 1"], visible: true },
-            item4: { id: 4, name: "Латте", price: 200, category: "Кофе", ingredients: ["Эспрессо 1", "Молоко 3"], visible: true }
+            item4: { id: 4, name: "Тирамису", price: 200, category: "Десерты", ingredients: ["Печенье 2", "Сыр маскарпоне 3"], visible: true }
         }
     };
     
-    db.ref('menu').set(initialData)
+    return db.ref('menu').set(initialData)
         .then(() => {
             menuCategories = initialData.categories;
             menuItems = Object.values(initialData.items);
-            isLoadingMenu = false;
-            updateMainMenu();
-        })
-        .catch(error => {
-            console.error("Ошибка инициализации меню:", error);
-            isLoadingMenu = false;
             updateMainMenu();
         });
 }
