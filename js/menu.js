@@ -34,25 +34,15 @@ function initSearch() {
 
 // Загрузка меню из Firebase
 export function loadMenuFromFirebase() {
-    isLoadingMenu = true;
-    updateMainMenu();
-    
     const menuRef = db.ref('menu');
     
     menuRef.on('value', (snapshot) => {
-        const data = snapshot.val();
-        if (data) {
-            menuCategories = data.categories || [];
-            menuItems = data.items ? Object.values(data.items) : [];
-            isLoadingMenu = false;
-            updateMainMenu();
-        } else {
-            initializeMenuData();
-        }
+        const data = snapshot.val() || {};
+        menuCategories = data.categories || [];
+        menuItems = data.items ? Object.values(data.items) : [];
+        updateMainMenu();
     }, (error) => {
         console.error("Ошибка загрузки меню:", error);
-        isLoadingMenu = false;
-        updateMainMenu();
     });
 }
 
