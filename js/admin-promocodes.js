@@ -1,5 +1,5 @@
-import { db } from '/Cafe/js/firebase-config.js';
-import { auth, onAuthStateChanged, signOut } from '/Cafe/js/auth.js';
+import { db, auth } from '/Cafe/js/firebase-config.js';
+import { onAuthStateChanged, signOut } from '/Cafe/js/auth.js';
 
 // Проверка прав администратора
 onAuthStateChanged(auth, (user) => {
@@ -106,12 +106,10 @@ function loadMenuItems() {
 
 // Настройка обработчиков событий
 function setupEventListeners() {
-    // Переключение типа скидки
     document.querySelectorAll('input[name="discount-type"]').forEach(radio => {
         radio.addEventListener('change', toggleDiscountFields);
     });
     
-    // Ограничения
     document.getElementById('use-limit-check').addEventListener('change', (e) => {
         document.getElementById('use-limit').disabled = !e.target.checked;
     });
@@ -120,7 +118,6 @@ function setupEventListeners() {
         document.getElementById('expiry-date').disabled = !e.target.checked;
     });
     
-    // Модальное окно
     document.getElementById('add-promo-btn').addEventListener('click', () => {
         document.getElementById('promo-modal').classList.remove('hidden');
         document.getElementById('promo-form').reset();
@@ -129,28 +126,23 @@ function setupEventListeners() {
     document.querySelector('.close-btn').addEventListener('click', closeModal);
     document.getElementById('cancel-btn').addEventListener('click', closeModal);
     
-    // Сохранение
     document.getElementById('promo-form').addEventListener('submit', savePromoCode);
     
-    // Выход
     document.getElementById('logout-btn').addEventListener('click', () => {
         signOut(auth).then(() => window.location.href = '/Cafe/');
     });
 }
 
-// Переключение полей скидки
 function toggleDiscountFields() {
     const type = document.querySelector('input[name="discount-type"]:checked').value;
     document.getElementById('percent-fields').classList.toggle('hidden', type !== 'percent');
     document.getElementById('item-fields').classList.toggle('hidden', type !== 'item');
 }
 
-// Закрытие модального окна
 function closeModal() {
     document.getElementById('promo-modal').classList.add('hidden');
 }
 
-// Сохранение промокода
 function savePromoCode(e) {
     e.preventDefault();
     
@@ -191,7 +183,6 @@ function savePromoCode(e) {
         });
 }
 
-// Валидация промокода (для использования в order.js)
 export function validatePromoCode(code, orderTotal, orderItems) {
     return db.ref(`promocodes/${code}`).once('value').then(snapshot => {
         const promo = snapshot.val();
