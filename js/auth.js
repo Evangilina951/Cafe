@@ -13,24 +13,27 @@ const elements = {
     errorMessage: document.getElementById('error-message'),
     loginBtn: document.getElementById('login-btn'),
     logoutBtn: document.querySelector('.logout-btn'),
-    adminBtn: document.querySelector('.admin-btn')
+    adminBtn: document.querySelector('.admin-btn'),
+    promoManagementBtn: document.getElementById('promo-management-btn')
 };
 
 // Функции для работы с DOM
 function showElement(element) {
-    if (!element) return;
-    element.style.display = 'block';
-    element.classList.remove('hidden');
+    if (element) {
+        element.style.display = 'block';
+        element.classList.remove('hidden');
+    }
 }
 
 function hideElement(element) {
-    if (!element) return;
-    element.style.display = 'none';
-    element.classList.add('hidden');
+    if (element) {
+        element.style.display = 'none';
+        element.classList.add('hidden');
+    }
 }
 
 // Обработчик состояния авторизации
-auth.onAuthStateChanged(user => {
+function handleAuthStateChanged(user) {
     if (user) {
         currentUser = user;
         hideElement(elements.authForm);
@@ -40,17 +43,19 @@ auth.onAuthStateChanged(user => {
             elements.userEmail.textContent = user.email;
         }
         
-        if (user.email === 'admin@dismail.com') {
-            if (elements.adminBtn) {
-                elements.adminBtn.style.display = 'block';
-                // Показываем админ-панель если в URL есть #admin
-                if (window.location.hash === '#admin') {
-                    showElement(elements.adminPanel);
-                    hideElement(elements.orderInterface);
-                }
-            }
-        } else if (elements.adminBtn) {
-            elements.adminBtn.style.display = 'none';
+        const isAdmin = user.email === 'admin@dismail.com';
+        
+        if (elements.adminBtn) {
+            elements.adminBtn.style.display = isAdmin ? 'block' : 'none';
+        }
+        
+        if (elements.promoManagementBtn) {
+            elements.promoManagementBtn.style.display = isAdmin ? 'block' : 'none';
+        }
+
+        if (isAdmin && window.location.hash === '#admin') {
+            showElement(elements.adminPanel);
+            hideElement(elements.orderInterface);
         }
     } else {
         currentUser = null;
@@ -58,8 +63,9 @@ auth.onAuthStateChanged(user => {
         hideElement(elements.orderInterface);
         hideElement(elements.adminPanel);
         if (elements.adminBtn) elements.adminBtn.style.display = 'none';
+        if (elements.promoManagementBtn) elements.promoManagementBtn.style.display = 'none';
     }
-});
+}
 
 function login(e) {
     e.preventDefault();
@@ -88,14 +94,15 @@ function login(e) {
 }
 
 function logout() {
-    auth.signOut()
-        .catch(error => {
-            console.error("Logout error:", error);
-        });
+    auth.signOut().catch(error => {
+        console.error("Logout error:", error);
+    });
 }
 
 // Инициализация обработчиков событий
 export function initAuth() {
+    auth.onAuthStateChanged(handleAuthStateChanged);
+    
     if (elements.loginBtn) {
         elements.loginBtn.addEventListener('click', login);
     }
@@ -104,27 +111,11 @@ export function initAuth() {
         elements.logoutBtn.addEventListener('click', logout);
     }
 
-    // Обработка формы по нажатию Enter
     if (elements.authForm) {
         elements.authForm.addEventListener('keypress', (e) => {
-            if (e.key === 'Enter') {
-                login(e);
-            }
+            if (e.key === 'Enter') login(e);
         });
     }
 }
 
-export function onAuthStateChanged(auth, callback) {
-    firebase.auth().onAuthStateChanged((user) => {
-        if (user) {
-            // Показываем кнопку промокодов только для админа
-            const promoBtn = document.getElementById('promo-management-btn');
-            if (promoBtn) {
-                promoBtn.style.display = user.email === 'admin@dismail.com' ? 'block' : 'none';
-            }
-        }
-        callback(user);
-    });
-}
-
-export { currentUser };
+export { currentUser, auth };
