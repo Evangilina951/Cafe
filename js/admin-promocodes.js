@@ -18,7 +18,7 @@ function initPromoPage() {
     setupEventListeners();
 }
 
-// Загрузка промокодов
+// Загрузка промокодов из Firebase
 function loadPromoCodes() {
     const promoList = document.getElementById('promo-list');
     promoList.innerHTML = '<div class="loading">Загрузка промокодов...</div>';
@@ -106,43 +106,57 @@ function loadMenuItems() {
 
 // Настройка обработчиков событий
 function setupEventListeners() {
+    // Переключение типа скидки
     document.querySelectorAll('input[name="discount-type"]').forEach(radio => {
         radio.addEventListener('change', toggleDiscountFields);
     });
     
+    // Ограничение по количеству использований
     document.getElementById('use-limit-check').addEventListener('change', (e) => {
         document.getElementById('use-limit').disabled = !e.target.checked;
     });
     
+    // Ограничение по сроку действия
     document.getElementById('use-date-check').addEventListener('change', (e) => {
         document.getElementById('expiry-date').disabled = !e.target.checked;
     });
     
+    // Открытие модального окна
     document.getElementById('add-promo-btn').addEventListener('click', () => {
         document.getElementById('promo-modal').classList.remove('hidden');
         document.getElementById('promo-form').reset();
     });
     
+    // Закрытие модального окна
     document.querySelector('.close-btn').addEventListener('click', closeModal);
     document.getElementById('cancel-btn').addEventListener('click', closeModal);
     
+    // Сохранение промокода
     document.getElementById('promo-form').addEventListener('submit', savePromoCode);
     
+    // Выход из системы
     document.getElementById('logout-btn').addEventListener('click', () => {
-        signOut(auth).then(() => window.location.href = '/Cafe/');
+        signOut(auth).then(() => {
+            window.location.href = '/Cafe/';
+        }).catch(error => {
+            console.error('Ошибка при выходе:', error);
+        });
     });
 }
 
+// Переключение полей формы
 function toggleDiscountFields() {
     const type = document.querySelector('input[name="discount-type"]:checked').value;
     document.getElementById('percent-fields').classList.toggle('hidden', type !== 'percent');
     document.getElementById('item-fields').classList.toggle('hidden', type !== 'item');
 }
 
+// Закрытие модального окна
 function closeModal() {
     document.getElementById('promo-modal').classList.add('hidden');
 }
 
+// Сохранение промокода
 function savePromoCode(e) {
     e.preventDefault();
     
@@ -157,12 +171,14 @@ function savePromoCode(e) {
         created: new Date().toISOString()
     };
     
+    // Добавляем параметры в зависимости от типа скидки
     if (type === 'percent') {
         promoData.value = parseInt(form['discount-value'].value);
     } else if (type === 'item') {
         promoData.itemId = form['free-item'].value;
     }
     
+    // Добавляем ограничения
     if (form['use-limit-check'].checked) {
         promoData.maxUses = parseInt(form['use-limit'].value);
         promoData.usedCount = 0;
@@ -172,6 +188,7 @@ function savePromoCode(e) {
         promoData.expires = form['expiry-date'].value;
     }
     
+    // Сохраняем в Firebase
     db.ref(`promocodes/${code}`).set(promoData)
         .then(() => {
             alert('Промокод успешно сохранен!');
@@ -183,14 +200,23 @@ function savePromoCode(e) {
         });
 }
 
+// Валидация промокода (для использования в order.js)
 export function validatePromoCode(code, orderTotal, orderItems) {
     return db.ref(`promocodes/${code}`).once('value').then(snapshot => {
         const promo = snapshot.val();
         
-        if (!promo || !promo.isActive) throw new Error('Промокод недействителен');
-        if (promo.expires && new Date(promo.expires) < new Date()) throw new Error('Промокод истек');
-        if (promo.minOrder && orderTotal < promo.minOrder) throw new Error(`Минимальная сумма: ${promo.minOrder} ₽`);
-        if (promo.maxUses && promo.usedCount >= promo.maxUses) throw new Error('Лимит использований исчерпан');
+        if (!promo || !promo.isActive) {
+            throw new Error('Промокод недействителен');
+        }
+        if (promo.expires && new Date(promo.expires) < new Date()) {
+            throw new Error('Промокод истек');
+        }
+        if (promo.minOrder && orderTotal < promo.minOrder) {
+            throw new Error(`Минимальная сумма заказа: ${promo.minOrder} ₽`);
+        }
+        if (promo.maxUses && promo.usedCount >= promo.maxUses) {
+            throw new Error('Лимит использований исчерпан');
+        }
         
         return promo;
     });
