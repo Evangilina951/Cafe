@@ -93,10 +93,17 @@
     display: grid;
     grid-template-columns: 300px 1fr;
     gap: 20px;
+    align-items: start;
 }
 
 .categories-list {
+    border-right: 1px solid #d7ccc8;
     padding-right: 20px;
+    height: 100%;
+}
+
+.menu-items-container {
+    padding-left: 20px;
 }
 
 .categories-list h3 {
@@ -116,19 +123,25 @@
     align-items: center;
 }
 
-.category-card span {
+.category-name {
+    flex: 1;
     font-size: 16px;
     color: #6d341f;
 }
 
-.delete-category-btn {
-    background-color: #c62828;
+.category-actions {
+    display: flex;
+    gap: 8px;
+}
+
+.edit-category-btn {
+    background-color: #6d341f;
     color: white;
     border: none;
     border-radius: 50%;
-    padding: 5px 10px;
+    padding: 5px;
     cursor: pointer;
-    font-size: 16px;
+    font-size: 14px;
     width: 28px;
     height: 28px;
     display: flex;
@@ -136,9 +149,26 @@
     justify-content: center;
 }
 
+.delete-category-btn {
+    background-color: #c62828;
+    color: white;
+    border: none;
+    border-radius: 50%;
+    padding: 5px;
+    cursor: pointer;
+    font-size: 16px;
+    width: 28px;
+    height: 28px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-weight: bold;
+}
+
 .menu-items-container {
     display: flex;
     flex-direction: column;
+    gap: 15px;
 }
 
 .category-filter {
@@ -174,24 +204,42 @@
     border: 1px solid #ddd;
     border-radius: 12px;
     padding: 20px;
+    margin-bottom: 15px;
 }
 
-.item-main-info {
-    width: 100%;
+.item-category {
+    color: #6d341f;
+    font-size: 14px;
+    margin-bottom: 5px;
 }
 
-.menu-item-card .item-name {
+.item-name {
     font-size: 16px;
     font-weight: bold;
     color: #6d341f;
-    margin-bottom: 8px;
+    margin-bottom: 5px;
 }
 
-.menu-item-card .item-price {
-    color: #6d341f;
+.item-price {
+    color: #2E7D32;
     font-weight: bold;
-    margin-bottom: 8px;
+    margin-bottom: 10px;
     text-align: left;
+}
+
+.item-ingredients {
+    margin-top: 10px;
+}
+
+.item-ingredients ul {
+    list-style-type: none;
+    padding-left: 0;
+    margin-top: 5px;
+}
+
+.item-ingredients li {
+    padding: 2px 0;
+    font-size: 14px;
 }
 
 .item-actions {
@@ -200,22 +248,35 @@
     margin-top: 15px;
 }
 
-.edit-item-btn, .delete-item-btn {
-    padding: 8px 12px;
-    border: none;
-    border-radius: 6px;
-    cursor: pointer;
-    font-size: 14px;
-}
-
 .edit-item-btn {
     background-color: #6d341f;
     color: white;
+    border: none;
+    border-radius: 50%;
+    padding: 5px;
+    cursor: pointer;
+    font-size: 14px;
+    width: 28px;
+    height: 28px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
 }
 
 .delete-item-btn {
     background-color: #c62828;
     color: white;
+    border: none;
+    border-radius: 50%;
+    padding: 5px;
+    cursor: pointer;
+    font-size: 16px;
+    width: 28px;
+    height: 28px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-weight: bold;
 }
 
 .edit-form {
@@ -224,29 +285,31 @@
     padding: 20px;
     background-color: rgba(255, 255, 255, 0.8);
     border-radius: 8px;
+    border: 1px solid #ddd;
 }
 
 .form-group {
-    margin-bottom: 20px;
+    margin-bottom: 15px;
 }
 
 .form-group label {
     display: block;
-    margin-bottom: 8px;
+    margin-bottom: 5px;
     font-weight: bold;
     color: #6d341f;
 }
 
-.form-group input, .form-group select {
+.form-group input, 
+.form-group select {
     width: 100%;
-    padding: 10px 12px;
+    padding: 8px 12px;
     border: 1px solid #ddd;
-    border-radius: 6px;
-    font-size: 16px;
+    border-radius: 4px;
+    font-size: 14px;
 }
 
 .edit-ingredients-list {
-    margin-top: 15px;
+    margin-top: 10px;
 }
 
 .ingredient-item {
@@ -256,7 +319,8 @@
     align-items: center;
 }
 
-.ingredient-name, .ingredient-quantity {
+.ingredient-name, 
+.ingredient-quantity {
     flex: 1;
     padding: 10px 12px;
     border: 1px solid #ddd;
@@ -296,7 +360,8 @@
     margin-top: 20px;
 }
 
-.save-edit-btn, .cancel-edit-btn {
+.save-edit-btn, 
+.cancel-edit-btn {
     padding: 10px 20px;
     border-radius: 6px;
     cursor: pointer;
@@ -313,4 +378,208 @@
     background-color: #c62828;
     color: white;
     border: none;
+}
+
+.edit-category-form {
+    display: flex;
+    flex-direction: column;
+    gap: 15px;
+    width: 100%;
+    padding: 15px;
+    background-color: rgba(255, 255, 255, 0.8);
+    border-radius: 8px;
+    margin-top: 10px;
+}
+
+.edit-category-input {
+    width: 100%;
+    padding: 10px;
+    border: 1px solid #d7ccc8;
+    border-radius: 6px;
+    font-size: 16px;
+}
+
+.category-form-actions {
+    display: flex;
+    gap: 10px;
+    justify-content: flex-end;
+}
+
+.save-category-btn, .cancel-category-btn {
+    padding: 8px 16px;
+    border-radius: 6px;
+    cursor: pointer;
+    font-size: 14px;
+}
+
+.save-category-btn {
+    background-color: #4CAF50;
+    color: white;
+    border: none;
+}
+
+.cancel-category-btn {
+    background-color: #c62828;
+    color: white;
+    border: none;
+    width: 28px;
+    height: 28px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 0;
+}
+
+/* Стили для переключателя видимости в карточке товара */
+.visibility-toggle {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 28px;
+    height: 28px;
+    cursor: pointer;
+    position: relative;
+}
+
+.visibility-checkbox {
+    appearance: none;
+    -webkit-appearance: none;
+    width: 28px;
+    height: 28px;
+    border-radius: 50%;
+    background-color: #c62828;
+    cursor: pointer;
+    position: relative;
+    transition: background-color 0.3s;
+    margin: 0;
+}
+
+.visibility-checkbox:checked {
+    background-color: #4CAF50;
+}
+
+.visibility-checkbox::after {
+    content: "✓";
+    color: white;
+    font-size: 16px;
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    opacity: 0;
+    transition: opacity 0.3s;
+}
+
+.visibility-checkbox:checked::after {
+    opacity: 1;
+}
+
+/* Стили для формы добавления/редактирования */
+/*
+.form-group.visibility-group {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.form-group.visibility-group label {
+    margin-bottom: 0;
+    order: 2;
+    cursor: pointer;
+}
+
+.form-group.visibility-group .visibility-checkbox {
+    order: 1;
+}
+
+.visibility-label {
+    cursor: pointer;
+    font-weight: bold;
+    color: #6d341f;
+    margin-bottom: 0;
+}
+*/
+
+/* Скрываем label в карточке товара */
+.menu-item-card .visibility-label {
+    display: none;
+}
+
+/* Обновленные стили для item-actions */
+.item-actions {
+    display: flex;
+    gap: 10px;
+    margin-top: 15px;
+    align-items: center;
+}
+
+/* Обновленные стили для формы добавления */
+#add-item-form .form-group.visibility-group {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    margin-bottom: 15px;
+}
+
+#add-item-form .form-group.visibility-group label {
+    margin-bottom: 0;
+    order: 2;
+}
+
+#add-item-form .form-group.visibility-group .visibility-checkbox {
+    order: 1;
+}
+
+/* Стили для иконок действий */
+.edit-item-btn,
+.delete-item-btn,
+.visibility-toggle {
+    width: 28px;
+    height: 28px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 50%;
+    cursor: pointer;
+    transition: all 0.3s;
+}
+
+.edit-item-btn {
+    background-color: #6d341f;
+    color: white;
+    border: none;
+    font-size: 14px;
+}
+
+.delete-item-btn {
+    background-color: #c62828;
+    color: white;
+    border: none;
+    font-size: 16px;
+    font-weight: bold;
+}
+
+.ingredients-toggle {
+    margin-top: 10px;
+}
+
+.toggle-ingredients-btn {
+    background: none;
+    border: none;
+    color: #6d341f;
+    cursor: pointer;
+    font-size: 14px;
+    padding: 0;
+    text-decoration: underline;
+}
+
+.item-ingredients ul {
+    list-style-type: none;
+    padding-left: 0;
+    margin-top: 5px;
+}
+
+.item-ingredients li {
+    padding: 2px 0;
+    font-size: 14px;
 }
