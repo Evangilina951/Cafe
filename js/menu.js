@@ -6,12 +6,31 @@ let menuCategories = [];
 let menuItems = [];
 let isLoadingMenu = true;
 let activeCategoryFilter = null;
+let searchQuery = '';
 
 // DOM элементы
 const elements = {
     menuColumns: document.getElementById('menu-columns'),
-    categoryFilter: document.getElementById('category-filter')
+    categoryFilter: document.getElementById('category-filter'),
+    searchInput: document.getElementById('menu-search-input'),
+    clearSearchBtn: document.getElementById('clear-search-btn')
 };
+
+// Инициализация поиска
+function initSearch() {
+    if (elements.searchInput && elements.clearSearchBtn) {
+        elements.searchInput.addEventListener('input', (e) => {
+            searchQuery = e.target.value.toLowerCase();
+            updateMainMenu();
+        });
+
+        elements.clearSearchBtn.addEventListener('click', () => {
+            elements.searchInput.value = '';
+            searchQuery = '';
+            updateMainMenu();
+        });
+    }
+}
 
 // Загрузка меню из Firebase
 export function loadMenuFromFirebase() {
@@ -76,10 +95,17 @@ function updateMainMenu() {
     }
 
     elements.menuColumns.innerHTML = '';
-    const visibleItems = menuItems.filter(item => item.visible !== false);
+    let visibleItems = menuItems.filter(item => item.visible !== false);
     
+    // Фильтрация по поисковому запросу
+       if (searchQuery) {
+        visibleItems = visibleItems.filter(item => 
+            item.name.toLowerCase().includes(searchQuery)
+        );
+    }
+
     if (visibleItems.length === 0) {
-        elements.menuColumns.innerHTML = '<div class="menu-error">Нет доступных блюд в меню</div>';
+        elements.menuColumns.innerHTML = '<div class="menu-error">Ничего не найдено</div>';
         return;
     }
 
@@ -99,35 +125,59 @@ function updateMainMenu() {
     for (let i = 0; i < categories.length; i += 5) {
         const rowCategories = categories.slice(i, i + 5);
         
-        // Создаем колонки для каждой категории в строке
-        rowCategories.forEach(category => {
+        const row = document.createElement('div');
+        row.className = 'menu-row';
+        
+        // Создаем ровно 5 колонок в каждой строке
+        for (let j = 0; j < 5; j++) {
             const column = document.createElement('div');
             column.className = 'menu-column';
             
-            const title = document.createElement('h3');
-            title.className = 'category-title';
-            title.textContent = category;
-            column.appendChild(title);
+            if (j < rowCategories.length) {
+                const category = rowCategories[j];
+                const title = document.createElement('h3');
+                title.className = 'category-title';
+                title.textContent = category;
+                column.appendChild(title);
+                
+                const buttonsContainer = document.createElement('div');
+                buttonsContainer.className = 'menu-buttons';
+                
+                itemsByCategory[category].forEach(item => {
+                    const btn = document.createElement('button');
+                    btn.className = 'menu-btn';
+                    
+                    // Подсветка совпадений в названии
+                    let highlightedName = item.name;
+                    if (searchQuery) {
+                        const regex = new RegExp(searchQuery, 'gi');
+                        highlightedName = item.name.replace(regex, 
+                            match => `<span class="highlight">${match}</span>`);
+                    }
+                    
+                    btn.innerHTML = `
+                        <div class="item-name">${highlightedName}</div>
+                        <div class="item-price">${item.price} ₽</div>
+                    `;
+                    btn.onclick = () => addToOrder(item.name, item.price);
+                    buttonsContainer.appendChild(btn);
+                });
+                
+                column.appendChild(buttonsContainer);
+            } else {
+                // Пустая колонка для выравнивания
+                column.style.visibility = 'hidden';
+            }
             
-            const buttonsContainer = document.createElement('div');
-            buttonsContainer.className = 'menu-buttons';
-            
-            itemsByCategory[category].forEach(item => {
-                const btn = document.createElement('button');
-                btn.className = 'menu-btn';
-                btn.innerHTML = `
-                    <div class="item-name">${item.name}</div>
-                    <div class="item-price">${item.price} ₽</div>
-                `;
-                btn.onclick = () => addToOrder(item.name, item.price);
-                buttonsContainer.appendChild(btn);
-            });
-            
-            column.appendChild(buttonsContainer);
-            elements.menuColumns.appendChild(column);
-        });
+            row.appendChild(column);
+        }
+        
+        elements.menuColumns.appendChild(row);
     }
 }
+
+// Инициализация при загрузке
+initSearch();
 
 export { menuCategories, menuItems };
 
