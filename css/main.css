@@ -423,3 +423,26 @@ body {
         padding: 15px;
     }
 }
+
+/* Специфичные стили только для кнопки промокодов */
+.promocodes-btn {
+    background-color: #2E7D32; /* Зеленый вместо коричневого */
+    margin-left: 10px;
+}
+
+.promocodes-btn:hover {
+    background-color: #1B5E20;
+}
+
+/* Адаптивность для обеих кнопок */
+@media (max-width: 768px) {
+    .admin-btn, .promocodes-btn {
+        display: block;
+        width: 100%;
+        margin: 5px 0 !important;
+    }
+    
+    .user-info {
+        flex-direction: column;
+    }
+}
