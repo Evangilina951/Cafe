@@ -424,17 +424,20 @@ body {
     }
 }
 
-/* Специфичные стили только для кнопки промокодов */
+css
+Copy
+
+/* Специфичные стили для кнопки промокодов */
 .promocodes-btn {
-    background-color: #2E7D32; /* Зеленый вместо коричневого */
+    background-color: #2E7D32; /* Зеленый цвет вместо стандартного коричневого */
     margin-left: 10px;
 }
 
 .promocodes-btn:hover {
-    background-color: #1B5E20;
+    background-color: #1B5E20; /* Темно-зеленый при наведении */
 }
 
-/* Адаптивность для обеих кнопок */
+/* Адаптивные стили для обеих кнопок */
 @media (max-width: 768px) {
     .admin-btn, .promocodes-btn {
         display: block;
