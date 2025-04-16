@@ -16,6 +16,7 @@ document.addEventListener('DOMContentLoaded', () => {
             // Настройка кнопки админ-панели
             const adminBtn = document.querySelector('.admin-btn');
             if (adminBtn) {
+                // Обработчик для кнопки управления меню
                 adminBtn.addEventListener('click', () => {
                     if (user.email === 'admin@dismail.com') {
                         window.location.href = '/Cafe/admin.html';
@@ -23,16 +24,24 @@ document.addEventListener('DOMContentLoaded', () => {
                         alert("Доступ разрешен только администратору");
                     }
                 });
-            }
-                // Добавляем кнопку промокодов с новым классом
+
+                // Создаем и настраиваем кнопку управления промокодами
                 const promocodesBtn = document.createElement('button');
-                promocodesBtn.className = 'admin-btn promocodes-btn'; // Два класса
+                promocodesBtn.className = 'admin-btn promocodes-btn';
                 promocodesBtn.textContent = 'Управление промокодами';
+
+                // Обработчик для кнопки управления промокодами
                 promocodesBtn.addEventListener('click', () => {
-                    window.location.href = '/Cafe/promocodes.html';
+                    if (user.email === 'admin@dismail.com') {
+                        window.location.href = '/Cafe/promocodes.html';
+                    } else {
+                        alert("Доступ разрешен только администратору");
+                    }
                 });
-                
-                adminBtn.after(promocodesBtn); 
+
+                // Вставляем кнопку промокодов после кнопки админ-панели
+                adminBtn.insertAdjacentElement('afterend', promocodesBtn);
+            }
         }
     });
 
