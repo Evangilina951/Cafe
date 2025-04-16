@@ -24,6 +24,15 @@ document.addEventListener('DOMContentLoaded', () => {
                     }
                 });
             }
+                // Добавляем кнопку промокодов с новым классом
+                const promocodesBtn = document.createElement('button');
+                promocodesBtn.className = 'admin-btn promocodes-btn'; // Два класса
+                promocodesBtn.textContent = 'Управление промокодами';
+                promocodesBtn.addEventListener('click', () => {
+                    window.location.href = '/Cafe/promocodes.html';
+                });
+                
+                adminBtn.after(promocodesBtn); 
         }
     });
 
