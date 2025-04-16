@@ -1,0 +1,114 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Управление промокодами - Кофейня</title>
+    <link rel="stylesheet" href="/Cafe/css/main.css">
+    <link rel="stylesheet" href="/Cafe/css/admin.css">
+    <!-- Firebase -->
+    <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-app.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-auth.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-database.js"></script>
+</head>
+<body>
+    <!-- Админ-панель -->
+    <div id="promocodes-panel">
+        <div class="admin-header">
+            <h2>Управление промокодами</h2>
+            <button class="back-btn">← Назад к заказу</button>
+        </div>
+        
+        <div class="admin-actions">
+            <button class="add-promocode-btn">+ Добавить промокод</button>
+        </div>
+
+        <!-- Форма добавления промокода -->
+        <div id="add-promocode-form" class="hidden">
+            <div class="form-group">
+                <label>Название промокода</label>
+                <input type="text" id="promocode-name" placeholder="SUMMER25" pattern="[A-Za-z0-9]+" minlength="3" maxlength="20" required>
+                <small>Только латинские буквы и цифры (3-20 символов)</small>
+            </div>
+            
+            <div class="form-group">
+                <label>Тип скидки</label>
+                <div class="radio-group">
+                    <label><input type="radio" name="discount-type" value="percent" checked> Процентная скидка</label>
+                    <label><input type="radio" name="discount-type" value="fixed"> Фиксированная сумма</label>
+                    <label><input type="radio" name="discount-type" value="item"> Бесплатное блюдо</label>
+                </div>
+            </div>
+            
+            <!-- Поля для разных типов скидки -->
+            <div id="percent-fields" class="discount-fields">
+                <div class="form-group">
+                    <label>Размер скидки (%)</label>
+                    <input type="number" id="discount-percent" min="0" max="100" step="1" placeholder="10">
+                </div>
+            </div>
+            
+            <div id="fixed-fields" class="discount-fields hidden">
+                <div class="form-group">
+                    <label>Сумма скидки (руб)</label>
+                    <input type="number" id="discount-fixed" min="0" step="1" placeholder="100">
+                </div>
+            </div>
+            
+            <div id="item-fields" class="discount-fields hidden">
+                <div class="form-group">
+                    <label>Выберите блюдо</label>
+                    <select id="free-item">
+                        <!-- Будет заполнено динамически -->
+                    </select>
+                </div>
+            </div>
+            
+            <div class="form-group">
+                <label>Условия применения</label>
+                <div class="form-row">
+                    <input type="number" id="min-order" min="0" placeholder="Минимальная сумма">
+                    <input type="number" id="max-order" min="0" placeholder="Максимальная сумма (необязательно)">
+                </div>
+            </div>
+            
+            <div class="form-group">
+                <label>Ограничения по использованию</label>
+                <select id="usage-limit">
+                    <option value="unlimited">Без ограничений</option>
+                    <option value="limited">Ограниченное количество</option>
+                </select>
+                <input type="number" id="max-uses" min="1" class="hidden" placeholder="Макс. использований">
+            </div>
+            
+            <div class="form-group">
+                <label>Ограничение по времени</label>
+                <select id="time-limit">
+                    <option value="unlimited">Без ограничений</option>
+                    <option value="limited">До определенной даты</option>
+                </select>
+                <input type="date" id="expiry-date" class="hidden" min="">
+            </div>
+            
+            <div class="form-group">
+                <label>
+                    <input type="checkbox" id="is-active" checked> Активный промокод
+                </label>
+            </div>
+            
+            <div class="form-actions">
+                <button id="save-promocode-btn" class="save-edit-btn">Сохранить промокод</button>
+            </div>
+        </div>
+
+        <!-- Список промокодов -->
+        <div class="promocodes-list" id="promocodes-list">
+            <!-- Промокоды будут загружены динамически -->
+        </div>
+    </div>
+
+    <!-- Подключение скриптов -->
+    <script type="module" src="/Cafe/js/firebase-config.js"></script>
+    <script type="module" src="/Cafe/js/promocodes.js"></script>
+</body>
+</html>
