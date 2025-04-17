@@ -13,11 +13,14 @@ document.addEventListener('DOMContentLoaded', () => {
         if (user) {
             loadMenuFromFirebase();
             
-            // Настройка кнопки админ-панели
+            // Настройка кнопок админ-панели
+            const userInfoContainer = document.querySelector('.user-info');
             const adminBtn = document.querySelector('.admin-btn');
-            if (adminBtn) {
+            
+            if (userInfoContainer && adminBtn) {
                 // Обработчик для кнопки управления меню
-                adminBtn.addEventListener('click', () => {
+                adminBtn.addEventListener('click', (e) => {
+                    e.preventDefault();
                     if (user.email === 'admin@dismail.com') {
                         window.location.href = '/Cafe/admin.html';
                     } else {
@@ -25,31 +28,31 @@ document.addEventListener('DOMContentLoaded', () => {
                     }
                 });
 
-                // Создаем и настраиваем кнопку управления промокодами
-                const promocodesBtn = document.createElement('button');
-                promocodesBtn.className = 'admin-btn promocodes-btn';
-                promocodesBtn.textContent = 'Управление промокодами';
+                // Создаем кнопку управления промокодами только если её ещё нет
+                if (!document.querySelector('.promocodes-btn')) {
+                    const promocodesBtn = document.createElement('button');
+                    promocodesBtn.className = 'admin-btn promocodes-btn';
+                    promocodesBtn.textContent = 'Управление промокодами';
 
-                // Обработчик для кнопки управления промокодами
-                promocodesBtn.addEventListener('click', () => {
-                    if (user.email === 'admin@dismail.com') {
-                        window.location.href = '/Cafe/promocodes.html';
-                    } else {
-                        alert("Доступ разрешен только администратору");
-                    }
-                });
+                    promocodesBtn.addEventListener('click', (e) => {
+                        e.preventDefault();
+                        if (user.email === 'admin@dismail.com') {
+                            window.location.href = '/Cafe/promocodes.html';
+                        } else {
+                            alert("Доступ разрешен только администратору");
+                        }
+                    });
 
-                // Вставляем кнопку промокодов после кнопки админ-панели
-                adminBtn.insertAdjacentElement('afterend', promocodesBtn);
+                    // Вставляем кнопку после кнопки админ-панели
+                    adminBtn.insertAdjacentElement('afterend', promocodesBtn);
+                    
+                    // Добавляем разделитель для лучшего визуального восприятия
+                    const spacer = document.createElement('div');
+                    spacer.style.width = '10px';
+                    spacer.style.display = 'inline-block';
+                    adminBtn.insertAdjacentElement('afterend', spacer);
+                }
             }
         }
     });
-
-    // Стили для формы добавления напитка (если есть на странице)
-    const addItemForm = document.getElementById('add-item-form');
-    if (addItemForm) {
-        addItemForm.style.display = 'flex';
-        addItemForm.style.flexDirection = 'column';
-        addItemForm.style.gap = '10px';
-    }
 });
