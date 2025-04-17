@@ -48,7 +48,7 @@ document.addEventListener('DOMContentLoaded', () => {
                     
                     // Добавляем отступ между кнопками
                     const spacer = document.createElement('span');
-                    spacer.style.marginLeft = '10px';
+                    spacer.style.marginLeft = '5px';
                     adminBtn.insertAdjacentElement('afterend', spacer);
                 }
             }
