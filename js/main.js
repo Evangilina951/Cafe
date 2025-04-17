@@ -17,6 +17,11 @@ document.addEventListener('DOMContentLoaded', () => {
             const userInfoContainer = document.querySelector('.user-info');
             const adminBtn = document.querySelector('.admin-btn');
             
+            // Добавляем console.log здесь (перед проверкой элементов)
+            console.log('Admin button:', adminBtn);
+            console.log('User info container:', userInfoContainer);
+            console.log('User email:', user?.email);
+            
             if (userInfoContainer && adminBtn) {
                 // Обработчик для кнопки управления меню
                 adminBtn.addEventListener('click', (e) => {
@@ -46,11 +51,8 @@ document.addEventListener('DOMContentLoaded', () => {
                     // Вставляем кнопку после кнопки админ-панели
                     adminBtn.insertAdjacentElement('afterend', promocodesBtn);
                     
-                    // Добавляем разделитель для лучшего визуального восприятия
-                    const spacer = document.createElement('div');
-                    spacer.style.width = '10px';
-                    spacer.style.display = 'inline-block';
-                    adminBtn.insertAdjacentElement('afterend', spacer);
+                    // Логируем создание кнопки
+                    console.log('Promocodes button created:', promocodesBtn);
                 }
             }
         }
