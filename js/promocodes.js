@@ -1,15 +1,16 @@
-import { db } from '/Cafe/js/firebase-config.js';
-import { currentUser } from '/Cafe/js/auth.js';
+import { db, auth } from '/Cafe/js/firebase-config.js';
 import { menuItems } from '/Cafe/js/menu.js';
 
+// DOM элементы
 const elements = {
     promocodesPanel: document.getElementById('promocodes-panel'),
     backBtn: document.querySelector('.back-btn'),
     addPromocodeBtn: document.querySelector('.add-promocode-btn'),
     addPromocodeForm: document.getElementById('add-promocode-form'),
     promocodeName: document.getElementById('promocode-name'),
-    discountTypeRadios: document.querySelectorAll('input[name="discount-type"]'),
-    discountFields: document.querySelectorAll('.discount-fields'),
+    discountTypePercent: document.getElementById('discount-type-percent'),
+    discountTypeFixed: document.getElementById('discount-type-fixed'),
+    discountTypeItem: document.getElementById('discount-type-item'),
     discountPercent: document.getElementById('discount-percent'),
     discountFixed: document.getElementById('discount-fixed'),
     freeItemSelect: document.getElementById('free-item'),
@@ -24,102 +25,165 @@ const elements = {
     promocodesList: document.getElementById('promocodes-list')
 };
 
+// Вспомогательные функции
+function showElement(element) {
+    if (element) {
+        element.style.display = 'block';
+        element.classList.remove('hidden');
+    }
+}
+
+function hideElement(element) {
+    if (element) {
+        element.style.display = 'none';
+        element.classList.add('hidden');
+    }
+}
+
+function isAdmin() {
+    return auth.currentUser?.email === 'admin@dismail.com';
+}
+
 let promocodes = [];
 
-// Инициализация админ-панели промокодов
 export async function initPromocodes() {
-    if (!window.location.pathname.includes('promocodes.html')) return;
-    if (!elements.promocodesPanel) return;
-
-    if (!currentUser || currentUser.email !== 'admin@dismail.com') {
+    if (!isAdmin()) {
         alert("Доступ разрешен только администратору");
         window.location.href = '/Cafe/index.html';
         return;
     }
 
     try {
+        await loadMenuItems();
         await loadPromocodesFromFirebase();
         setupEventListeners();
         renderPromocodesInterface();
     } catch (error) {
-        console.error("Ошибка инициализации:", error);
-        alert("Ошибка загрузки промокодов");
+        handleFirebaseError(error);
     }
 }
 
+async function loadMenuItems() {
+    return new Promise((resolve) => {
+        if (elements.freeItemSelect) {
+            elements.freeItemSelect.innerHTML = '';
+            menuItems.forEach(item => {
+                const option = document.createElement('option');
+                option.value = item.id;
+                option.textContent = item.name;
+                elements.freeItemSelect.appendChild(option);
+            });
+        }
+        resolve();
+    });
+}
+
 async function loadPromocodesFromFirebase() {
-    try {
-        const snapshot = await db.ref('promocodes').once('value');
-        promocodes = snapshot.val() ? Object.entries(snapshot.val()).map(([code, data]) => ({ code, ...data })) : [];
-    } catch (error) {
-        console.error("Ошибка загрузки промокодов:", error);
-        throw error;
+    return new Promise((resolve, reject) => {
+        db.ref('promocodes').on('value', 
+            (snapshot) => {
+                promocodes = snapshot.val() ? Object.entries(snapshot.val()).map(([code, data]) => ({ code, ...data })) : [];
+                resolve();
+            },
+            (error) => {
+                reject(error);
+            }
+        );
+    });
+}
+
+function handleFirebaseError(error) {
+    console.error("Ошибка Firebase:", error);
+    
+    switch (error.code) {
+        case 'PERMISSION_DENIED':
+            alert("Ошибка доступа: недостаточно прав");
+            window.location.href = '/Cafe/index.html';
+            break;
+        case 'NETWORK_ERROR':
+            alert("Ошибка сети: проверьте подключение");
+            break;
+        default:
+            alert("Ошибка загрузки данных");
     }
 }
 
 function setupEventListeners() {
-    elements.backBtn?.addEventListener('click', () => window.location.href = '/Cafe/index.html');
-    elements.addPromocodeBtn?.addEventListener('click', () => {
-        showElement(elements.addPromocodeForm);
-        resetPromocodeForm();
-    });
-    
-    elements.discountTypeRadios?.forEach(radio => {
-        radio.addEventListener('change', toggleDiscountFields);
-    });
-    
-    elements.usageLimit?.addEventListener('change', function() {
-        elements.maxUses.classList.toggle('hidden', this.value !== 'limited');
-    });
-    
-    elements.timeLimit?.addEventListener('change', function() {
-        elements.expiryDate.classList.toggle('hidden', this.value !== 'limited');
-        if (this.value === 'limited') {
-            const today = new Date().toISOString().split('T')[0];
-            elements.expiryDate.min = today;
-        }
-    });
-    
-    elements.savePromocodeBtn?.addEventListener('click', savePromocode);
+    // Кнопка "Назад"
+    if (elements.backBtn) {
+        elements.backBtn.addEventListener('click', () => {
+            window.location.href = '/Cafe/index.html';
+        });
+    }
+
+    // Кнопка "Добавить промокод"
+    if (elements.addPromocodeBtn) {
+        elements.addPromocodeBtn.addEventListener('click', () => {
+            showElement(elements.addPromocodeForm);
+            resetPromocodeForm();
+        });
+    }
+
+    // Переключение типа скидки
+    if (elements.discountTypePercent && elements.discountTypeFixed && elements.discountTypeItem) {
+        elements.discountTypePercent.addEventListener('change', toggleDiscountFields);
+        elements.discountTypeFixed.addEventListener('change', toggleDiscountFields);
+        elements.discountTypeItem.addEventListener('change', toggleDiscountFields);
+    }
+
+    // Ограничения использования
+    if (elements.usageLimit) {
+        elements.usageLimit.addEventListener('change', () => {
+            elements.maxUses.classList.toggle('hidden', elements.usageLimit.value !== 'limited');
+        });
+    }
+
+    // Ограничение по времени
+    if (elements.timeLimit) {
+        elements.timeLimit.addEventListener('change', () => {
+            elements.expiryDate.classList.toggle('hidden', elements.timeLimit.value !== 'limited');
+            if (elements.timeLimit.value === 'limited') {
+                const today = new Date().toISOString().split('T')[0];
+                elements.expiryDate.min = today;
+            }
+        });
+    }
+
+    // Кнопка "Сохранить промокод"
+    if (elements.savePromocodeBtn) {
+        elements.savePromocodeBtn.addEventListener('click', savePromocode);
+    }
 }
 
 function toggleDiscountFields() {
-    const selectedType = document.querySelector('input[name="discount-type"]:checked').value;
-    elements.discountFields.forEach(field => {
-        field.classList.toggle('hidden', field.id !== `${selectedType}-fields`);
+    document.querySelectorAll('.discount-field-group').forEach(group => {
+        group.classList.add('hidden');
     });
+
+    const selectedType = document.querySelector('input[name="discount-type"]:checked').value;
+    document.getElementById(`${selectedType}-fields`).classList.remove('hidden');
 }
 
 function resetPromocodeForm() {
-    elements.promocodeName.value = '';
-    document.querySelector('input[name="discount-type"][value="percent"]').checked = true;
-    elements.discountPercent.value = '';
-    elements.discountFixed.value = '';
-    elements.freeItemSelect.innerHTML = '';
-    elements.minOrder.value = '';
-    elements.maxOrder.value = '';
-    elements.usageLimit.value = 'unlimited';
-    elements.maxUses.value = '';
-    elements.maxUses.classList.add('hidden');
-    elements.timeLimit.value = 'unlimited';
-    elements.expiryDate.value = '';
-    elements.expiryDate.classList.add('hidden');
-    elements.isActive.checked = true;
-    
-    // Заполняем список блюд
-    menuItems.forEach(item => {
-        const option = document.createElement('option');
-        option.value = item.id;
-        option.textContent = item.name;
-        elements.freeItemSelect.appendChild(option);
-    });
-    
+    if (elements.promocodeName) elements.promocodeName.value = '';
+    if (elements.discountTypePercent) elements.discountTypePercent.checked = true;
+    if (elements.discountPercent) elements.discountPercent.value = '';
+    if (elements.discountFixed) elements.discountFixed.value = '';
+    if (elements.minOrder) elements.minOrder.value = '';
+    if (elements.maxOrder) elements.maxOrder.value = '';
+    if (elements.usageLimit) elements.usageLimit.value = 'unlimited';
+    if (elements.maxUses) elements.maxUses.value = '';
+    if (elements.maxUses) elements.maxUses.classList.add('hidden');
+    if (elements.timeLimit) elements.timeLimit.value = 'unlimited';
+    if (elements.expiryDate) elements.expiryDate.value = '';
+    if (elements.expiryDate) elements.expiryDate.classList.add('hidden');
+    if (elements.isActive) elements.isActive.checked = true;
+
     toggleDiscountFields();
 }
 
 function savePromocode() {
     const code = elements.promocodeName.value.trim().toUpperCase();
-    const type = document.querySelector('input[name="discount-type"]:checked').value;
     
     // Валидация
     if (!code || !/^[A-Z0-9]{3,20}$/.test(code)) {
@@ -132,6 +196,7 @@ function savePromocode() {
         return;
     }
     
+    const type = document.querySelector('input[name="discount-type"]:checked').value;
     let value = null;
     let itemId = null;
     
@@ -195,7 +260,7 @@ function savePromocode() {
         created
     };
     
-    // Сохраняем в Firebase
+    // Сохранение в Firebase
     db.ref(`promocodes/${code}`).set(promocodeData)
         .then(() => {
             alert('Промокод успешно сохранен!');
@@ -256,82 +321,48 @@ function renderPromocodesInterface() {
             <div class="promocode-usage">Использован ${promo.usedCount || 0} раз</div>
             <div class="promocode-actions">
                 <button class="copy-promocode-btn" title="Копировать">⎘</button>
-                <button class="edit-promocode-btn" title="Редактировать">✏️</button>
+                <button class="toggle-active-btn" title="${promo.isActive ? 'Деактивировать' : 'Активировать'}">
+                    ${promo.isActive ? '✖' : '✓'}
+                </button>
                 <button class="delete-promocode-btn" title="Удалить">×</button>
-                <label class="active-toggle" title="${promo.isActive ? 'Деактивировать' : 'Активировать'}">
-                    <input type="checkbox" class="active-checkbox" ${promo.isActive ? 'checked' : ''}>
-                </label>
             </div>
         `;
         
-        elements.promocodesList.appendChild(card);
-    });
-    
-    setupPromocodeActions();
-}
-
-function setupPromocodeActions() {
-    // Копирование промокода
-    document.querySelectorAll('.copy-promocode-btn').forEach(btn => {
-        btn.addEventListener('click', function() {
-            const code = this.closest('.promocode-card').querySelector('.promocode-name').textContent;
-            navigator.clipboard.writeText(code)
-                .then(() => alert(`Промокод "${code}" скопирован!`))
+        // Обработчики действий
+        card.querySelector('.copy-promocode-btn').addEventListener('click', () => {
+            navigator.clipboard.writeText(promo.code)
+                .then(() => alert(`Промокод "${promo.code}" скопирован!`))
                 .catch(err => console.error('Ошибка копирования:', err));
         });
-    });
-    
-    // Переключение активности
-    document.querySelectorAll('.active-checkbox').forEach(checkbox => {
-        checkbox.addEventListener('change', function() {
-            const code = this.closest('.promocode-card').querySelector('.promocode-name').textContent;
-            const isActive = this.checked;
-            
-            db.ref(`promocodes/${code}/isActive`).set(isActive)
-                .then(() => {
-                    const card = this.closest('.promocode-card');
-                    card.classList.toggle('inactive', !isActive);
-                    card.querySelector('.promocode-status').textContent = isActive ? 'Активен' : 'Неактивен';
-                    this.parentNode.title = isActive ? 'Деактивировать' : 'Активировать';
-                })
-                .catch(error => {
-                    console.error("Ошибка обновления статуса:", error);
-                    this.checked = !this.checked;
-                    alert("Не удалось изменить статус промокода");
-                });
+        
+        card.querySelector('.toggle-active-btn').addEventListener('click', () => {
+            const newStatus = !promo.isActive;
+            db.ref(`promocodes/${promo.code}/isActive`).set(newStatus)
+                .then(() => loadPromocodesFromFirebase().then(renderPromocodesInterface))
+                .catch(error => console.error("Ошибка изменения статуса:", error));
         });
-    });
-    
-    // Удаление промокода
-    document.querySelectorAll('.delete-promocode-btn').forEach(btn => {
-        btn.addEventListener('click', function() {
-            const code = this.closest('.promocode-card').querySelector('.promocode-name').textContent;
-            if (confirm(`Удалить промокод "${code}"?`)) {
-                db.ref(`promocodes/${code}`).remove()
+        
+        card.querySelector('.delete-promocode-btn').addEventListener('click', () => {
+            if (confirm(`Удалить промокод "${promo.code}"?`)) {
+                db.ref(`promocodes/${promo.code}`).remove()
                     .then(() => loadPromocodesFromFirebase().then(renderPromocodesInterface))
-                    .catch(error => {
-                        console.error("Ошибка удаления:", error);
-                        alert("Не удалось удалить промокод");
-                    });
+                    .catch(error => console.error("Ошибка удаления:", error));
             }
         });
+        
+        elements.promocodesList.appendChild(card);
     });
 }
 
-// Инициализация при загрузке страницы
+// Инициализация
 if (window.location.pathname.includes('promocodes.html')) {
-    document.addEventListener('DOMContentLoaded', async () => {
-        try {
-            const { auth } = await import('/Cafe/js/firebase-config.js');
-            auth.onAuthStateChanged(user => {
-                if (user?.email === 'admin@dismail.com') {
-                    initPromocodes();
-                } else {
-                    window.location.href = '/Cafe/index.html';
-                }
-            });
-        } catch (error) {
-            console.error("Ошибка инициализации Firebase:", error);
-        }
+    document.addEventListener('DOMContentLoaded', () => {
+        auth.onAuthStateChanged(user => {
+            if (user?.email === 'admin@dismail.com') {
+                initPromocodes();
+            } else {
+                window.location.href = '/Cafe/index.html';
+            }
+        });
     });
 }
