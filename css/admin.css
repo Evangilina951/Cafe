@@ -583,31 +583,3 @@
     padding: 2px 0;
     font-size: 14px;
 }
-
-/* Стили для выпадающего списка блюд */
-#free-item {
-    height: auto;
-    max-height: 200px;
-    overflow-y: auto;
-    border: 1px solid #d7ccc8;
-    border-radius: 4px;
-    padding: 5px;
-}
-
-#free-item option {
-    padding: 8px;
-    margin: 2px 0;
-    border-bottom: 1px solid #eee;
-}
-
-#free-item option:hover {
-    background-color: #f5f5f5;
-}
-
-#item-search-input {
-    width: 100%;
-    padding: 8px;
-    margin-bottom: 10px;
-    border: 1px solid #d7ccc8;
-    border-radius: 4px;
-}
