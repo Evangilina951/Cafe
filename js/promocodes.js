@@ -128,6 +128,8 @@ async function loadMenuItems() {
         }
         resolve();
     });
+    console.log("Загружено блюд:", menuItems.length);
+    console.log("Пример блюда:", menuItems[0]); // Проверьте структуру данных
 }
 
 function setupEventListeners() {
@@ -197,6 +199,10 @@ function toggleDiscountFields() {
 
     const selectedType = document.querySelector('input[name="discount-type"]:checked').value;
     document.getElementById(`${selectedType}-fields`).classList.remove('hidden');
+
+        console.log("Активный тип скидки:", selectedType);
+        console.log("Видимость item-fields:", 
+        document.getElementById('item-fields').style.display);
 }
 
 function resetPromocodeForm() {
