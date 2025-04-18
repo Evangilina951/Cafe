@@ -193,16 +193,45 @@ function setupEventListeners() {
 }
 
 function toggleDiscountFields() {
-    document.querySelectorAll('.discount-field-group').forEach(group => {
-        group.classList.add('hidden');
-    });
-
-    const selectedType = document.querySelector('input[name="discount-type"]:checked').value;
-    document.getElementById(`${selectedType}-fields`).classList.remove('hidden');
-
-        console.log("Активный тип скидки:", selectedType);
-        console.log("Видимость item-fields:", 
-        document.getElementById('item-fields').style.display);
+    try {
+        const selectedType = document.querySelector('input[name="discount-type"]:checked').value;
+        console.log("[DEBUG] Выбран тип:", selectedType);
+        
+        // Список всех возможных групп
+        const allGroups = ['percent-fields', 'fixed-fields', 'item-fields'];
+        
+        // Сначала скрываем все
+        allGroups.forEach(groupId => {
+            const group = document.getElementById(groupId);
+            if (group) {
+                group.classList.add('hidden');
+                console.log(`[DEBUG] Скрыта группа: ${groupId}`);
+            }
+        });
+        
+        // Показываем только выбранную
+        const activeGroupId = `${selectedType}-fields`;
+        const activeGroup = document.getElementById(activeGroupId);
+        
+        if (activeGroup) {
+            activeGroup.classList.remove('hidden');
+            console.log(`[DEBUG] Показана группа: ${activeGroupId}`, {
+                classes: activeGroup.className,
+                computedStyle: window.getComputedStyle(activeGroup).display
+            });
+            
+            // Особое поведение для группы с блюдами
+            if (selectedType === 'item') {
+                loadMenuItems().then(() => {
+                    console.log("[DEBUG] Блюда загружены в select");
+                });
+            }
+        } else {
+            console.error(`[ERROR] Группа ${activeGroupId} не найдена`);
+        }
+    } catch (error) {
+        console.error("[ERROR] Ошибка в toggleDiscountFields:", error);
+    }
 }
 
 function resetPromocodeForm() {
