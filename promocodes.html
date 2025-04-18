@@ -56,14 +56,19 @@
                 </div>
             </div>
             
-            <div id="item-fields" class="discount-fields hidden">
-                <div class="form-group">
-                    <label>Выберите блюдо</label>
-                    <select id="free-item">
-                        <!-- Будет заполнено динамически -->
-                    </select>
-                </div>
+            <div id="item-fields" class="discount-field-group hidden">
+            <div class="form-group">
+                <label>Поиск блюда</label>
+                <input type="text" id="item-search-input" placeholder="Введите название блюда">
             </div>
+            <div class="form-group">
+                <label>Выберите блюдо</label>
+                <select id="free-item" size="5">
+                    <option value="">Выберите блюдо</option>
+                    <!-- Блюда будут загружены динамически -->
+                </select>
+            </div>
+        </div>
             
             <div class="form-group">
                 <label>Условия применения</label>
