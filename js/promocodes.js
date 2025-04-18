@@ -14,6 +14,7 @@ const elements = {
     discountPercent: document.getElementById('discount-percent'),
     discountFixed: document.getElementById('discount-fixed'),
     freeItemSelect: document.getElementById('free-item'),
+    itemSearchInput: document.getElementById('item-search-input'),
     minOrder: document.getElementById('min-order'),
     maxOrder: document.getElementById('max-order'),
     usageLimit: document.getElementById('usage-limit'),
@@ -54,28 +55,12 @@ export async function initPromocodes() {
     }
 
     try {
-        await loadMenuItems();
         await loadPromocodesFromFirebase();
         setupEventListeners();
         renderPromocodesInterface();
     } catch (error) {
         handleFirebaseError(error);
     }
-}
-
-async function loadMenuItems() {
-    return new Promise((resolve) => {
-        if (elements.freeItemSelect) {
-            elements.freeItemSelect.innerHTML = '';
-            menuItems.forEach(item => {
-                const option = document.createElement('option');
-                option.value = item.id;
-                option.textContent = item.name;
-                elements.freeItemSelect.appendChild(option);
-            });
-        }
-        resolve();
-    });
 }
 
 async function loadPromocodesFromFirebase() {
@@ -108,6 +93,43 @@ function handleFirebaseError(error) {
     }
 }
 
+async function loadMenuItems() {
+    return new Promise((resolve) => {
+        if (elements.freeItemSelect) {
+            elements.freeItemSelect.innerHTML = '<option value="">Выберите блюдо</option>';
+            
+            // Группировка по категориям
+            const categories = {};
+            menuItems
+                .filter(item => item.visible !== false)
+                .sort((a, b) => a.name.localeCompare(b.name))
+                .forEach(item => {
+                    if (!categories[item.category]) {
+                        categories[item.category] = [];
+                    }
+                    categories[item.category].push(item);
+                });
+
+            // Добавление в select с группами
+            Object.keys(categories).sort().forEach(category => {
+                const optgroup = document.createElement('optgroup');
+                optgroup.label = category;
+                
+                categories[category].forEach(item => {
+                    const option = document.createElement('option');
+                    option.value = item.id;
+                    option.textContent = `${item.name} (${item.price} ₽)`;
+                    option.setAttribute('data-search', `${item.name} ${item.category}`.toLowerCase());
+                    optgroup.appendChild(option);
+                });
+                
+                elements.freeItemSelect.appendChild(optgroup);
+            });
+        }
+        resolve();
+    });
+}
+
 function setupEventListeners() {
     // Кнопка "Назад"
     if (elements.backBtn) {
@@ -118,7 +140,8 @@ function setupEventListeners() {
 
     // Кнопка "Добавить промокод"
     if (elements.addPromocodeBtn) {
-        elements.addPromocodeBtn.addEventListener('click', () => {
+        elements.addPromocodeBtn.addEventListener('click', async () => {
+            await loadMenuItems();
             showElement(elements.addPromocodeForm);
             resetPromocodeForm();
         });
@@ -129,6 +152,18 @@ function setupEventListeners() {
         elements.discountTypePercent.addEventListener('change', toggleDiscountFields);
         elements.discountTypeFixed.addEventListener('change', toggleDiscountFields);
         elements.discountTypeItem.addEventListener('change', toggleDiscountFields);
+    }
+
+    // Поиск блюд
+    if (elements.itemSearchInput) {
+        elements.itemSearchInput.addEventListener('input', (e) => {
+            const searchText = e.target.value.toLowerCase();
+            Array.from(elements.freeItemSelect.options).forEach(option => {
+                if (option.value && option.getAttribute('data-search')) {
+                    option.style.display = option.getAttribute('data-search').includes(searchText) ? '' : 'none';
+                }
+            });
+        });
     }
 
     // Ограничения использования
@@ -169,6 +204,7 @@ function resetPromocodeForm() {
     if (elements.discountTypePercent) elements.discountTypePercent.checked = true;
     if (elements.discountPercent) elements.discountPercent.value = '';
     if (elements.discountFixed) elements.discountFixed.value = '';
+    if (elements.itemSearchInput) elements.itemSearchInput.value = '';
     if (elements.minOrder) elements.minOrder.value = '';
     if (elements.maxOrder) elements.maxOrder.value = '';
     if (elements.usageLimit) elements.usageLimit.value = 'unlimited';
@@ -218,7 +254,7 @@ function savePromocode() {
         case 'item':
             itemId = elements.freeItemSelect.value;
             if (!itemId) {
-                alert('Выберите блюдо для бесплатного предложения');
+                alert('Пожалуйста, выберите блюдо из списка');
                 return;
             }
             break;
@@ -297,7 +333,7 @@ function renderPromocodesInterface() {
                 break;
             case 'item':
                 const item = menuItems.find(i => i.id == promo.itemId);
-                discountInfo = item ? `Бесплатно: ${item.name}` : 'Бесплатное блюдо';
+                discountInfo = item ? `Бесплатно: ${item.name}` : '[Блюдо удалено]';
                 break;
         }
         
