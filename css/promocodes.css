@@ -30,6 +30,37 @@
     transition: all 0.3s ease;
 }
 
+/* Стили для выбора блюд */
+#item-fields {
+  transition: all 0.3s ease;
+}
+
+#free-item {
+  width: 100%;
+  padding: 8px;
+  border: 1px solid #ddd;
+  border-radius: 4px;
+  background: white;
+}
+
+#free-item optgroup {
+  font-weight: bold;
+  color: #6d341f;
+}
+
+#free-item option {
+  padding: 5px 10px;
+  border-bottom: 1px solid #eee;
+}
+
+#item-search-input {
+  width: 100%;
+  padding: 8px 12px;
+  margin-bottom: 10px;
+  border: 1px solid #ddd;
+  border-radius: 4px;
+}
+
 .promocode-card:hover {
     box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
 }
