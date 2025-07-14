@@ -1,3 +1,5 @@
+
+
 import { db, auth } from '/Cafe/js/firebase-config.js';
 import { menuItems } from '/Cafe/js/menu.js';
 
@@ -94,11 +96,19 @@ function handleFirebaseError(error) {
 }
 
 async function loadMenuItems() {
-    return new Promise((resolve) => {
+    try {
+        const snapshot = await db.ref('menuItems').once('value');
+        const menuItems = snapshot.val() ? Object.values(snapshot.val()) : [];
+        console.log("Загружено блюд:", menuItems.length);
+        if (menuItems.length > 0) {
+            console.log("Пример блюда:", menuItems[0]);
+        } else {
+            console.error("menuItems пуст");
+        }
+
         if (elements.freeItemSelect) {
             elements.freeItemSelect.innerHTML = '<option value="">Выберите блюдо</option>';
             
-            // Группировка по категориям
             const categories = {};
             menuItems
                 .filter(item => item.visible !== false)
@@ -110,7 +120,6 @@ async function loadMenuItems() {
                     categories[item.category].push(item);
                 });
 
-            // Добавление в select с группами
             Object.keys(categories).sort().forEach(category => {
                 const optgroup = document.createElement('optgroup');
                 optgroup.label = category;
@@ -126,21 +135,18 @@ async function loadMenuItems() {
                 elements.freeItemSelect.appendChild(optgroup);
             });
         }
-        resolve();
-    });
-    console.log("Загружено блюд:", menuItems.length);
-    console.log("Пример блюда:", menuItems[0]); // Проверьте структуру данных
+    } catch (error) {
+        console.error("Ошибка загрузки блюд:", error);
+    }
 }
 
 function setupEventListeners() {
-    // Кнопка "Назад"
     if (elements.backBtn) {
         elements.backBtn.addEventListener('click', () => {
             window.location.href = '/Cafe/index.html';
         });
     }
 
-    // Кнопка "Добавить промокод"
     if (elements.addPromocodeBtn) {
         elements.addPromocodeBtn.addEventListener('click', async () => {
             await loadMenuItems();
@@ -149,14 +155,12 @@ function setupEventListeners() {
         });
     }
 
-    // Переключение типа скидки
     if (elements.discountTypePercent && elements.discountTypeFixed && elements.discountTypeItem) {
-        elements.discountTypePercent.addEventListener('change', toggleDiscountFields);
+        elementsDiscountTypePercent.addEventListener('change', toggleDiscountFields);
         elements.discountTypeFixed.addEventListener('change', toggleDiscountFields);
         elements.discountTypeItem.addEventListener('change', toggleDiscountFields);
     }
 
-    // Поиск блюд
     if (elements.itemSearchInput) {
         elements.itemSearchInput.addEventListener('input', (e) => {
             const searchText = e.target.value.toLowerCase();
@@ -168,14 +172,12 @@ function setupEventListeners() {
         });
     }
 
-    // Ограничения использования
     if (elements.usageLimit) {
         elements.usageLimit.addEventListener('change', () => {
             elements.maxUses.classList.toggle('hidden', elements.usageLimit.value !== 'limited');
         });
     }
 
-    // Ограничение по времени
     if (elements.timeLimit) {
         elements.timeLimit.addEventListener('change', () => {
             elements.expiryDate.classList.toggle('hidden', elements.timeLimit.value !== 'limited');
@@ -186,27 +188,24 @@ function setupEventListeners() {
         });
     }
 
-    // Кнопка "Сохранить промокод"
     if (elements.savePromocodeBtn) {
         elements.savePromocodeBtn.addEventListener('click', savePromocode);
     }
 }
 
-function toggleDiscountFields() {
+async function toggleDiscountFields() {
     const selectedType = document.querySelector('input[name="discount-type"]:checked')?.value;
     if (!selectedType) {
         console.error("Тип скидки не выбран");
         return;
     }
 
-    // Все возможные группы полей
     const fieldGroups = {
         'percent': document.getElementById('percent-fields'),
         'fixed': document.getElementById('fixed-fields'),
         'item': document.getElementById('item-fields')
     };
 
-    // Скрываем все группы
     Object.values(fieldGroups).forEach(group => {
         if (group) {
             group.style.display = 'none';
@@ -214,15 +213,13 @@ function toggleDiscountFields() {
         }
     });
 
-    // Показываем активную группу
     const activeGroup = fieldGroups[selectedType];
     if (activeGroup) {
         activeGroup.style.display = 'block';
         activeGroup.classList.remove('hidden');
 
-        // Если выбрано "Бесплатное блюдо", загружаем список блюд
         if (selectedType === 'item') {
-            loadMenuItems();
+            await loadMenuItems();
         }
     } else {
         console.error(`Группа полей для типа "${selectedType}" не найдена`);
@@ -251,7 +248,6 @@ function resetPromocodeForm() {
 function savePromocode() {
     const code = elements.promocodeName.value.trim().toUpperCase();
     
-    // Валидация
     if (!code || !/^[A-Z0-9]{3,20}$/.test(code)) {
         alert('Название промокода должно содержать только латинские буквы и цифры (3-20 символов)');
         return;
@@ -277,7 +273,7 @@ function savePromocode() {
         case 'fixed':
             value = parseInt(elements.discountFixed.value);
             if (isNaN(value) || value <= 0) {
-                alert('Укажите корректную сумму скидки');
+                alert ادУкажите корректную сумму скидки');
                 return;
             }
             break;
@@ -326,7 +322,6 @@ function savePromocode() {
         created
     };
     
-    // Сохранение в Firebase
     db.ref(`promocodes/${code}`).set(promocodeData)
         .then(() => {
             alert('Промокод успешно сохранен!');
@@ -394,7 +389,6 @@ function renderPromocodesInterface() {
             </div>
         `;
         
-        // Обработчики действий
         card.querySelector('.copy-promocode-btn').addEventListener('click', () => {
             navigator.clipboard.writeText(promo.code)
                 .then(() => alert(`Промокод "${promo.code}" скопирован!`))
@@ -420,7 +414,6 @@ function renderPromocodesInterface() {
     });
 }
 
-// Инициализация
 if (window.location.pathname.includes('promocodes.html')) {
     document.addEventListener('DOMContentLoaded', () => {
         auth.onAuthStateChanged(user => {
