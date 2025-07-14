@@ -32,7 +32,15 @@
 
 /* Стили для выбора блюд */
 #item-fields {
-  transition: all 0.3s ease;
+    transition: all 0.3s ease; /* Плавное переключение */
+}
+
+#item-fields:not(.hidden) {
+    display: block !important; /* Явное отображение при отсутствии класса hidden */
+}
+
+.hidden {
+    display: none; /* Универсальный класс для скрытия элементов */
 }
 
 #free-item {
