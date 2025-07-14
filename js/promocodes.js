@@ -193,44 +193,39 @@ function setupEventListeners() {
 }
 
 function toggleDiscountFields() {
-    try {
-        const selectedType = document.querySelector('input[name="discount-type"]:checked').value;
-        console.log("[DEBUG] Выбран тип:", selectedType);
-        
-        // Список всех возможных групп
-        const allGroups = ['percent-fields', 'fixed-fields', 'item-fields'];
-        
-        // Сначала скрываем все
-        allGroups.forEach(groupId => {
-            const group = document.getElementById(groupId);
-            if (group) {
-                group.classList.add('hidden');
-                console.log(`[DEBUG] Скрыта группа: ${groupId}`);
-            }
-        });
-        
-        // Показываем только выбранную
-        const activeGroupId = `${selectedType}-fields`;
-        const activeGroup = document.getElementById(activeGroupId);
-        
-        if (activeGroup) {
-            activeGroup.classList.remove('hidden');
-            console.log(`[DEBUG] Показана группа: ${activeGroupId}`, {
-                classes: activeGroup.className,
-                computedStyle: window.getComputedStyle(activeGroup).display
-            });
-            
-            // Особое поведение для группы с блюдами
-            if (selectedType === 'item') {
-                loadMenuItems().then(() => {
-                    console.log("[DEBUG] Блюда загружены в select");
-                });
-            }
-        } else {
-            console.error(`[ERROR] Группа ${activeGroupId} не найдена`);
+    const selectedType = document.querySelector('input[name="discount-type"]:checked')?.value;
+    if (!selectedType) {
+        console.error("Тип скидки не выбран");
+        return;
+    }
+
+    // Все возможные группы полей
+    const fieldGroups = {
+        'percent': document.getElementById('percent-fields'),
+        'fixed': document.getElementById('fixed-fields'),
+        'item': document.getElementById('item-fields')
+    };
+
+    // Скрываем все группы
+    Object.values(fieldGroups).forEach(group => {
+        if (group) {
+            group.style.display = 'none';
+            group.classList.add('hidden');
         }
-    } catch (error) {
-        console.error("[ERROR] Ошибка в toggleDiscountFields:", error);
+    });
+
+    // Показываем активную группу
+    const activeGroup = fieldGroups[selectedType];
+    if (activeGroup) {
+        activeGroup.style.display = 'block';
+        activeGroup.classList.remove('hidden');
+
+        // Если выбрано "Бесплатное блюдо", загружаем список блюд
+        if (selectedType === 'item') {
+            loadMenuItems();
+        }
+    } else {
+        console.error(`Группа полей для типа "${selectedType}" не найдена`);
     }
 }
 
