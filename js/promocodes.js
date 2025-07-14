@@ -85,7 +85,7 @@ function handleFirebaseError(error) {
     
     switch (error.code) {
         case 'PERMISSION_DENIED':
-            alert("Ошибка доступа: недостат-    alert("Ошибка доступа: недостаточно прав");
+            alert("Ошибка доступа: недостаточно прав");
             window.location.href = '/Cafe/index.html';
             break;
         case 'NETWORK_ERROR':
