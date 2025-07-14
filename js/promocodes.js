@@ -1,7 +1,7 @@
 import { db, auth } from '/Cafe/js/firebase-config.js';
 
-// Глобальная переменная для menuItems
-let menuItems = [];
+// Глобальная переменная для хранения загруженных блюд
+let loadedMenuItems = [];
 
 // DOM элементы
 const elements = {
@@ -57,7 +57,7 @@ export async function initPromocodes() {
     }
 
     try {
-        await loadMenuItems(); // Загружаем блюда при инициализации
+        await loadMenuItems(); // Загружаем блюда один раз при инициализации
         await loadPromocodesFromFirebase();
         setupEventListeners();
         renderPromocodesInterface();
@@ -85,7 +85,7 @@ function handleFirebaseError(error) {
     
     switch (error.code) {
         case 'PERMISSION_DENIED':
-            alert("Ошибка доступа: недостаточно прав");
+            alert("Ошибка доступа: недостат-    alert("Ошибка доступа: недостаточно прав");
             window.location.href = '/Cafe/index.html';
             break;
         case 'NETWORK_ERROR':
@@ -98,45 +98,13 @@ function handleFirebaseError(error) {
 
 async function loadMenuItems() {
     try {
-        const snapshot = await db.ref('menuItems').once('value');
-        menuItems = snapshot.val() ? Object.values(snapshot.val()) : [];
-        console.log("Загружено блюд:", menuItems.length);
-        if (menuItems.length > 0) {
-            console.log("Пример блюда:", menuItems[0]);
+        const snapshot = await db.ref('menu/items').once('value');
+        loadedMenuItems = snapshot.val() ? Object.values(snapshot.val()) : [];
+        console.log("Загружено блюд:", loadedMenuItems.length);
+        if (loadedMenuItems.length > 0) {
+            console.log("Пример блюда:", loadedMenuItems[0]);
         } else {
-            console.error("menuItems пуст");
-        }
-
-        if (elements.freeItemSelect) {
-            elements.freeItemSelect.innerHTML = '<option value="">Выберите блюдо</option>';
-            
-            const categories = {};
-            menuItems
-                .filter(item => item.visible !== false)
-                .sort((a, b) => a.name.localeCompare(b.name))
-                .forEach(item => {
-                    if (!categories[item.category]) {
-                        categories[item.category] = [];
-                    }
-                    categories[item.category].push(item);
-                });
-
-            Object.keys(categories).sort().forEach(category => {
-                const optgroup = document.createElement('optgroup');
-                optgroup.label = category;
-                
-                categories[category].forEach(item => {
-                    const option = document.createElement('option');
-                    option.value = item.id;
-                    option.textContent = `${item.name} (${item.price} ₽)`;
-                    option.setAttribute('data-search', `${item.name} ${item.category}`.toLowerCase());
-                    optgroup.appendChild(option);
-                });
-                
-                elements.freeItemSelect.appendChild(optgroup);
-            });
-        } else {
-            console.error("Элемент freeItemSelect не найден");
+            console.error("menu/items пуст");
         }
     } catch (error) {
         console.error("Ошибка загрузки блюд:", error);
@@ -151,7 +119,7 @@ function setupEventListeners() {
     }
 
     if (elements.addPromocodeBtn) {
-        elements.addPromocodeBtn.addEventListener('click', async () => {
+        elements.addPromocodeBtn.addEventListener('click', () => {
             showElement(elements.addPromocodeForm);
             resetPromocodeForm();
         });
@@ -219,8 +187,44 @@ async function toggleDiscountFields() {
     if (activeGroup) {
         activeGroup.style.display = 'block';
         activeGroup.classList.remove('hidden');
+
+        if (selectedType === 'item') {
+            populateFreeItemSelect();
+        }
     } else {
         console.error(`Группа полей для типа "${selectedType}" не найдена`);
+    }
+}
+
+function populateFreeItemSelect() {
+    if (elements.freeItemSelect) {
+        elements.freeItemSelect.innerHTML = '<option value="">Выберите блюдо</option>';
+        
+        const categories = {};
+        loadedMenuItems
+            .filter(item => item.visible !== false)
+            .sort((a, b) => a.name.localeCompare(b.name))
+            .forEach(item => {
+                if (!categories[item.category]) {
+                    categories[item.category] = [];
+                }
+                categories[item.category].push(item);
+            });
+
+        Object.keys(categories).sort().forEach(category => {
+            const optgroup = document.createElement('optgroup');
+            optgroup.label = category;
+            
+            categories[category].forEach(item => {
+                const option = document.createElement('option');
+                option.value = item.id;
+                option.textContent = `${item.name} (${item.price} ₽)`;
+                option.setAttribute('data-search', `${item.name} ${item.category}`.toLowerCase());
+                optgroup.appendChild(option);
+            });
+            
+            elements.freeItemSelect.appendChild(optgroup);
+        });
     }
 }
 
@@ -355,7 +359,7 @@ function renderPromocodesInterface() {
                 discountInfo = `Скидка ${promo.value} руб`;
                 break;
             case 'item':
-                const item = menuItems.find(i => i.id == promo.itemId);
+                const item = loadedMenuItems.find(i => i.id === promo.itemId);
                 discountInfo = item ? `Бесплатно: ${item.name}` : '[Блюдо удалено]';
                 break;
         }
