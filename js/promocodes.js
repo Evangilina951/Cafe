@@ -1,5 +1,7 @@
 import { db, auth } from '/Cafe/js/firebase-config.js';
-import { menuItems } from '/Cafe/js/menu.js';
+
+// Глобальная переменная для menuItems
+let menuItems = [];
 
 // DOM элементы
 const elements = {
@@ -55,6 +57,7 @@ export async function initPromocodes() {
     }
 
     try {
+        await loadMenuItems(); // Загружаем блюда при инициализации
         await loadPromocodesFromFirebase();
         setupEventListeners();
         renderPromocodesInterface();
@@ -96,7 +99,7 @@ function handleFirebaseError(error) {
 async function loadMenuItems() {
     try {
         const snapshot = await db.ref('menuItems').once('value');
-        const menuItems = snapshot.val() ? Object.values(snapshot.val()) : [];
+        menuItems = snapshot.val() ? Object.values(snapshot.val()) : [];
         console.log("Загружено блюд:", menuItems.length);
         if (menuItems.length > 0) {
             console.log("Пример блюда:", menuItems[0]);
@@ -132,6 +135,8 @@ async function loadMenuItems() {
                 
                 elements.freeItemSelect.appendChild(optgroup);
             });
+        } else {
+            console.error("Элемент freeItemSelect не найден");
         }
     } catch (error) {
         console.error("Ошибка загрузки блюд:", error);
@@ -147,7 +152,6 @@ function setupEventListeners() {
 
     if (elements.addPromocodeBtn) {
         elements.addPromocodeBtn.addEventListener('click', async () => {
-            await loadMenuItems();
             showElement(elements.addPromocodeForm);
             resetPromocodeForm();
         });
@@ -215,10 +219,6 @@ async function toggleDiscountFields() {
     if (activeGroup) {
         activeGroup.style.display = 'block';
         activeGroup.classList.remove('hidden');
-
-        if (selectedType === 'item') {
-            await loadMenuItems();
-        }
     } else {
         console.error(`Группа полей для типа "${selectedType}" не найдена`);
     }
