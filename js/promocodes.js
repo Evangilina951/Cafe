@@ -1,5 +1,3 @@
-
-
 import { db, auth } from '/Cafe/js/firebase-config.js';
 import { menuItems } from '/Cafe/js/menu.js';
 
@@ -156,7 +154,7 @@ function setupEventListeners() {
     }
 
     if (elements.discountTypePercent && elements.discountTypeFixed && elements.discountTypeItem) {
-        elementsDiscountTypePercent.addEventListener('change', toggleDiscountFields);
+        elements.discountTypePercent.addEventListener('change', toggleDiscountFields);
         elements.discountTypeFixed.addEventListener('change', toggleDiscountFields);
         elements.discountTypeItem.addEventListener('change', toggleDiscountFields);
     }
@@ -273,7 +271,7 @@ function savePromocode() {
         case 'fixed':
             value = parseInt(elements.discountFixed.value);
             if (isNaN(value) || value <= 0) {
-                alert ادУкажите корректную сумму скидки');
+                alert('Укажите корректную сумму скидки');
                 return;
             }
             break;
